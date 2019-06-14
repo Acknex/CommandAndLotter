@@ -5,5 +5,5 @@
 
 function main()
 {
-	error("Hello, World!");
+
 }
