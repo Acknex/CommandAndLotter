@@ -24,5 +24,19 @@ include(AckCon19.pri)
 INCLUDEPATH = $$quote($$ACKNEX_INSTALL_PATH/include)
 DEPENDPATH = $$quote($$ACKNEX_INSTALL_PATH/include)
 
+INCLUDEPATH += $$pwd/src
+DEPENDPATH += $$pwd/src
+
 SOURCES += \
-  main.c
+  main.c \
+  src/credits.c \
+  src/framework.c \
+  src/game.c \
+  src/mainmenu.c
+
+HEADERS += \
+  src/credits.h \
+  src/framework.h \
+  src/game.h \
+  src/global.h \
+  src/mainmenu.h
