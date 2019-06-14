@@ -36,6 +36,15 @@ set(ACK19_HEADERS
 	src/mainmenu.h
 )
 
+file(GLOB_RECURSE ACK19_SOURCES
+ "${CMAKE_SOURCE_DIR}/*.c"
+ "${CMAKE_SOURCE_DIR}/src/*.c"
+ )
+
+file(GLOB_RECURSE ACK19_HEADERS
+ "${CMAKE_SOURCE_DIR}/src/*.h"
+ )
+
 add_executable(Ack19 "${ACK19_SOURCES}" "${ACK19_HEADERS}")
 
 set(CURRENT_GAME_CMAKE_DIR ${CMAKE_CURRENT_LIST_DIR})
