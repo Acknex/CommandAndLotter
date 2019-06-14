@@ -24,5 +24,13 @@ include(AckCon19.pri)
 INCLUDEPATH = $$quote($$ACKNEX_INSTALL_PATH/include)
 DEPENDPATH = $$quote($$ACKNEX_INSTALL_PATH/include)
 
+INCLUDEPATH += $$pwd/src
+DEPENDPATH += $$pwd/src
+
 SOURCES += \
-  main.c
+  main.c \
+  src/framework.c
+
+HEADERS += \
+  src/framework.h \
+  src/global.h
