@@ -1,6 +1,8 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
+#include <acknex.h>
+
 // boolstuff!
 typedef int bool;
 #define true  1

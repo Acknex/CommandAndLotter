@@ -1,5 +1,7 @@
 #include "framework.h"
 #include "global.h"
+#include "mainmenu.h"
+#include "game.h"
 
 #include <acknex.h>
 #include <windows.h>
@@ -7,12 +9,8 @@
 #define FRAMEWORK_STATE_SHUTDOWN    -1
 #define FRAMEWORK_STATE_STARTUP      0
 #define FRAMEWORK_STATE_MAINMENU     1
-#define FRAMEWORK_STATE_CREDITS      2
-#define FRAMEWORK_STATE_LOAD         3
-#define FRAMEWORK_STATE_GAME         4
-#define FRAMEWORK_STATE_SPLASHSCREEN 5
-#define FRAMEWORK_STATE_UNLOAD       6
-#define FRAMEWORK_STATE_INTRO        7
+#define FRAMEWORK_STATE_GAME         2
+#define FRAMEWORK_STATE_CREDITS      3
 
 typedef struct
 {
@@ -134,16 +132,9 @@ void framework_update()
         framework_transfer(FRAMEWORK_STATE_SHUTDOWN);
 #endif
 
-#ifndef DEBUG_NO_CAPTURE
-//    if(window_focus && framework_mousemode == MOUSEMODE_GAME)
-//        framework_capture_mouse();
-#endif
-
 #ifdef DEBUG_NO_ESCAPE_QUIT
     on_esc = NULL;
 #endif
-
-    // input_update();
 
     switch(framework.state)
     {
@@ -151,62 +142,40 @@ void framework_update()
         if(framework.frameCounter == 1)
         {
             // spiel im ersten frame initialisieren
-            // input_init();
-
-//            splashscreen_init();
-//            mainmenu_init();
-//            music_init();
-//            game_init();
-//            credits_init();
-//            hud_init();
-//            options_init();
-//            cheats_init();
-
-//            // TODO: Fix relative link?
-//            music_start("Media/intro.mp3", 0.2, false);
-
+						mainmenu_init();
+						game_init();
 #ifdef DEBUG_FRAMEWORK_FASTSTART
             if(settings.skipIntro)
                 framework_transfer(FRAMEWORK_STATE_LOAD);
             else
                 framework_transfer(FRAMEWORK_STATE_INTRO);
 #else
-            framework_transfer(FRAMEWORK_STATE_SPLASHSCREEN);
+            framework_transfer(FRAMEWORK_STATE_MAINMENU);
 #endif
         }
         break;
 
-    case FRAMEWORK_STATE_SPLASHSCREEN:
-        // splashscreen_update();
-        // if(splashscreen_is_done())
-        //     framework_transfer(FRAMEWORK_STATE_MAINMENU);
-        break;
-
     case FRAMEWORK_STATE_MAINMENU:
     {
-        // hud_hide(); //evil hack
-        // mainmenu_update();
-//        int response = mainmenu_get_response();
-//        if(response != MAINMENU_RESPONSE_STILLACTIVE)
-//        {
-//            switch(response)
-//            {
-//            case MAINMENU_RESPONSE_START:
-//                if(settings.skipIntro)
-//                    framework_transfer(FRAMEWORK_STATE_LOAD);
-//                else
-//                    framework_transfer(FRAMEWORK_STATE_INTRO);
-//                break;
-//            case MAINMENU_RESPONSE_CREDITS:
-//                framework_transfer(FRAMEWORK_STATE_CREDITS);
-//                break;
-//            case MAINMENU_RESPONSE_EXIT:
-//                framework_transfer(FRAMEWORK_STATE_SHUTDOWN);
-//                break;
-//            default:
-//                error("framework: unknown response from main menu.");
-//            }
-//        }
+        mainmenu_update();
+        int response = mainmenu_get_response();
+        if(response != MAINMENU_RESPONSE_KEEP)
+        {
+            switch(response)
+            {
+            case MAINMENU_RESPONSE_STARTGAME:
+								framework_transfer(FRAMEWORK_STATE_GAME);
+                break;
+            case MAINMENU_RESPONSE_CREDIT:
+                framework_transfer(FRAMEWORK_STATE_CREDITS);
+                break;
+            case MAINMENU_RESPONSE_EXIT:
+                framework_transfer(FRAMEWORK_STATE_SHUTDOWN);
+                break;
+            default:
+                error("framework: unknown response from main menu.");
+            }
+        }
         break;
     }
 
@@ -216,67 +185,10 @@ void framework_update()
 //            framework_transfer(FRAMEWORK_STATE_MAINMENU);
         break;
 
-    case FRAMEWORK_STATE_LOAD:
-//        if(framework.loaderState == 3)
-//        {
-#ifdef DEBUG_LEVEL
-            level_load(DEBUG_LEVEL);
-#else
-            // level_load(LEVEL_FILE);
-#endif
-			// fog_color = 1;
-			// camera.fog_end = 6000.0;
-
-			// meshFunDo();
-			// levelsky = ent_createlayer("sky_1+6.png", SHOW|CUBE|SKY, 100);
-			// bmap_to_cubemap(ent_getskin(levelsky, 0));
-
-//        }
-
-//        if(framework.loaderState == 6)
-//        {
-//            // game_open();
-//        }
-
-//        if(framework.loaderState == 9)
-//        {
-//            // journals_play(49, JOURNAL_LEVEL_STORY);
-//        }
-
-//        if(framework_intro_sequence_complete)
-//        {
-//            framework_load_screen->alpha -= FRAMEWORK_ALPHA_BLENDSPEED * time_step;
-//            if(framework_load_screen->alpha <= 0)
-//            {
-//                framework_load_screen->alpha = 0;
-//                framework_transfer(FRAMEWORK_STATE_GAME);
-//            }
-//        }
-//        framework.loaderState += 1;
-        break;
-
     case FRAMEWORK_STATE_GAME:
-        // game_update();
-        // if(game_is_done())
-        //     framework_transfer(FRAMEWORK_STATE_UNLOAD);
-        break;
-    case FRAMEWORK_STATE_UNLOAD:
-				// ptr_remove(levelsky);
-        // level_load(NULL);
-
-//        if(game_is_won()) // when game was won, roll the credits!
-//            framework_transfer(FRAMEWORK_STATE_CREDITS);
-//        else
-//            framework_transfer(FRAMEWORK_STATE_MAINMENU);
-        break;
-
-    case FRAMEWORK_STATE_UNLOAD:
-        break;
-
-    case FRAMEWORK_STATE_INTRO:
-        // intro_update();
-//        if(intro_is_done())
-//            framework_transfer(FRAMEWORK_STATE_LOAD);
+        game_update();
+        if(game_is_done())
+					framework_transfer(FRAMEWORK_STATE_MAINMENU);
         break;
 
     default:
@@ -297,31 +209,16 @@ void framework_update()
         case FRAMEWORK_STATE_STARTUP:
             break;
 
-        case FRAMEWORK_STATE_SPLASHSCREEN:
-            // splashscreen_close();
-            break;
-
         case FRAMEWORK_STATE_MAINMENU:
-            // mainmenu_close();
+            mainmenu_close();
             break;
 
         case FRAMEWORK_STATE_CREDITS:
             // credits_close();
             break;
 
-        case FRAMEWORK_STATE_LOAD:
-            // reset(framework_load_screen, SHOW);
-            break;
-
         case FRAMEWORK_STATE_GAME:
-            // game_close();
-            break;
-
-        case FRAMEWORK_STATE_UNLOAD:
-            break;
-
-        case FRAMEWORK_STATE_INTRO:
-            // intro_close();
+            game_close();
             break;
 
         default:
@@ -339,13 +236,8 @@ void framework_update()
             error("framework: startup state should never be entered again!");
             break;
 
-        case FRAMEWORK_STATE_SPLASHSCREEN:
-            //splashscreen_open();
-            break;
-
         case FRAMEWORK_STATE_MAINMENU:
-//            framework_set_mousemode(MOUSEMODE_UI);
-//            mainmenu_open();
+						mainmenu_open();
             break;
 
         case FRAMEWORK_STATE_CREDITS:
@@ -353,26 +245,10 @@ void framework_update()
 //            credits_open();
             break;
 
-        case FRAMEWORK_STATE_LOAD:
-//            framework_set_mousemode(MOUSEMODE_GAME);
-//            music_start("Media/background.mp3", 3, true);
-//            framework.loaderState = 0;
-//            set(framework_load_screen, SHOW);
-//            framework_load_screen->alpha = 100;
-
-
-            break;
-
         case FRAMEWORK_STATE_GAME:
             // game was already openend
-            // by LOAD state
-            break;
-
-        case FRAMEWORK_STATE_UNLOAD:
-            break;
-
-        case FRAMEWORK_STATE_INTRO:
-
+            // by LOAD stateg
+						game_open();
             break;
 
         default:

@@ -29,8 +29,12 @@ DEPENDPATH += $$pwd/src
 
 SOURCES += \
   main.c \
-  src/framework.c
+  src/framework.c \
+  src/game.c \
+  src/mainmenu.c
 
 HEADERS += \
   src/framework.h \
-  src/global.h
+  src/game.h \
+  src/global.h \
+  src/mainmenu.h
