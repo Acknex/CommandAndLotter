@@ -1,3 +1,4 @@
+#include <acknex.h>
 #define PRAGMA_PATH "src"
 
 #define wait _ich_bin_verboten_
@@ -22,5 +23,6 @@ function main()
 #include "mainmenu.c"
 #include "credits.c"
 #include "music_player.c"
-
+#include "sputnik.c"
+#include "enemy_hit.c"
 
