@@ -1,4 +1,11 @@
+#include <acknex.h>
 #define PRAGMA_PATH "src"
+
+#define DEBUG
+
+#ifdef DEBUG
+#include <default.c>
+#endif
 
 #define wait _ich_bin_verboten_
 #undef wait_for
@@ -7,6 +14,7 @@
 #include "framework.h"
 
 #define PRAGMA_PATH "ui"
+#define PRAGMA_PATH "map"
 
 function main()
 {
@@ -23,5 +31,6 @@ function main()
 #include "credits.c"
 #include "music_player.c"
 #include "ui_game.c"
-
-
+#include "map_loader.c"
+#include "sputnik.c"
+#include "enemy_hit.c"

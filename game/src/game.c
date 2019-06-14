@@ -1,5 +1,7 @@
 #include "game.h"
+#include "map_loader.h"
 #include "ui_game.h"
+#include "framework.h"
 #include <acknex.h>
 
 void game_init(void)
@@ -9,6 +11,10 @@ void game_init(void)
 
 void game_open(void)
 {
+	framework_load_level(NULL);
+
+	maploader_load("the-core.png");
+
 	ui_game_open();
 }
 
