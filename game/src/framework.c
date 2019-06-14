@@ -2,6 +2,8 @@
 #include "global.h"
 #include "mainmenu.h"
 #include "game.h"
+#include "credits.h"
+#include "music_player.h"
 
 #include <acknex.h>
 #include <windows.h>
@@ -142,8 +144,10 @@ void framework_update()
         if(framework.frameCounter == 1)
         {
             // spiel im ersten frame initialisieren
+						music_init();
 						mainmenu_init();
 						game_init();
+						credits_init();
 #ifdef DEBUG_FRAMEWORK_FASTSTART
             if(settings.skipIntro)
                 framework_transfer(FRAMEWORK_STATE_LOAD);
@@ -180,9 +184,9 @@ void framework_update()
     }
 
     case FRAMEWORK_STATE_CREDITS:
-//        credits_update();
-//        if(credits_isdone())
-//            framework_transfer(FRAMEWORK_STATE_MAINMENU);
+        credits_update();
+        if(credits_isdone())
+            framework_transfer(FRAMEWORK_STATE_MAINMENU);
         break;
 
     case FRAMEWORK_STATE_GAME:
@@ -214,7 +218,7 @@ void framework_update()
             break;
 
         case FRAMEWORK_STATE_CREDITS:
-            // credits_close();
+            credits_close();
             break;
 
         case FRAMEWORK_STATE_GAME:
@@ -241,8 +245,7 @@ void framework_update()
             break;
 
         case FRAMEWORK_STATE_CREDITS:
-//            framework_set_mousemode(MOUSEMODE_GAME);
-//            credits_open();
+            credits_open();
             break;
 
         case FRAMEWORK_STATE_GAME:

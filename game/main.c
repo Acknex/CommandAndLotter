@@ -6,6 +6,8 @@
 
 #include "src/framework.h"
 
+#define PRAGMA_PATH "ui"
+
 function main()
 {
 	framework_init();
@@ -18,5 +20,7 @@ function main()
 #include "src/framework.c"
 #include "src/game.c"
 #include "src/mainmenu.c"
+#include "src/credits.c"
+#include "src/music_player.c"
 
 
