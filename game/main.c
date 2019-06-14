@@ -19,6 +19,7 @@
 
 function main()
 {
+    def_move();
 	framework_init();
 }
 
