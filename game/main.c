@@ -4,7 +4,7 @@
 #undef wait_for
 #undef wait_for_my
 
-#include "src/framework.h"
+#include "framework.h"
 
 #define PRAGMA_PATH "ui"
 
@@ -17,10 +17,10 @@ function main()
 
 
 // Include your code file here
-#include "src/framework.c"
-#include "src/game.c"
-#include "src/mainmenu.c"
-#include "src/credits.c"
-#include "src/music_player.c"
+#include "framework.c"
+#include "game.c"
+#include "mainmenu.c"
+#include "credits.c"
+#include "music_player.c"
 
 
