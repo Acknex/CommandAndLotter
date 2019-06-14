@@ -1,1 +1,3 @@
 *.pro.user
+/build
+/game/CMakeLists.txt.user
