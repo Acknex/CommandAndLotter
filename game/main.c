@@ -22,5 +22,6 @@ function main()
 #include "mainmenu.c"
 #include "credits.c"
 #include "music_player.c"
+#include "ui_game.c"
 
 
