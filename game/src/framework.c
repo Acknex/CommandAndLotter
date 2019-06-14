@@ -271,3 +271,9 @@ void framework_update()
     framework.frameCounter += 1;
 }
 
+
+void framework_load_level(const char * msg)
+{
+	player = NULL;
+	level_load(NULL);
+}

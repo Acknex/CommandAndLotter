@@ -8,6 +8,7 @@
 #define MAPLOADER_TILE_WATER   2
 #define MAPLOADER_TILE_LAVA    3
 #define MAPLOADER_TILE_BARRIER 4
+#define MAPLOADER_TILE_STREET  5
 
 void maploader_init(void);
 

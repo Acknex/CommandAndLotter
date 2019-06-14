@@ -11,6 +11,7 @@ struct maploader_t
 {
 	int w, h;
 	maploader_cell * cells;
+	ENTITY * terrain;
 };
 
 struct maploader_t maploader;
@@ -22,8 +23,10 @@ void maploader_init()
 
 int maploader_grey_to_type(int gray)
 {
-	if(gray < 0x20)
+	if(gray < 0x10)
 		return MAPLOADER_TILE_BARRIER;
+	if(gray < 0x30)
+		return MAPLOADER_TILE_STREET;
 	else if(gray <= 0x60)
 		return MAPLOADER_TILE_WATER;
 	else if(gray <= 0xA0)
@@ -66,7 +69,50 @@ void maploader_load(char const * fileName)
 	}
 
 	bmap_unlock(bmp);
-	bmap_remove(bmp);
+	// bmap_remove(bmp);
+
+	int cellsize = 3;
+	var trisize = 32;
+
+	int size_x = cellsize * maploader.w + cellsize - 1;
+	int size_y = cellsize * maploader.h + cellsize - 1;
+
+	maploader.terrain = ent_createterrain(
+		bmp,
+		vector(0, 0, 0),
+		size_x,
+		size_y,
+		trisize
+	);
+
+	int i;
+	int cnt = ent_status(maploader.terrain, 1);
+	for(i = 1; i <= cnt; i++)
+	{
+		CONTACT c;
+		ent_getvertex(maploader.terrain, &c, i);
+
+		x = (c.x + maploader.terrain->x + trisize * size_x / 2) / (trisize * cellsize);
+		y = (c.y + maploader.terrain->y + trisize * size_y / 2) / (trisize * cellsize);
+
+//		diag("x=");
+//		diag(str_for_int(NULL, x));
+//		diag(" y=");
+//		diag(str_for_int(NULL, y));
+//		diag("\n");
+
+		if(x <= 0) x = 0;
+		if(y <= 0) y = 0;
+		if(x >= maploader.w) x = maploader.w - 1;
+		if(y >= maploader.h) y = maploader.h - 1;
+
+		c.v->y = maploader_tile_height(x, y);
+
+		c.v->u1 = (float)x / (float)maploader.w;
+		c.v->v1 = (float)y / (float)maploader.h;
+
+		ent_setvertex(maploader.terrain, &c, i);
+	}
 }
 
 bool maploader_has_map()
