@@ -7,6 +7,7 @@
 #include "src/framework.h"
 
 #define PRAGMA_PATH "ui"
+#define PRAGMA_PATH "map"
 
 function main()
 {
@@ -22,5 +23,5 @@ function main()
 #include "src/mainmenu.c"
 #include "src/credits.c"
 #include "src/music_player.c"
-
+#include "src/map_loader.c"
 
