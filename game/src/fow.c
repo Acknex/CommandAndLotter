@@ -26,8 +26,8 @@ void Fog(PARTICLE *p)
 void FogOfWarTest()
 {
     var x, y;
-    for(x = -1000; x < 1000; x+=50){
-        for(y = -1000; y < 10000; y+=50){
+    for(x = -1000; x < 1000; x+=100){
+        for(y = -1000; y < 10000; y+=100){
             effect(Fog, 1, vector(x,y,500), nullvector);
         }
     }
@@ -36,7 +36,9 @@ void FogOfWarTest()
 
 void fow_open()
 {
-    FogOfWarTest();
+    if(key_f){
+        FogOfWarTest();
+    }
 }
 
 
