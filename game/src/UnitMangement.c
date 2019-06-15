@@ -142,7 +142,6 @@ void UnitMangement_open(){
     }
     vec_set(camera.x, vector(-800,-1064,1000));
     vec_set(camera.pan, vector(0,-32,0));
-
 }
 
 
@@ -266,7 +265,8 @@ function SetDestForSelectd(VECTOR * Dest)
     ENTITY * ent;
     SUBSYSTEM_LOOP(ent, SUBSYSTEM_UNIT_MANAGEMENT){
         if(ent.SELCTED_SKILL){
-            vec_set(ent.UNIT_DEST_SKILL,Dest);
+				unit_setTarget(ent, Dest);
+            //vec_set(ent.UNIT_DEST_SKILL,Dest);
         }
     }
 }

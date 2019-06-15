@@ -155,11 +155,16 @@
 
 	VECTOR* mapGetVectorFromTile(MAP* map, VECTOR* v, TILE* tile);
 
-	VECTOR* mapGetVector2DFromVector3D(MAP* map, VECTOR* v, VECTOR* v2d);
+	VECTOR* mapGetVector2DFromVector3D(MAP* map, VECTOR* v2d, VECTOR* v3d);
+	VECTOR* mapGetVector3DFromVector2D(MAP* map, VECTOR* v3d, VECTOR* v2d);
+
+	void unitSetTargetFromVector2D(MAP* map, UNIT* unit, VECTOR *vTarget);
 
 	TILE* mapGetTileFromVector(MAP* map, VECTOR* v);
 
 	BMAP* mapGetBitmap(MAP* map);
+
+	void jpsGameUpdate(MAP* map);
 
 	/////////////////////////////////////////////////
 	// more available functions
@@ -225,7 +230,6 @@
 
 	void mapMoveUnits(MAP* map);
 
-	void gameUpdate(MAP* map);
 
 	void unitInitializeFromPreset(UNIT *unit, int presetID);
 
