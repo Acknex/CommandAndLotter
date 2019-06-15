@@ -11,6 +11,7 @@ var CamFPS;
 #include "framework.h"
 #include "map_loader.h"
 #include "camera.h"
+#include "global.h"
 
 #ifdef DebugMode
     var test1; //für debugzwecke
@@ -123,7 +124,7 @@ function DbgToggleDebugpanel()
 
 void UnitMangement_init(){
     #ifdef DebugMode
-        on_f11 = DbgToggleDebugpanel;
+        on_f12 = DbgToggleDebugpanel;
     #endif
 }
 
@@ -134,15 +135,12 @@ void UnitMangement_init(){
 void UnitMangement_open(){
 
     var x, y;
-    for(x = -1500; x < -500; x+=100){
-        for(y = -1500; y < -500; y+=100){
+    for(x = -1500; x < 1500; x+=300){
+        for(y = -1500; y < 1500; y+=300){
 
             var z = maploader_get_height(vector(x,y,0));
-            you = ent_create("sputnik.mdl",vector(x,y,z),NULL);
+            you = ent_create("sputnik.mdl",vector(x,y,z+90),NULL);
             you.ambient = 0;
-            if(you.y == 0){
-                you.ambient = 200;
-            }
             framework_setup(you, SUBSYSTEM_UNIT_MANAGEMENT);
         }
     }
@@ -164,6 +162,9 @@ function PosToMap(VECTOR * vec, var x, var y)
     if(vec_for_screen(temp,camera) != 0)
     {
         VECTOR * p = maploader_trace(camera.x, temp.x);
+        if(p == 0){
+            error("p ist null");
+        }
         vec_set(vec,p);
     }
 }
@@ -173,17 +174,21 @@ function CheckIsLeftFrom(VECTOR* Base, VECTOR* V1, VECTOR * V2)
     VECTOR Line1;
     VECTOR Line2;
     VECTOR Cross;
-
-    Base.z = V1.z = V2.z;
-
     vec_diff(Line1,Base, V1);
     vec_diff(Line2,Base, V2);
+
+
+
+    vec_normalize (Line1, 1);
+    vec_normalize (Line2, 1);
+
     vec_cross(Cross, Line1, Line2);
     if(Cross.z < 0){
         return 1;
     }
 }
 
+#define SEL_AMBIENT 255
 
 function DeselectUnit(ENTITY * ent)
 {
@@ -194,7 +199,7 @@ function DeselectUnit(ENTITY * ent)
 function SelectUnit(ENTITY * ent)
 {
     ent.SELCTED_SKILL = 1;
-    ent.ambient = 255;
+    ent.ambient = SEL_AMBIENT;
 }
 
 function SetUnitSelcted(ENTITY* ent, var isSelected)
@@ -206,9 +211,7 @@ function SetUnitSelcted(ENTITY* ent, var isSelected)
     }
 }
 
-
-
-function SelectEntitys()
+function MarkUnits()
 {
     VECTOR Posis[4];
 
@@ -217,27 +220,40 @@ function SelectEntitys()
     PosToMap(Posis[2], minv(ClickPoint2D_A[0],ClickPoint2D_B[0]), maxv(ClickPoint2D_A[1],ClickPoint2D_B[1]));
     PosToMap(Posis[3], minv(ClickPoint2D_A[0],ClickPoint2D_B[0]), minv(ClickPoint2D_A[1],ClickPoint2D_B[1]));
 
+    var i;
     ENTITY * ent;
+
     SUBSYSTEM_LOOP(ent, SUBSYSTEM_UNIT_MANAGEMENT){
 
-        int i;
         var isInside = 1;
         for(i = 0; i < 4 && isInside; i++){
             isInside = CheckIsLeftFrom(Posis[i],Posis[(i+1)%4],ent.x);
         }
-        SetUnitSelcted(ent, isInside);
+        if(isInside || (key_shiftl && ent.SELCTED_SKILL)){
+            ent.ambient = SEL_AMBIENT;
+        }else{
+           ent.ambient = 0;
+        }
+    }
+}
+
+
+function SelectMarkedUnits()
+{
+    ENTITY * ent;
+    SUBSYSTEM_LOOP(ent, SUBSYSTEM_UNIT_MANAGEMENT){
+        SetUnitSelcted(ent, ent.ambient > 0);
     }
 }
 
 
 
-
 function DrawQuadDemo(){
     draw_line(vector(maxv(ClickPoint2D_A[0],ClickPoint2D_B[0]),minv(ClickPoint2D_A[1],ClickPoint2D_B[1]),0),NULL,100);
-    draw_line(vector(maxv(ClickPoint2D_A[0],ClickPoint2D_B[0]),maxv(ClickPoint2D_A[1],ClickPoint2D_B[1]),0),vector(255,255,255),100);
-    draw_line(vector(minv(ClickPoint2D_A[0],ClickPoint2D_B[0]),maxv(ClickPoint2D_A[1],ClickPoint2D_B[1]),0),vector(255,255,255),100);
-    draw_line(vector(minv(ClickPoint2D_A[0],ClickPoint2D_B[0]),minv(ClickPoint2D_A[1],ClickPoint2D_B[1]),0),vector(255,255,255),100);
-    draw_line(vector(maxv(ClickPoint2D_A[0],ClickPoint2D_B[0]),minv(ClickPoint2D_A[1],ClickPoint2D_B[1]),0),vector(255,255,255),100);
+    draw_line(vector(maxv(ClickPoint2D_A[0],ClickPoint2D_B[0]),maxv(ClickPoint2D_A[1],ClickPoint2D_B[1]),0),vector(255,255,255),80);
+    draw_line(vector(minv(ClickPoint2D_A[0],ClickPoint2D_B[0]),maxv(ClickPoint2D_A[1],ClickPoint2D_B[1]),0),vector(255,255,255),80);
+    draw_line(vector(minv(ClickPoint2D_A[0],ClickPoint2D_B[0]),minv(ClickPoint2D_A[1],ClickPoint2D_B[1]),0),vector(255,255,255),80);
+    draw_line(vector(maxv(ClickPoint2D_A[0],ClickPoint2D_B[0]),minv(ClickPoint2D_A[1],ClickPoint2D_B[1]),0),vector(255,255,255),80);
 }
 
 
@@ -265,12 +281,18 @@ function DebugDrawDests()
     ENTITY * ent;
     SUBSYSTEM_LOOP(ent, SUBSYSTEM_UNIT_MANAGEMENT){
         draw_line3d(ent.x, NULL, 100);
-        draw_line3d(ent.x, vector(0,255,0), 100);
-        draw_line3d(ent.UNIT_DEST_SKILL, vector(0,255,0), 100);
+        draw_line3d(ent.x, vector(0,255,0), 50);
+        draw_line3d(ent.UNIT_DEST_SKILL, vector(0,255,0), 50);
     }
 }
 
-
+function DeselectAll()
+{
+    ENTITY * ent;
+    SUBSYSTEM_LOOP(ent, SUBSYSTEM_UNIT_MANAGEMENT){
+        DeselectUnit(ent);
+    }
+}
 
 function NumberKeyPressed(int nr)
 {
@@ -283,6 +305,10 @@ function NumberKeyPressed(int nr)
         if(key_ctrl){
             if(ent.SELCTED_SKILL){
                 ent.UNIT_GROUP_SKILL = nr;
+            }else{
+                if(ent.UNIT_GROUP_SKILL == nr){
+                    ent.UNIT_GROUP_SKILL = 0;
+                }
             }
         }else{
             SetUnitSelcted(ent, ent.UNIT_GROUP_SKILL == nr);
@@ -301,13 +327,25 @@ function NumberKeyPressed(int nr)
     }
 }
 
+var NuberKeyPressedLast = 0;
 
-function RealUnitControl()
+function UnitControl()
 {
     VECTOR temp;
     mouse_mode = 4;
     if(mouse_left){
         if(MouseLeftLast == 0){
+            if(!key_shiftl){
+                DeselectAll();
+            }
+            vec_set(temp, vector(mouse_pos.x,mouse_pos.y, camera.clip_far));
+            vec_for_screen(temp,camera);
+            c_trace(camera.x, temp,USE_POLYGON);
+            if(you != 0){
+                if(you.SK_SUBSYSTEM == SUBSYSTEM_UNIT_MANAGEMENT){
+                    SelectUnit(you);
+                }
+            }
 
             ClickPoint2D_A[0]=mouse_pos.x;
             ClickPoint2D_A[1]=mouse_pos.y;
@@ -320,11 +358,14 @@ function RealUnitControl()
             ClickPoint2D_B[1]=mouse_pos.y;
             DrawQuadDemo();
         }
-        SelectEntitys();
+        if(abs(ClickPoint2D_A[0]-ClickPoint2D_B[0])+abs(ClickPoint2D_A[1]-ClickPoint2D_B[1])  >5){
+            MarkUnits();
+        }
+
 
     }else{
        if(MouseLeftLast){
-
+            SelectMarkedUnits();
        }
     }
     if(mouse_right && !MouseRightLast){
@@ -335,23 +376,24 @@ function RealUnitControl()
     }
 
     int i;
+    var NuberPressed = 0;
     for(i = 2; i < 10; i++){
-        if(key_pressed(i)){
+        if(key_pressed(i) && !NuberKeyPressedLast){
             NumberKeyPressed(i-1);
+            NuberPressed = i-1;
         }
     }
+    NuberKeyPressedLast = NuberPressed;
     MouseLeftLast = mouse_left;
     MouseRightLast = mouse_right;
-
 }
 
 
 
 void UnitMangement_update()
 {
-    RealUnitControl();
-    DebugDrawDests();
-
+    UnitControl();
+   // DebugDrawDests();
 }
 
 bool UnitMangement_is_done(){

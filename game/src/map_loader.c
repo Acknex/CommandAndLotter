@@ -28,18 +28,29 @@ MATERIAL * maploader_material =
   emissive_blue = 255;
 }
 
-void maploader_get_tile_pos(VECTOR * v, int * x, int * y)
+
+void maploader_pos_to_vec(VECTOR * v, int x, int y)
 {
-	int size_x = maploader_cellsize * maploader.w + maploader_cellsize - 1;
-	int size_y = maploader_cellsize * maploader.h + maploader_cellsize - 1;
+    int size_x = maploader_cellsize * maploader.w + maploader_cellsize - 1;
+    int size_y = maploader_cellsize * maploader.h + maploader_cellsize - 1;
 
-	*x = (v->x + maploader_trisize * size_x / 2) / (maploader_trisize * maploader_cellsize);
-	*y = (v->y + maploader_trisize * size_y / 2) / (maploader_trisize * maploader_cellsize);
+    v->x = x * (maploader_trisize * maploader_cellsize) - maploader_trisize * size_x / 2;
+    v->y = y * (maploader_trisize * maploader_cellsize) - maploader_trisize * size_y / 2;
+    v->z = maploader_tile_height(x, y);
+}
 
-	if(*x <= 0) *x = 0;
-	if(*y <= 0) *y = 0;
-	if(*x >= maploader.w) *x = maploader.w - 1;
-	if(*y >= maploader.h) *y = maploader.h - 1;
+void maploader_pos_for_vec(VECTOR *v, int *x, int *y)
+{
+    int size_x = maploader_cellsize * maploader.w + maploader_cellsize - 1;
+    int size_y = maploader_cellsize * maploader.h + maploader_cellsize - 1;
+
+    *x = (v->x + maploader_trisize * size_x / 2) / (maploader_trisize * maploader_cellsize);
+    *y = (v->y + maploader_trisize * size_y / 2) / (maploader_trisize * maploader_cellsize);
+
+    if(*x <= 0) *x = 0;
+    if(*y <= 0) *y = 0;
+    if(*x >= maploader.w) *x = maploader.w - 1;
+    if(*y >= maploader.h) *y = maploader.h - 1;
 }
 
 void maploader_init()
@@ -132,7 +143,7 @@ void maploader_load(char const * fileName)
 
             D3DVERTEX * v = &vertices[i];
 
-            maploader_get_tile_pos(vector(v->x, v->z, 0), &x, &y);
+            maploader_pos_for_vec(vector(v->x, v->z, 0), &x, &y);
 
             if(x <= 0) x = 0;
             if(y <= 0) y = 0;
@@ -165,14 +176,41 @@ void maploader_load(char const * fileName)
 
     set(maploader.terrain, PASSABLE);
 
+    effect_load(maploader_material, "terrain.fx");
+    maploader.terrain.material = maploader_material;
+
+    random_seed(1337);
+    for(x = 0; x < maploader.w; x++)
+    {
+        for(y = 0; y < maploader.h; y++)
+        {
+            if(random(100) < 50)
+                continue;
+            float v = maploader_tile_vegetation(x, y);
+            if(v < 0.2)
+                continue;
+            if(random(100) < pow(v, 6.0) * 100) {
+                char const * boom = "tree01.mdl";
+                var r = random(1);
+                if(r > 0.66)
+                    boom = "tree02.mdl";
+                else if(r > 0.33)
+                    boom = "tree03.mdl";
+
+                you = ent_create(boom, nullvector, NULL);
+                maploader_pos_to_vec(you->x, x, y);
+                you->pan = random(360);
+                you->tilt = random(30) - 15;
+                // you->emask &= ~DYNAMIC;
+            }
+        }
+    }
+
     collision_mode = 1;
 
     if(key_c)
         c_updatehull(maploader.terrain, 0);
     ent_fixnormals(maploader.terrain, 0);
-
-    effect_load(maploader_material, "terrain.fx");
-    maploader.terrain.material = maploader_material;
 }
 
 bool maploader_has_map()
@@ -208,21 +246,21 @@ float maploader_tile_height(int x, int y)
 int   maploader_get_type(VECTOR * v)
 {
 	int x, y;
-	maploader_get_tile_pos(v, &x, &y);
+	maploader_pos_for_vec(v, &x, &y);
 	return maploader_tile_type(x, y);
 }
 
 float maploader_get_vegetation(VECTOR * v)
 {
 	int x, y;
-	maploader_get_tile_pos(v, &x, &y);
+	maploader_pos_for_vec(v, &x, &y);
 	return maploader_tile_vegetation(x, y);
 }
 
 float maploader_get_height(VECTOR * v)
 {
 	int x, y;
-	maploader_get_tile_pos(v, &x, &y);
+	maploader_pos_for_vec(v, &x, &y);
 	return maploader_tile_height(x, y);
 }
 

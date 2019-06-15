@@ -46,7 +46,7 @@ typedef int bool;
 #define SUBSYSTEM_UNIT_LERCHE       103
 #define SUBSYSTEM_UNIT_SPHERE       104
 #define SUBSYSTEM_TERRAIN_SYSTEM    105
-#define SUBSYSTEM_UNIT_MANAGEMENT   	106
+#define SUBSYSTEM_UNIT_MANAGEMENT   106
 // HIER WEITERE SUBSYSTEME DEFINIEREN
 
 #define SUBSYSTEM_LOOP(ptr,system) for(ptr = ent_next(NULL); ptr != NULL; ptr = ent_next(ptr)) if(ptr->SK_SUBSYSTEM == (system))
