@@ -17,6 +17,8 @@ uimenu_window_t * uimenu_window_create(var x, var y, var width, var height, char
     window->_is_initialized = false;
     window->_is_visible = false;
     window->_is_dirty = true;
+    window->_is_borderless = false;
+    window->_is_moving = false;
 
     // Increment the layers, so every window has 100 layers to work with.
     // 99 effective layers for bordered windows since one is used for the nested content panel
@@ -251,14 +253,16 @@ void uimenu_sync_panel_with_window(uimenu_window_t * window)
     {
         window->_panel->pos_x = window->x;
         window->_panel->pos_y = window->y;
+
         if(window->width > 0)
             window->_panel->size_x = window->width;
         else // Negative number is percentage relative to screen size
-            window->_panel->size_x = screen_size.x * -(window->width / 100);
+            window->_panel->size_x = screen_size.x * (-window->width / 100.0);
+
         if(window->height > 0)
             window->_panel->size_y = window->height;
         else // Negative number is percentage relative to screen size
-            window->_panel->size_y = screen_size.y * -(window->height / 100);
+            window->_panel->size_y = screen_size.y * (-window->height / 100.0);
             
         layer_sort(window->_panel, window->layer);
 
@@ -353,9 +357,9 @@ void uimenu_window_show(uimenu_window_t * window)
 
 void uimenu_window_hide(uimenu_window_t * window)
 {
-    window->_panel->flags &= ~(SHOW);
+    window->_panel->flags &= ~SHOW;
     if(window->_is_borderless == FALSE)
-        window->_content_panel->flags &= ~(SHOW);
+        window->_content_panel->flags &= ~SHOW;
 
     window->_is_visible = FALSE;
 }
@@ -364,6 +368,7 @@ void uimenu_window_update(uimenu_window_t * window)
 {
     if(window == NULL) return; // Fail gracefully
 
+    // Drag+Move window code
     if(window->_is_visible == TRUE && window->_is_borderless == FALSE)
     {
         if(window->_is_moving == FALSE && mouse_left && uimenu_is_cursor_in_window_titlebar(window))
@@ -393,7 +398,6 @@ void uimenu_window_destroy(uimenu_window_t * window)
     // Honestly can't be arsed with freeing memory properly for all the minutiae.
     // We don't have that much menu stuff anyway, so just hide it.
     uimenu_window_hide(window);
-
 
     // Find and remove node from linked list
     // uimenu_window_t * tmpWnd = uimenu_first_window;

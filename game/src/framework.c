@@ -123,8 +123,8 @@ void framework_cleanup()
         ent = ent_next(ent);
         if(you->SK_ENTITY_DEAD)
         {
-        		UNIT *unit = jpsUnitGetFromEntity(you);
-        		if(unit) jpsUnitDestroy(unit);
+            UNIT *unit = jpsUnitGetFromEntity(you);
+            if(unit) jpsUnitDestroy(unit);
             ptr_remove(you);
         }
     }
@@ -267,7 +267,7 @@ void framework_update()
         case FRAMEWORK_STATE_GAME:
             // game was already openend
             // by LOAD stateg
-						game_open();
+            game_open();
             break;
 
         default:
