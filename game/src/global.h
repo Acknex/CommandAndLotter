@@ -33,7 +33,7 @@ typedef int bool;
 
 #define SELCTED_SKILL skill[39]
 #define UNIT_DEST_SKILL skill[40]
-#define UNIT_GROUP_SKILL skill[43]
+#define UNIT_GROUP_SKILL skill[38]
 
 #define SK_ENTITY_JPS_POINTER_TO_UNIT_STRUCT skill97
 #define jpsUnitGetFromEntity(ent) ((UNIT*)ent->SK_ENTITY_JPS_POINTER_TO_UNIT_STRUCT)

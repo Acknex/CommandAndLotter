@@ -13,10 +13,11 @@
 #define SPAWNER_FIREPARTICLES skill28
 #define SPAWNER_DEBRISPARTICLES skill29
 #define SPAWNER_SMOKEPARTICLES skill30
+#define SPAWNER_WIREFRAME skill31
 
-#define SPAWNER_BASEX skill40			// Position nach dem erstellen
-#define SPAWNER_BASEY skill41
-#define SPAWNER_BASEZ skill42
+#define SPAWNER_BASEX skill70			// Position nach dem erstellen
+#define SPAWNER_BASEY skill71
+#define SPAWNER_BASEZ skill72
 
 
 #define SPAWNER_ACTIVEANIM "stand"
@@ -38,13 +39,27 @@
 #define SPAWNER_MAXDEBRIS 5
 #define SPAWNER_MAXSMOKE 90
 
+MATERIAL * building_wireframe_material =
+{
+  flags = AUTORELOAD | TRANSLUCENT;
+  effect = "building_wireframe.fx";
+}
+
+MATERIAL * building_material =
+{
+  flags = AUTORELOAD;
+  effect = "building.fx";
+}
+
 ENTITY* spawner_spawn(int spawnertype, VECTOR* pos, var owner)
 {
 	ENTITY* ent;
+    ENTITY *wireframe;
 	switch (spawnertype)
 	{
 		case 0:
 			ent = ent_create("the_tower.mdl", pos, Spawner);
+            wireframe = ent_create("the_tower_wireframe.mdl", pos, NULL);
 			break;
 	}
 
@@ -53,7 +68,15 @@ ENTITY* spawner_spawn(int spawnertype, VECTOR* pos, var owner)
 		if (owner == SPAWNER_ENEMY)
 			ent->group = GROUP_ENEMY_SPAWNER;
 		else
-			ent->group = GROUP_PLAYER_SPAWNER;		
+            ent->group = GROUP_PLAYER_SPAWNER;
+
+        ent->material = building_material;
+
+        if(wireframe != NULL)
+        {
+            wireframe->material = building_wireframe_material;
+            ent->SPAWNER_WIREFRAME = wireframe;
+        }
 	}
 	
 	return ent;
@@ -216,6 +239,24 @@ void SPAWNER__construct(ENTITY* ptr)
 		ptr->ENTITY_STATE = SPAWNER_STATE_ACTIVE;
 	}
 
+
+    var percentage = ptr->SPAWNER_PROGRESS * (ptr.max_z + 200) / 100;
+    ptr->skill41 = floatv(percentage);
+    ptr->skill42 = floatv(ptr->max_x * 0.5);
+
+    ptr->skill45 = floatv(ptr->x);
+    ptr->skill46 = floatv(ptr->z);
+    ptr->skill47 = floatv(ptr->y);
+
+    ENTITY *wireframe = ptr->SPAWNER_WIREFRAME;
+    if(wireframe != NULL)
+    {
+        wireframe->skill41 = floatv(percentage);
+
+        wireframe->skill45 = floatv(wireframe->x);
+        wireframe->skill46 = floatv(wireframe->z);
+        wireframe->skill47 = floatv(wireframe->y);
+    }
 }
 
 void SPAWNER__active(ENTITY* ptr)

@@ -93,6 +93,7 @@ void maploader_load(char const * fileName)
 	BMAP * bmp = bmap_create(fileName);
 	if(bmp == NULL)
 		error("failed to load level");
+    bmap_to_mipmap(bmp);
 	var format = bmap_lock(bmp, 0);
 
 	maploader.w = bmap_width(bmp);
@@ -110,6 +111,7 @@ void maploader_load(char const * fileName)
 			var alpha;
 			pixel_to_vec(&col, &alpha, format, pixel);
 
+            /*
             int type = maploader_grey_to_type(col.red);
 
             if(x < 3 || y < 3 || x >= maploader.w-3 || y >= maploader.h -3) {
@@ -118,11 +120,11 @@ void maploader_load(char const * fileName)
                 pixel = pixel_for_vec(&col, alpha, format);
                 pixel_to_bmap(bmp, x, y, pixel);
             }
+            */
 
-			((maploader.cells)[maploader.w * y + x]).celltype = type;
+			((maploader.cells)[maploader.w * y + x]).celltype = 0;
 			((maploader.cells)[maploader.w * y + x]).vegetation = col.green / 255.0;
             ((maploader.cells)[maploader.w * y + x]).elevation = col.blue * 3;
-
 		}
 	}
 
