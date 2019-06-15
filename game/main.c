@@ -48,3 +48,4 @@ function main()
 #include "grid.c"
 #include "particle.h"
 #include "spawner.c"
+#include "building.c"

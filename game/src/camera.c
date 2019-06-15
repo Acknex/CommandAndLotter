@@ -5,8 +5,6 @@ var topdown_camera_height;
 VECTOR topdown_camera_center;
 VECTOR topdown_camera_centerTarget;
 
-
-
 void topdown_camera_open() 
 {
 	camera.z = 3000;
@@ -18,6 +16,7 @@ void topdown_camera_open()
 
 void topdown_camera_update() 
 {
+	
 #ifdef DEBUG
 	if(def_camera == 0)
 #endif
@@ -73,4 +72,16 @@ void topdown_camera_update()
 void topdown_camera_set_pos(VECTOR* target_pos)
 {
 	vec_set(&topdown_camera_centerTarget, target_pos);
+}
+
+
+VECTOR *get_pos_under_cursor()
+{
+	VECTOR ray;
+	ray.x = mouse_pos.x;
+	ray.y = mouse_pos.y;
+	ray.z = 10000;
+	vec_for_screen(ray, camera);
+	
+	return maploader_trace(&camera->x, ray);
 }

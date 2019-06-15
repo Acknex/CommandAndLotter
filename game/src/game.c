@@ -8,12 +8,14 @@
 #include "stub.h"
 #include <acknex.h>
 #include "UnitMangement.h"
+#include "building.h"
 
 void game_init(void)
 {
 	ui_game_init();
     UnitMangement_init();
     grid_init();
+	buildingPlacement_init();
 }
 
 void game_open(void)
@@ -32,6 +34,7 @@ void game_open(void)
 	stub_init(); //hook debug shit here
 	
 	grid_open(50,50);
+	buildingPlacement_open();
 }
 
 void game_update(void)
@@ -41,6 +44,7 @@ void game_update(void)
 	stub_update(); //hook debug shit here
 	topdown_camera_update();
     UnitMangement_update();
+	buildingPlacement_update();
 }
 
 void game_close(void)
