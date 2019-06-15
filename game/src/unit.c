@@ -58,6 +58,11 @@ ENTITY* unit_getVictim(ENTITY* ent)
 
 ENTITY* unit_spawn(int unittype, VECTOR* pos, var owner)
 {
+	return unit_spawn(unittype, pos, pos, owner);
+}
+
+ENTITY* unit_spawn(int unittype, VECTOR* pos, VECTOR* targetPos, var owner)
+{
 	ENTITY* ent = NULL;
 	switch (unittype)
 	{
@@ -84,7 +89,7 @@ ENTITY* unit_spawn(int unittype, VECTOR* pos, var owner)
 		else
 			ent->group = GROUP_PLAYER_UNIT;		
 
-		unit_setTarget(ent, pos);
+		unit_setTarget(ent, targetPos);
 		unit_setVictim(ent,NULL);
 	}
 	

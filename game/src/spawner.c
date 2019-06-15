@@ -16,6 +16,8 @@
 #define SPAWNER_DEBRISPARTICLES skill29
 #define SPAWNER_SMOKEPARTICLES skill30
 #define SPAWNER_WIREFRAME skill31
+#define SPAWNER_SPAWNANGLE skill32
+
 
 #define SPAWNER_BASEX skill70			// Position nach dem erstellen
 #define SPAWNER_BASEY skill71
@@ -116,7 +118,7 @@ var spawner_getProgress(ENTITY* ent)
 	{
 		if (ent->group == GROUP_ENEMY_SPAWNER || ent->group == GROUP_PLAYER_SPAWNER)
 		{
-			if (ent->ENTITY_STATE == SPAWNER_STATE_CONSTRUCT)
+			if (ent->ENTITY_STATE == SPAWNER_STATE_PRODUCE)
 				return 1 - (ent->SPAWNER_BUILDTIMER / SPAWNER_BUILDTIME);
 		}
 	}
@@ -295,8 +297,13 @@ void SPAWNER__produce(ENTITY* ptr)
 			owner = UNIT_ENEMY;
 		else
 			owner = UNIT_PLAYER;
-				
-		unit_spawn(ptr->SPAWNER_UNITTYPE, ptr->x, owner);
+		ptr->SPAWNER_SPAWNANGLE += 137.5;
+		ptr->SPAWNER_SPAWNANGLE %= 360;
+		VECTOR* targetPos = vector(400,0,0);
+		VECTOR* angle = vector(ang(ptr->SPAWNER_SPAWNANGLE), 0, 0);
+		vec_rotate(targetPos, angle);
+		vec_add(targetPos, ptr->x);
+		unit_spawn(ptr->SPAWNER_UNITTYPE, ptr->x, targetPos, owner);
 	}
 	if (ptr->SPAWNER_QUEUE == 0)
 	{

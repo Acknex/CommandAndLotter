@@ -108,11 +108,6 @@ void SPUTNIK_Update()
 		{
 			ptr->z = maploader_get_height(ptr->x) - ptr->min_z + SPUTNIK_FEET;			
 		}
-	DEBUG_VAR(ptr->x, 120);
-	DEBUG_VAR(ptr->y, 140);
-		
-	DEBUG_VAR(ptr->UNIT_TARGETX, 180);
-	DEBUG_VAR(ptr->UNIT_TARGETY, 200);
 	}	
 }
 
