@@ -47,7 +47,7 @@ BMAP *ui_bmap_dead_indicator;
 BMAP *ui_bmap_life_indicator;
 
 BMAP *ui_bmap_cbabe[3];
-BMAP *ui_bmap_sputnik[4];
+BMAP *ui_bmap_sputnik[3];
 BMAP *ui_bmap_noise[3];
 
 BMAP **ui_active_portrait;
@@ -58,7 +58,7 @@ BMAP *ui_hide_button_p = "hide_button_p.png";
 
 BMAP *ui_radial_o = "ui_placeholder_counter.png";
 BMAP *ui_radial_n = "ui_placeholder_unit.png";
-BMAP *ui_radial_progress = "#116x116x8888";
+BMAP *ui_radial_progress = "#128x128x8888";
 
 BMAP *ui_icon_cbabe = "ui_H2.png";
 BMAP *ui_icon_sputnik = "ui_H1.png";
