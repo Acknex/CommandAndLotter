@@ -46,6 +46,7 @@ SOURCES += \
   src/unit.c
 
 HEADERS += \
+  shaders/terrain.fx \
   src/ang.h \
   src/camera.h \
   src/credits.h \
