@@ -135,14 +135,13 @@ void UnitMangement_open(){
         for(y = -1500; y < 1500; y+=300){
 
             var z = maploader_get_height(vector(x,y,0));
-            you = ent_create("sputnik.mdl",vector(x,y,z+90),NULL);
+			you = unit_spawn(0, vector(x,y,z+90), !UNIT_ENEMY);
             you.ambient = 0;
             framework_setup(you, SUBSYSTEM_UNIT_MANAGEMENT);
         }
     }
     vec_set(camera.x, vector(-800,-1064,1000));
     vec_set(camera.pan, vector(0,-32,0));
-
 }
 
 
@@ -266,7 +265,8 @@ function SetDestForSelectd(VECTOR * Dest)
     ENTITY * ent;
     SUBSYSTEM_LOOP(ent, SUBSYSTEM_UNIT_MANAGEMENT){
         if(ent.SELCTED_SKILL){
-            vec_set(ent.UNIT_DEST_SKILL,Dest);
+				unit_setTarget(ent, Dest);
+            //vec_set(ent.UNIT_DEST_SKILL,Dest);
         }
     }
 }

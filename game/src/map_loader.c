@@ -236,8 +236,21 @@ void maploader_load(char const * fileName)
             }
         }
     }
-
     maploader.terrain.clipfactor = 2;
+
+    int i; for(i = 0; i < 100; i++)
+    {
+        you = ent_create(
+            "StrasseGerade.mdl",
+            vector(580 * i, 0, 0),
+            NULL
+        );
+        you.z = maploader_get_height(you.x);
+    }
+
+
+
+
     collision_mode = 1;
 
     if(key_c)

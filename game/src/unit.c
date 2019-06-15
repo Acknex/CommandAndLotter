@@ -2,11 +2,18 @@
 
 var unit_setTarget(ENTITY* ent, VECTOR* pos)
 {
+	VECTOR target2D;
+	MAP* map = mapGetCurrent();
+	mapGetVector2DFromVector3D(map, target2D, pos);
+	
+	cprintf2("\n unit_setTarget(%p): group(%d)", ent, ent->group);
+	
 	if (ent != NULL)
 	{
 		if (ent->group == GROUP_PLAYER_UNIT || ent->group == GROUP_ENEMY_UNIT)
 		{
 			vec_set(ent->UNIT_TARGET, pos);
+			unitSetTargetFromVector2D(map, jpsUnitGetFromEntity(ent), target2D);
 			return 1;
 		}
 	}

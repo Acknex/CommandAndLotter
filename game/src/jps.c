@@ -637,6 +637,17 @@ VECTOR* mapGetVector2DFromVector3D(MAP* map, VECTOR* v2d, VECTOR* v3d)
 	return v2d;
 }
 
+
+VECTOR* mapGetVector3DFromVector2D(MAP* map, VECTOR* v3d, VECTOR* v2d)
+{
+	static VECTOR _vstatic;
+	if(!v3d) v3d = &_vstatic;
+	v3d->x = v2d->x*map->tileSize + map->vMin.x;
+	v3d->y = v2d->y*map->tileSize + map->vMin.y;
+	v3d->z = 0;
+	return v3d;
+}
+
 TILE* mapGetTileFromVector(MAP* map, VECTOR* v)
 {
 	int i = (v->x-map->vMin.x)/map->tileSize;
@@ -679,7 +690,7 @@ void mapUpdateUnits(MAP* map)
 			{
 				if(tile->numUnits[currentPlayer] < MAX_UNITS_PER_TILE)
 				{
-					tile->unitArray[tile->numUnits] = unit;
+					tile->unitArray[tile->numUnits[currentPlayer]] = unit;
 					tile->numUnits[currentPlayer]++;
 				}
 			}
@@ -1046,6 +1057,7 @@ void mapMoveUnits(MAP* map)
 			if(unit->isActive)
 			{
 				unitMove(map, unit);
+				//if(unit->ent) mapGetVector3DFromVector2D(map, unit->ent.x, unit->pos2d);
 				
 				if(unit->HP <= 0 || 1)
 				{
@@ -1065,7 +1077,7 @@ void mapMoveUnits(MAP* map)
 }
 
 
-void gameUpdate(MAP* map)
+void jpsGameUpdate(MAP* map)
 {
 	mapUpdateUnits(map);
 	mapMoveUnits(map);
@@ -1101,6 +1113,21 @@ void jpsUnitDestroy(UNIT* unit)
 	if(!unit) return;
 	if(unit->jpsPath) jpsPathDestroy(unit->jpsPath);
 	sys_free(unit);
+}
+
+void unitSetTargetFromVector2D(MAP* map, UNIT* unit, VECTOR *vTarget)
+{
+	cprintf3("\n unitSetTargetFromVector2D(%p, (%.1f,%.1f))", unit, (double)vTarget->x, (double)vTarget->y);
+	if(!unit) return;
+	vec_set(unit->target2d, vTarget);
+	if(vec_dist(unit->target2d, unit->prevTarget2d) > 0.2)
+	{
+		vec_set(unit->prevTarget2d, unit->target2d);
+		unit->targetTile = targetTile;
+		//if(targetTile && unit->tile)
+		if(!unit->jpsPath) unit->jpsPath = jpsPathCreate(16);
+		mapJPSPathGet(map, unit->tile, targetTile, unit->jpsPath);
+	}
 }
 
 void unitSetTargetFromTile(MAP* map, UNIT* unit, TILE* targetTile)
@@ -1177,7 +1204,7 @@ MAP* jpsMapLoadFromFile(char* filename)
 	entJPSDummyPlane = ent_create("jpsPlane.mdl", vector(0,0,580), NULL);
 	set(entJPSDummyPlane, PASSABLE | TRANSLUCENT);
 	ent_setskin(entJPSDummyPlane, map->bmp, 1);
-	vec_set(entJPSDummyPlane->scale_x, vector(sizeX/64.0*tileSize*6, sizeY/64.0*tileSize*6, 0));
+	vec_set(entJPSDummyPlane->scale_x, vector(sizeX/64.0*tileSize*4, sizeY/64.0*tileSize*4, 0));
 	entJPSDummyPlane->material = jpsDummyNoFilter_mat;
 	
 	return map;
