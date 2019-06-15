@@ -43,7 +43,7 @@ typedef int bool;
 #define SK_ENTITY_JPS_POINTER_TO_UNIT_STRUCT skill97
 #define jpsUnitGetFromEntity(ent) ((UNIT*)ent->SK_ENTITY_JPS_POINTER_TO_UNIT_STRUCT)
 #define jpsGetEntityFromUnit(unit) (unit->ent)
-#define jpsGetEntityFromUnitArray(unit, i) (((UNIT*)pointerArray[i])->ent)
+#define jpsGetEntityFromUnitArray(i) (((UNIT*)pointerArray[i])->ent)
 
 //! Markiert die Entity als "TOT" und sorgt dafür, dass sie zu Ende des Frames gelöscht wird.
 #define SK_ENTITY_DEAD skill98
