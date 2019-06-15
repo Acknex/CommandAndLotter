@@ -8,8 +8,8 @@ BMAP* FogBmap = "fow_fog2.png";
 void FogEvent(PARTICLE *p)
 {
     p.lifespan = 2;
-    p.x = p.skill_a + sinv(p->skill_c*total_ticks)*100+(p.skill_a%100);
-    p.y = p.skill_b + sinv(p->skill_d*total_ticks)*100+(p.skill_b%100);
+    p.x = p.skill_a + cosv(p->skill_c*total_ticks)*100+(p.skill_a%100);
+    p.y = p.skill_b + cosv(p->skill_d*total_ticks)*100+(p.skill_b%100);
 
 	
 	MAP *map = mapGetCurrent();
@@ -26,7 +26,12 @@ void Fog(PARTICLE *p)
     p.alpha = 90;
     p.gravity = 0;
     p.size = 600;
-
+    
+    var cRand = random(0.4)+0.4;
+    p.red = cRand * 255;
+    p.green = cRand * 255;
+    p.blue = cRand * 255;
+    
     p.flags |= (MOVE | TRANSLUCENT);
     p.event = FogEvent;
     
