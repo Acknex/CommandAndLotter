@@ -4,6 +4,7 @@
 #include "framework.h"
 #include "spawner.h"
 #include "enemy_hit.h"
+#include "jps.h"
 
 ENTITY *buildingPlacement_previewModel;
 int buildingPlacement_selection;
@@ -25,10 +26,20 @@ void buildingPlacement_open()
 void buildingPlacement_movePreview()
 {
 	VECTOR *_hit = get_pos_under_cursor();
-	if(_hit != NULL)
-		vec_set(&buildingPlacement_previewModel->x, _hit);	
+	if(_hit != NULL) 
+	{
+		TILE* tile = mapGetTileFromVector(mapCurrent, _hit);
+		if(tile != NULL)
+		{
+			VECTOR targetPos;
+			mapGetVectorFromTile(mapCurrent, &targetPos, tile);
+			targetPos.z = _hit.z;
+			vec_set(&buildingPlacement_previewModel->x, targetPos);
+		}	
+	}
 }
 
+	
 
 void buildingPlacement_beginConstruction(int selection)
 {
