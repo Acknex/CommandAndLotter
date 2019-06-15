@@ -28,11 +28,12 @@ typedef int bool;
 #define ENTITY_STATE skill55
 #define ENTITY_ANIM skill56
 #define ENTITY_VICTIM skill57
+#define ENTITY_DAMAGE skill58
 
 
 #define SELCTED_SKILL skill[39]
 #define UNIT_DEST_SKILL skill[40]
-#define UNIT_GROUP_SKILL skill[43]
+#define UNIT_GROUP_SKILL skill[38]
 
 #define SK_ENTITY_JPS_POINTER_TO_UNIT_STRUCT skill97
 #define jpsUnitGetFromEntity(ent) ((UNIT*)ent->SK_ENTITY_JPS_POINTER_TO_UNIT_STRUCT)

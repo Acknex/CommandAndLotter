@@ -80,7 +80,7 @@ VECTOR *get_pos_under_cursor()
 	VECTOR ray;
 	ray.x = mouse_pos.x;
 	ray.y = mouse_pos.y;
-	ray.z = 10000;
+	ray.z = camera.clip_far;
 	vec_for_screen(ray, camera);
 	
 	return maploader_trace(&camera->x, ray);
