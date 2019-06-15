@@ -6,6 +6,7 @@
 #include "credits.h"
 #include "music_player.h"
 #include "jps.h"
+#include "ui_game.h"
 
 #include <acknex.h>
 #include <windows.h>
@@ -137,6 +138,8 @@ void framework_capture_mouse()
     GetWindowRect(hWnd, &rect);
     SetCursorPos((rect.left + rect.right) / 2, (rect.top + rect.bottom) / 2);
 }
+
+var progress = 0;
 
 //! Aktualisiert alles.
 void framework_update()
@@ -281,6 +284,10 @@ void framework_update()
 
     // Do music update
     music_update();
+
+    // unfuck bmap_process abfuck
+    if(framework.state == FRAMEWORK_STATE_GAME)
+        ui_game_after_all();
 
     if(framework.state == FRAMEWORK_STATE_SHUTDOWN)
     {

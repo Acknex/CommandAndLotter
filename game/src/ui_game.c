@@ -1,6 +1,7 @@
 #include "ui_game.h"
 #include "unit.h"
 #include "spawner.h"
+#include "progressbars.h"
 
 void ui_spawn_event_sputnik(var num, PANEL *panel)
 {
@@ -342,15 +343,14 @@ void ui_game_update()
 				
 				ui_radial_sputnik->skill_y = ent;
 				ui_radial_delete->skill_y = ent;
+				ui_radial_counter->skill_y = ent;
 				a_dummy_var = spawner_getQueue(ent);
 				
-				var sp = spawner_getProgress(ent);
-				
-				ui_radial_counter->red = 128 + 128 * sp;
-				ui_radial_counter->green = 128 + 128 * sp;
-				ui_radial_counter->blue = 128 + 128 * sp;
-				
-				draw_text(str_for_num(NULL, sp), 0, 0, COLOR_GREEN);
+//				var sp = spawner_getProgress(ent);
+//				
+//				ui_radial_counter->red = 128 + 128 * sp;
+//				ui_radial_counter->green = 128 + 128 * sp;
+//				ui_radial_counter->blue = 128 + 128 * sp;
 			}
 		}
 	}
@@ -550,9 +550,20 @@ void ui_game_update()
 	
 	
 	
+	
+	
 }
 
 var ui_game_isdone()
 {
 	
+}
+
+void ui_game_after_all()
+{
+	ENTITY * ent = ui_radial_counter->skill_y;
+	if(ent)
+		progressbar_radial_render(ui_radial_progress, 100 - 100 * spawner_getProgress(ent), vector(0, 1, 0), 80);
+	
+	DEBUG_BMAP(ui_radial_progress, 16, 1);
 }

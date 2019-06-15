@@ -11,6 +11,7 @@
 #include "UnitMangement.h"
 #include "building.h"
 #include "fow.h"
+#include "z.h"
 
 void game_init(void)
 {
@@ -51,6 +52,7 @@ void game_open(void)
 
 	SPUTNIK_Init();
 	SPAWNER_Init();
+	Z_Init();
 	stub_init(); //hook debug shit here
 
 	grid_open(50,50);
@@ -67,6 +69,7 @@ void game_update(void)
 	jpsGameUpdate(mapGetCurrent());
 	SPUTNIK_Update();
 	SPAWNER_Update();
+	Z_Update();
 	stub_update(); //hook debug shit here
     UnitMangement_update();
     fow_update();

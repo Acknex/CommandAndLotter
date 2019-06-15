@@ -1,11 +1,13 @@
 #include "unit.h"
 #include "spawner.h"
+#include "z.h"
 
 VECTOR mousevec;
 int mouseupdate = 0;
 ENTITY* fancysputnik;
 ENTITY* fancytower;
 ENTITY* fancytarget;
+ENTITY* fancyz;
 int stubtoggle = 0;
 
 void setmousepos()
@@ -27,25 +29,31 @@ void producesputnik()
 	spawner_produce(fancytower);
 }
 
+void getz()
+{
+	unit_setTarget(fancysputnik, fancyz->x);
+	unit_setVictim(fancysputnik, fancyz);
+}
+
 void stub_init()
 {
-	mouse_mode = 4;
 	on_mouse_left = setmousepos;
 	on_p = producesputnik;
-	//fancysputnik = unit_spawn(0, vector(0,0,500), UNIT_PLAYER);
+	on_k = getz;
+	fancysputnik = unit_spawn(0, vector(0,0,500), UNIT_PLAYER);
 	fancytarget = ent_create(SPHERE_MDL, vector(100,100,500), NULL);
 	fancytower = spawner_spawn(0, vector(100,1000,500), SPAWNER_PLAYER);
+	fancyz = z_spawn(vector(3000, 0, 500));
 	vec_scale (&fancytarget->scale_x, 5);	
 }
 
 void stub_update()
 {
-	return;
 	if (mouseupdate == 1)
 	{
 		mouseupdate = 0;
 		stubtoggle = 1 - stubtoggle;
-		//unit_setTarget(fancysputnik, mousevec);
+		unit_setTarget(fancysputnik, mousevec);
 		if (stubtoggle > 0)
 			unit_setVictim(fancysputnik, fancytarget);
 		else

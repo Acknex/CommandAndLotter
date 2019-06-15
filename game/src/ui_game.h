@@ -58,6 +58,7 @@ BMAP *ui_hide_button_p = "hide_button_p.png";
 
 BMAP *ui_radial_o = "ui_placeholder_counter.png";
 BMAP *ui_radial_n = "ui_placeholder_unit.png";
+BMAP *ui_radial_progress = "#116x116x8888";
 
 BMAP *ui_icon_cbabe = "ui_H2.png";
 BMAP *ui_icon_sputnik = "ui_H1.png";
@@ -95,6 +96,7 @@ void ui_game_open();
 void ui_game_close();
 void ui_game_update();
 var ui_game_isdone();
+void ui_game_after_all();
 
 
 #endif
