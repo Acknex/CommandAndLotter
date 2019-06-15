@@ -27,7 +27,8 @@ void Z()
 	set(my, SHADOW);
 	vec_scale(my->scale_x, 10); //temp
 	c_setminmax(me);
-	my->ENTITY_STATE = ENTITY_STATE_WAIT_OR_WALK;	
+	my->ENTITY_STATE = ENTITY_STATE_WAIT_OR_WALK;
+	my->ENTITY_UNITTYPE = UNIT_Z;	
 }
 
 void Z_Init()
