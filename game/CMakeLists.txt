@@ -43,6 +43,7 @@ file(GLOB_RECURSE ACK19_SOURCES
 
 file(GLOB_RECURSE ACK19_HEADERS
  "${CMAKE_SOURCE_DIR}/src/*.h"
+ "${CMAKE_SOURCE_DIR}/shaders/*.fx"
  )
 
 add_executable(Ack19 "${ACK19_SOURCES}" "${ACK19_HEADERS}")

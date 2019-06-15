@@ -24,7 +24,7 @@ typedef struct
 
 framework_t framework;
 
-// BMAP * framework_mouse_cursor = "cursor3.tga";
+BMAP * framework_mouse_cursor = "cursor.tga";
 
 // BMAP * framework_load_screen_bmap = "game_loadingscreen.png";
 
@@ -72,16 +72,16 @@ void framework_init()
 
     // vec_set(sky_color, vector(1,1,1));
 
-    // mouse_map = framework_mouse_cursor;
+    mouse_map = framework_mouse_cursor;
 
 #ifndef FRAMEWORK_NO_POSTPROCESS
     // SetupDefaultMaterials();
     // SetupPostprocessing();
 #endif
 
-		mouse_mode = 4;
+    mouse_mode = 4;
 
-		on_frame = framework_update;
+    on_frame = framework_update;
 }
 
 void framework_setup(ENTITY * ent, int subsystem)
@@ -263,6 +263,9 @@ void framework_update()
 
     // Cleanup all dead entities
     framework_cleanup();
+
+    // Do music update
+    music_update();
 
     if(framework.state == FRAMEWORK_STATE_SHUTDOWN)
     {

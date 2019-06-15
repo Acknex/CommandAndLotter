@@ -11,19 +11,21 @@
 void game_init(void)
 {
 	ui_game_init();
-    UnitMangement_init();
+    //UnitMangement_init();
 }
 
 void game_open(void)
 {
 	framework_load_level(NULL);
 
+    sun_light = 100;
+
 	maploader_load("the-core.png");
 
 	ui_game_open();
 	topdown_camera_open();
 
-    UnitMangement_open();
+    //UnitMangement_open();
 	SPUTNIK_Init();
 	stub_init(); //hook debug shit here
 }
@@ -34,8 +36,7 @@ void game_update(void)
 	SPUTNIK_Update();
 	stub_update(); //hook debug shit here
 	topdown_camera_update();
-    UnitMangement_update();
-
+    //UnitMangement_update();
 }
 
 void game_close(void)

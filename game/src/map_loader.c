@@ -1,4 +1,6 @@
 #include "map_loader.h"
+#include <d3d9.h>
+#include <stdio.h>
 
 typedef struct
 {
@@ -94,49 +96,76 @@ void maploader_load(char const * fileName)
 	int size_x = maploader_cellsize * maploader.w + maploader_cellsize - 1;
 	int size_y = maploader_cellsize * maploader.h + maploader_cellsize - 1;
 
-	maploader.terrain = ent_createterrain(
-		bmp,
-		vector(0, 0, 0),
-		size_x,
-		size_y,
-		maploader_trisize
-	);
+    collision_mode = 0;
 
-	int i;
-	int cnt = ent_status(maploader.terrain, 1);
-	for(i = 0; i < cnt; i++)
-	{
-		CONTACT c;
-		ent_getvertex(maploader.terrain, &c, i);
+    maploader.terrain = ent_createterrain(
+        bmp,
+        vector(0, 0, 0),
+        size_x,
+        size_y,
+        maploader_trisize
+    );
 
-		D3DVERTEX * v = c.v;
+    int meshcnt = ent_status(maploader.terrain, 16);
 
-		maploader_get_tile_pos(vector(v->x, v->z, 0), &x, &y);
+    int iMesh;
+    for(iMesh = 0; iMesh < meshcnt; iMesh++)
+    {
+        LPD3DXMESH mesh = ent_getmesh(maploader.terrain, iMesh, 0);
 
-//		diag("x=");
-//		diag(str_for_int(NULL, x));
-//		diag(" y=");
-//		diag(str_for_int(NULL, y));
-//		diag("\n");
+        D3DVERTEX * vertices;
+        mesh->LockVertexBuffer(0, &vertices);
 
-		if(x <= 0) x = 0;
-		if(y <= 0) y = 0;
-		if(x >= maploader.w) x = maploader.w - 1;
-		if(y >= maploader.h) y = maploader.h - 1;
+        int i;
+        int cnt = mesh->GetNumVertices();
+        for(i = 0; i < cnt; i++)
+        {
+            // CONTACT c;
+            // ent_getvertex(maploader.terrain, &c, i);
 
-		v->y = maploader_tile_height(x, y);
+            D3DVERTEX * v = &vertices[i];
 
-		v->u1 = (float)x / (float)maploader.w;
-		v->v1 = (float)y / (float)maploader.h;
+            maploader_get_tile_pos(vector(v->x, v->z, 0), &x, &y);
 
-		ent_setvertex(maploader.terrain, &c, i);
-	}
+            if(x <= 0) x = 0;
+            if(y <= 0) y = 0;
+            if(x >= maploader.w) x = maploader.w - 1;
+            if(y >= maploader.h) y = maploader.h - 1;
 
-	c_updatehull(maploader.terrain, 0);
+            v->y = maploader_tile_height(x, y);
+            int neighborX = minv(x + 1, maploader.w-1);
+            int neighborY = minv(y + 1, maploader.h-1);
+            var neighborXValue = maploader_tile_height(neighborX, y);
+            var neighborYValue = maploader_tile_height(x, neighborY);
 
-	maploader.terrain = maploader_material;
+            VECTOR normalVector;
+            normalVector.x = (neighborX - v->y)/255;
+            normalVector.y = 1.0;
+            normalVector.z = (neighborY - v->y)/255;
+            vec_normalize(normalVector, 1.0);
 
-	effect_load(maploader_material, "terrain.fx");
+            v->u1 = (float)x / (float)maploader.w;
+            v->v1 = (float)y / (float)maploader.h;
+
+            v->nx = (float)normalVector.x;
+            v->ny = (float)normalVector.y;
+            v->nz = (float)normalVector.z;
+
+            // ent_setvertex(maploader.terrain, &c, i);
+        }
+        mesh->UnlockVertexBuffer();
+    }
+
+    set(maploader.terrain, PASSABLE);
+
+    collision_mode = 1;
+
+    if(key_c)
+        c_updatehull(maploader.terrain, 0);
+    ent_fixnormals(maploader.terrain, 0);
+
+    effect_load(maploader_material, "terrain.fx");
+    maploader.terrain.material = maploader_material;
 }
 
 bool maploader_has_map()
@@ -188,4 +217,50 @@ float maploader_get_height(VECTOR * v)
 	int x, y;
 	maploader_get_tile_pos(v, &x, &y);
 	return maploader_tile_height(x, y);
+}
+
+var maploader_dist2d(VECTOR * _a, VECTOR * _b)
+{
+    VECTOR a,b;
+    vec_set(a, _a);
+    vec_set(b, _b);
+    a.z = 0;
+    b.z = 0;
+    return vec_dist(a, b);
+}
+
+var maploader_lerp(var a, var b, float f)
+{
+    return (1.0 - f) * a + f * b;
+}
+
+VECTOR * maploader_trace(VECTOR *_start, VECTOR *_end)
+{
+    VECTOR start, end;
+    vec_set(start, _start);
+    vec_set(end, _end);
+
+    VECTOR iter;
+    vec_set(iter, start);
+
+    var total = maploader_dist2d(start, end);
+
+    while(maploader_dist2d(iter, end) > maploader_trisize)
+    {
+        var a = maploader_dist2d(iter, end) / total;
+        iter.z = maploader_lerp(end.z, start.z, a);
+        if(iter.z < maploader_get_height(iter))
+            return vector(iter.x, iter.y+1, iter.z);
+
+        VECTOR dir;
+        vec_diff(dir, end, start);
+        dir.z = 0;
+        vec_normalize(dir, maploader_trisize);
+
+        vec_add(iter, dir);
+    }
+    if(iter.z < maploader_get_height(iter))
+        return vector(iter.x, iter.y+1, iter.z);
+
+    return NULL;
 }

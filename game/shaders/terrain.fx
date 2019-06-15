@@ -2,7 +2,7 @@
 //help: Terrain contains a shadow map on the Skin1 blue channel.
 //help: With PS 1.1 (GeForce3), sun & dynamic lights are then disabled.
 //id: 14
-#define SHADOWMAP 1
+#define SHADOWMAP
 
 #include <define>
 #include <transform>
@@ -10,6 +10,7 @@
 #include <lights>
 #include <fog>
 #include <normal>
+#include <color>
 
 Texture entSkin1; // Red/green for blending, blue for shadow
 Texture entSkin2; // Basic tiled terrain texture
@@ -34,6 +35,7 @@ struct out_terraintex3 // Output to the pixelshader fragment
 	float2 BaseCoord: TEXCOORD1;
 	float2 RedCoord : TEXCOORD2;
 	float2 GreenCoord: TEXCOORD3;
+    float3 Normal : TEXCOORD4;
 };
 
 out_terraintex3 vs_terraintex3(
@@ -46,12 +48,12 @@ out_terraintex3 vs_terraintex3(
 	Out.Pos = DoTransform(inPos); // transform to screen coordinates
 
 // rotate and normalize the normal
-	float3 N = DoNormal(inNormal);
+    Out.Normal = DoNormal(inNormal);
 	float3 P = mul(inPos,matWorld);
 
-	Out.Color = fAmbient; // Add ambient and sun light
+    Out.Color = DoAmbient(); // Add ambient and sun light
 	for (int i=0; i<8; i++)  // Add 8 dynamic lights
-		Out.Color += DoLight(P,N,i);
+        Out.Color += DoLight(P,Out.Normal,i);
 	Out.Fog = DoFog(inPos); // Add fog
 
 // scale the texture coordinates for the masked textures
@@ -64,8 +66,9 @@ out_terraintex3 vs_terraintex3(
 
 float4 ps_terraintex3(out_terraintex3 In): COLOR
 {
-	float4 MaskColor = tex2D(sMaskTex,In.MaskCoord);
-	return MaskColor.ggga;
+//	float4 MaskColor = tex2D(sMaskTex,In.MaskCoord);
+
+    return /*MaskColor.ggga **/ DoSunLight(normalize(In.Normal));
 }
 
 technique terraintex3_13
@@ -76,6 +79,8 @@ technique terraintex3_13
 		sampler[1] = (sBaseTex);
 		sampler[2] = (sRedTex);
 		sampler[3] = (sGreenTex);
+
+        shademode = flat;
 
 		VertexShader = compile vs_2_0 vs_terraintex3();
 		PixelShader = compile ps_2_0 ps_terraintex3();
