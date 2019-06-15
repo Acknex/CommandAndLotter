@@ -40,8 +40,8 @@ void ui_rescale_radial(PANEL *rad)
 void ui_scale_radial(PANEL *rad, var scale)
 {
 	PANEL *icon = ptr_for_handle(rad->skill_x);
-	rad->size_x = bmap_width(ui_radial_n) * scale;
-	rad->size_y = bmap_height(ui_radial_n) * scale;
+	rad->size_x = bmap_width(ui_radial_n);
+	rad->size_y = bmap_height(ui_radial_n);
 	rad->scale_x = scale;
 	rad->scale_y = scale;
 	icon->scale_x = scale;
@@ -153,8 +153,6 @@ void ui_game_init()
 	ui_radial_sputnik = ui_create_radial_button(ui_icon_sputnik, ui_spawn_event_sputnik);
 	ui_radial_skull = ui_create_radial_button(ui_icon_skull, NULL);
 	ui_radial_esel = ui_create_radial_button(ui_icon_esel, NULL);
-	
-
 	
 	ui_main_resources = pan_create("", 99);
 	ui_unit_meta = pan_create("", 99);
@@ -304,24 +302,6 @@ void ui_game_update()
 	
 	int ui_max_type = 0;
 	
-	SUBSYSTEM_LOOP(ent, SUBSYSTEM_UNIT_MANAGEMENT)
-	{
-		if( ent->skill[39] )
-		{
-			if(!ent->MAXHEALTH || !ent->HEALTH)
-			{
-				ent->MAXHEALTH = 100;
-				ent->HEALTH = integer(random(100));
-			}
-			ui_has_ents = 1;
-			if( str_cmp(ent->type, "sputnik.mdl") )
-			{
-				ui_count_sputniks++;
-			}
-			update_or_create_lifebar(ent);
-		}
-	}
-	
 	SUBSYSTEM_LOOP(ent, SUBSYSTEM_SPAWNER)
 	{
 		if( ent->skill[39] )
@@ -343,6 +323,22 @@ void ui_game_update()
 				ui_radial_delete->skill_y = ent;
 				ui_radial_counter->skill_y = ent;
 				a_dummy_var = spawner_getQueue(ent);
+			}
+		}
+	}
+	
+	for(ent = ent_next(NULL); ent != NULL; ent = ent_next(ent))
+	{
+		if( ent->group == GROUP_PLAYER_UNIT)
+		{ 
+			if( ent->skill[39] )
+			{
+				ui_has_ents = 1;
+				if( str_cmp(ent->type, "SPUTNIK.MDL") )
+				{
+					ui_count_sputniks++;
+				}
+				update_or_create_lifebar(ent);
 			}
 		}
 	}
@@ -387,8 +383,6 @@ void ui_game_update()
 	if( last_building != ui_active_building)
 	{
 		ui_anim_state = UI_ANIM_RESTARTED;
-		ui_anim_unit_state = UI_ANIM_UNIT_OFF;
-		ui_selected_max_type = 0;
 		last_building = ui_active_building; 
 	} 
 	
@@ -406,6 +400,7 @@ void ui_game_update()
 	
 	if( ui_anim_unit_state == UI_ANIM_UNIT_RESTARTED )
 	{
+		
 		ui_switch_frame = 0;
 		pan_setwindow(ui_unit_meta, 1, 408, 98, 196, 186, (ui_active_portrait)[0], 0, 0);
 		ui_anim_unit_state = UI_ANIM_UNIT_PROGRESS;
@@ -414,10 +409,8 @@ void ui_game_update()
 	{
 		ui_switch_frame += time_step * UI_ANIM_UNIT_SPEED;
 		ui_switch_frame %= 19;
-		
 		if ( ui_switch_frame >= 13 && ui_switch_frame < 18)  
 		{
-			ui_active_portrait = NULL;
 			ui_active_portrait = ui_bmap_noise;	
 		} 
 		else if( ui_switch_frame >= 18 )
@@ -434,8 +427,6 @@ void ui_game_update()
 	else if ( ui_anim_unit_state == UI_ANIM_UNIT_OFF )
 	{
 		pan_setwindow(ui_unit_meta, 1, 0, 0, 0, 0, (ui_bmap_cbabe)[0], 0, 0);
-		
-		
 	}
 	
 	
@@ -456,7 +447,7 @@ void ui_game_update()
 		ui_orbit_radial(ui_radial_delete,screen.x, screen.y, 230, 200);
 		ui_orbit_radial(ui_radial_counter,screen.x, screen.y, 190, 200);
 		
-		
+		ui_anim_unit_state = UI_ANIM_UNIT_OFF;
 		
 		ui_show_radial(ui_radial_sputnik);
 		ui_scale_radial(ui_radial_sputnik, 0.1);
@@ -532,8 +523,6 @@ void ui_game_update()
 		ui_hide_radial(ui_radial_delete);
 		ui_radial_counter->flags &= ~SHOW;
 		
-		
-		
 		ui_scale1 = 0.1;
 		ui_scale2 = 0.1;
 		ui_scale3 = 0.1;
@@ -549,5 +538,5 @@ void ui_game_after_all()
 {
 	ENTITY * ent = ui_radial_counter->skill_y;
 	if(ent)
-		progressbar_radial_render(ui_radial_progress, 100 - 100 * spawner_getProgress(ent), 60, vector(0, 1, 0), 50);
+	progressbar_radial_render(ui_radial_progress, 100 - 100 * spawner_getProgress(ent), 60, vector(0, 1, 0), 50);
 }

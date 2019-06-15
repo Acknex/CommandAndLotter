@@ -429,7 +429,7 @@ void mapTileCalculateVisibility(MAP* map)
 	}
 }
 
-#define JPS_DEBUG
+//#define JPS_DEBUG
 
 int mapJPSPathGet(MAP* map, TILE* startTile, TILE *targetTile, JPSPATH *jpsPathOut)
 {
@@ -1096,16 +1096,17 @@ void jpsUnitDestroy(UNIT* unit)
 
 void unitSetTargetFromVector2D(MAP* map, UNIT* unit, VECTOR *vTarget)
 {
-	cprintf3("\n unitSetTargetFromVector2D(%p, (%.1f,%.1f))", unit, (double)vTarget->x, (double)vTarget->y);
+	//cprintf3("\n unitSetTargetFromVector2D(%p, (%.1f,%.1f))", unit, (double)vTarget->x, (double)vTarget->y);
 	if(!unit) return;
 	vec_set(unit->target2d, vTarget);
 	if(vec_dist(unit->target2d, unit->prevTarget2d) > 0.2)
 	{
 		vec_set(unit->prevTarget2d, unit->target2d);
 		unit->targetTile = mapTileGet(map, vTarget.x, vTarget.y);
+		//cprintf1(" - unit->targetTile(%p)", unit->targetTile);
 		//if(targetTile && unit->tile)
 		if(!unit->jpsPath) unit->jpsPath = jpsPathCreate(16);
-		mapJPSPathGet(map, unit->tile, targetTile, unit->jpsPath);
+		mapJPSPathGet(map, unit->tile, unit->targetTile, unit->jpsPath);
 	}
 }
 
@@ -1181,7 +1182,7 @@ MAP* jpsMapLoadFromFile(char* filename)
 	mapJPSUpdate(map);
 	mapUpdateBmap(map);
 	
-	entJPSDummyPlane = ent_create("jpsPlane.mdl", vector(0,0,580), NULL);
+	entJPSDummyPlane = ent_create("jpsPlane.mdl", vector(0,0,500), NULL);
 	set(entJPSDummyPlane, PASSABLE | TRANSLUCENT);
 	ent_setskin(entJPSDummyPlane, map->bmp, 1);
 	vec_set(entJPSDummyPlane->scale_x, vector(sizeX/64.0*tileSize, sizeY/64.0*tileSize, 0));
