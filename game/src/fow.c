@@ -114,6 +114,7 @@ void fow_update()
 		}
 	}
 	fow_calcoffset++;
+	fow_calcoffset = fow_calcoffset%fow_calcoffsetMAX;
 	
 	/*
 	fow_updatedelay += time_step;
