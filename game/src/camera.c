@@ -3,8 +3,6 @@
 
 var topdown_camera_height;
 VECTOR topdown_camera_center;
-var topdown_camera_rotation;
-
 VECTOR topdown_camera_centerTarget;
 
 
@@ -14,7 +12,6 @@ void topdown_camera_open()
 	camera.z = 3000;
 	camera.tilt = -70;
 	topdown_camera_height = 4;
-	topdown_camera_rotation = 0;
 	
 	vec_set(&topdown_camera_center, nullvector);
 }
@@ -29,8 +26,11 @@ void topdown_camera_update()
 	//	topdown_camera_set_pos(nullvector);
 		
 		if(mouse_middle)
-			topdown_camera_rotation += CAMERA_ROTATIONSPEED * mickey.x / screen_size.x;
-		camera.pan = topdown_camera_rotation;
+		{
+			camera.pan += CAMERA_ROTATIONSPEED * mickey.x / screen_size.x;
+			camera.tilt += CAMERA_ROTATIONSPEED * mickey.y / screen_size.y;
+			camera.tilt = clamp(camera.tilt, -90, -30);
+		}
 	
 		bool _left = (mouse_pos.y<CAMERA_MOVEBORDER);
 		bool _right = ((screen_size.y-mouse_pos.y)<CAMERA_MOVEBORDER);
