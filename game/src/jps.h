@@ -81,6 +81,7 @@
 		int playerID;
 		int isActive;
 		int isMoving;
+		int allowMovement;
 		int HP;
 		int speed;
 		VECTOR pos2d, pos3d, prevPos3d;
@@ -164,6 +165,9 @@
 	BMAP* mapGetBitmap(MAP* map);
 
 	void jpsGameUpdate(MAP* map);
+	
+	UNIT* jpsAllowMovementForEntity(ENTITY* ptr, int allow);
+	
 
 	/////////////////////////////////////////////////
 	// more available functions
