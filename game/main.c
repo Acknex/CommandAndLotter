@@ -46,3 +46,5 @@ function main()
 #include "ang.c"
 #include "scan.c"
 #include "grid.c"
+#include "particle.h"
+#include "spawner.c"
