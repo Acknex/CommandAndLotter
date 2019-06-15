@@ -1,8 +1,8 @@
 #ifndef SPAWNER_H
 #define SPAWNER_H
 
-#define SPAWNER_ENEMY 0
-#define SPAWNER_PLAYER 1
+#define SPAWNER_ENEMY 1
+#define SPAWNER_PLAYER 0
 
 ENTITY* spawner_spawn(int spawnertype, VECTOR* pos, var owner);
 var spawner_produce(ENTITY* ent);
