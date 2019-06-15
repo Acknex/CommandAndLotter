@@ -215,7 +215,7 @@ void SPUTNIK__attack(ENTITY* ptr)
 				c_ignore(GROUP_PLAYER_UNIT, GROUP_PLAYER_SPAWNER,0);
 			else
 				c_ignore(GROUP_ENEMY_UNIT, GROUP_ENEMY_SPAWNER,0);
-			ENEMY_HIT_setAttack()
+			//ENEMY_HIT_setAttack()
 			c_trace(ptr->x, unit_getTarget(ptr), mode);			
 		}
 		ptr->SPUTNIK_DIDATTACK = 1;
