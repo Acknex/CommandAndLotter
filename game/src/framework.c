@@ -79,6 +79,8 @@ void framework_init()
     // SetupPostprocessing();
 #endif
 
+    video_set(1280, 720, 0, 2);
+
     mouse_mode = 4;
 
     on_frame = framework_update;

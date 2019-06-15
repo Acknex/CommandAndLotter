@@ -19,9 +19,10 @@
 #define PRAGMA_PATH "ui"
 #define PRAGMA_PATH "map"
 
+BMAP * shader_noise = "noise.png";
+
 function main()
 {
-	def_move();
 	framework_init();
 }
 
