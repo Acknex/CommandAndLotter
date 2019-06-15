@@ -1,8 +1,4 @@
 
-#define SELCTED_SKILL skill[39]
-#define UNIT_DEST_SKILL skill[40]
-#define UNIT_GROUP_SKILL skill[43]
-
 #define DebugMode
 
 var CamFPS;

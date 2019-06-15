@@ -29,6 +29,12 @@ typedef int bool;
 #define ENTITY_ANIM skill56
 #define ENTITY_VICTIM skill57
 
+
+#define SELCTED_SKILL skill[39]
+#define UNIT_DEST_SKILL skill[40]
+#define UNIT_GROUP_SKILL skill[43]
+
+
 //! Markiert die Entity als "TOT" und sorgt dafür, dass sie zu Ende des Frames gelöscht wird.
 #define SK_ENTITY_DEAD skill98
 
@@ -58,5 +64,7 @@ typedef int bool;
 #define GROUP_PLAYER_SPAWNER 11
 #define GROUP_ENEMY_UNIT     12
 #define GROUP_ENEMY_SPAWNER  13
+
+
 
 #endif // GLOBAL_H
