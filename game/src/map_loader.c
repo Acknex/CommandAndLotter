@@ -26,6 +26,7 @@ BMAP * maploader_terrain_analogue = "terrain_analogue.png";
 BMAP * maploader_terrain_splatter = "terrain_splatter.png";
 BMAP * maploader_terrain_street_digital = "terrain_street.png";
 BMAP * maploader_terrain_street_analogue = "terrain_street2.png";
+BMAP * maploader_terrain_digital_fancy = "terrain_street3.png";
 
 MATERIAL * maploader_terrain_material =
 {
@@ -72,6 +73,7 @@ void maploader_init()
     bmap_to_mipmap(maploader_terrain_splatter);
     bmap_to_mipmap(maploader_terrain_street_digital);
     bmap_to_mipmap(maploader_terrain_street_analogue);
+    bmap_to_mipmap(maploader_terrain_digital_fancy);
 }
 
 int maploader_grey_to_type(int gray)

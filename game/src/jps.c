@@ -742,6 +742,54 @@ int mapGetNearbyUnits(MAP* map, TILE* sourceTile, int range)
 	return pointerArrayNum;
 }
 
+int unit_getType(ENTITY* ent);
+
+// set typeID to -1 to get all objects
+// owner to -1 for both player and enemy units
+int mapGetNearbyUnitsOfTypeForPos(VECTOR *vpos, int typeID, int owner, var maxDistance, int maxNumEntities)
+{
+	MAP* map = mapGetCurrent();
+	TILE* sourceTile = mapGetTileFromVector(map, vpos);
+	pointerArrayNum = 0;
+	if(!sourceTile) return 0;
+	int range = 1+maxDistance/map->tileSize;
+	int ownerMin = 0;
+	int ownerMax = 1;
+	if(owner == 0) ownerMax = 0;
+	if(owner == 1) ownerMin = 1;
+	int i,j;
+	for(i = sourceTile->pos[0]-range; i <= sourceTile->pos[0]+range; i++)
+	{
+		for(j = sourceTile->pos[1]-range; j <= sourceTile->pos[1]+range; j++)
+		{
+			TILE* tile = mapTileGet(map, i, j);
+			if(tile)
+			{
+				int k;
+				int currentPlayer;
+				for(currentPlayer = ownerMin; currentPlayer < ownerMax; ++currentPlayer)
+				{		
+					for(k = 0; k < tile->numUnits[currentPlayer]; k++)
+					{
+						UNIT* unit = tile->unitArray[k];
+						ENTITY* ent = unit->ent;
+						if(ent)
+						{
+							if(owner < 0 || owner == unit_getType(ent))
+							{
+								pointerArray[pointerArrayNum++] = tile->unitArray[k];
+								if(pointerArrayNum >= POINTER_ARRAY_MAX || pointerArrayNum >= maxNumEntities) return pointerArrayNum;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return pointerArrayNum;
+}
+
+
 int mapIsAnyUnitNearby(MAP* map, TILE* sourceTile, int range)
 {
 	if(!sourceTile) return NULL;
@@ -1255,6 +1303,54 @@ int mapGetTileValueAtPos3D(MAP* map, VECTOR* pos3d)
 	TILE* tile = mapGetTileFromVector(map, pos3d);
 	if(tile) return tile->value;
 	return -1;
+}
+
+TILE* mapGetEmptyTileForAI(MAP* map, int freeBorder)
+{
+	int ishift = random(map->size[0]);
+	//int jshift = random(map->size[0]);
+	int jstart = 2+random(4);
+	int i,j;
+	for(j = jstart; j < map->size[1]; j++)
+	{
+		for(i = 0; i < map->size[0]; i++)
+		{
+			int i2 = (i+ishift)%map->size[0];
+			//int j2 = (j+jshift)%map->size[1];
+			int j2 = j;
+			if(i2 >= 3 && i2 < map->size[0]-3 && j2 >= 3 && j2 < map->size[1]-3)
+			{
+				TILE* tile = mapTileGet(map,i2,j2);
+				if(!tile->value)
+				{
+					int tileOkay = 8;
+					if(freeBorder)
+					{
+						tileOkay = 0;
+						int i3,j3;
+						for(i3 = -1; i3 <= 1; i3++)
+						{
+							for(j3 = -1; j3 <= 1; j3++)
+							{
+								if(i3 || j3)
+								{
+									int i4 = i3+i2;
+									int j4 = j3+j2;
+									TILE* tile2 = mapTileGet(map,i4,j4);
+									if(tile2)
+									{
+										if(!tile2->value) tileOkay++;
+									}
+								}
+							}
+						}
+					}
+					if(tileOkay == 8) return tile;
+				}
+			}
+		}
+	}
+	return NULL;
 }
 
 ///////////////////////////////

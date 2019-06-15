@@ -149,12 +149,11 @@ var spawner_getHealth(ENTITY* ent)
 void Spawner()
 {
    framework_setup(my, SUBSYSTEM_SPAWNER);
-	my->HEALTH = 50;//TODO HOOK TO UNIT SYSTEM
+	my->HEALTH = 50;
 	my->MAXHEALTH = my->HEALTH;
 	set(my, SHADOW);
 	c_setminmax(me);
 	my->ENTITY_STATE = SPAWNER_STATE_CONSTRUCT;
-	//my->ENTITY_STATE = SPAWNER_STATE_DIE;
 
 	my->SPAWNER_QUEUE = 0;
 	my->SPAWNER_BUILDTIMER = SPAWNER_BUILDTIME;

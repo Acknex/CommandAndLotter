@@ -29,6 +29,7 @@ DEPENDPATH += $$pwd/src
 
 SOURCES += \
   main.c \
+  src/ai.c \
   src/ang.c \
   src/building.c \
   src/camera.c \
@@ -80,6 +81,7 @@ HEADERS += \
   src/credits.h \
   src/effects2d.h \
   src/enemy_hit.h \
+  src/fow.h \
   src/framework.h \
   src/game.h \
   src/global.h \
@@ -87,6 +89,7 @@ HEADERS += \
   src/mainmenu.h \
   src/map_loader.h \
   src/UnitMangement.h \
+  src/materials.h \
   src/music_player.h \
   src/progressbars.h \
   src/scan.h \
