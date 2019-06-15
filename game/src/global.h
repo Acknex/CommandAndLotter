@@ -46,6 +46,7 @@ typedef int bool;
 //skill50-67 reserved for module use
 
 #define SUBSYSTEM_FRAMEWORK         1
+#define SUBSYSTEM_CONSTRUCTION      98
 #define SUBSYSTEM_SPAWNER           99
 #define SUBSYSTEM_UNIT_SPUTNIK      100
 #define SUBSYSTEM_UNIT_EYE          101
