@@ -16,7 +16,7 @@ float4 postprocessing_colorshift(float4 screenSpace : VPOS ) : COLOR0
 	return lerp(
 		float4(0, 0, 0, 0),
 		vecSkill1.rgba,
-		step(length(p), 1.0) * step(a, vecSkill5.x)
+		step(length(p), vecSkill5.y) * step(a, vecSkill5.x)
 	);
 }
 
