@@ -5,6 +5,7 @@
 #include "grid.h"
 #include "camera.h"
 #include "sputnik.h"
+#include "spawner.h"
 #include "stub.h"
 #include <acknex.h>
 #include "UnitMangement.h"
@@ -29,6 +30,7 @@ void game_open(void)
 
     UnitMangement_open();
 	SPUTNIK_Init();
+	SPAWNER_Init();
 	stub_init(); //hook debug shit here
 	
 	grid_open(50,50);
@@ -38,6 +40,7 @@ void game_update(void)
 {
 	ui_game_update();
 	SPUTNIK_Update();
+	SPAWNER_Update();
 	stub_update(); //hook debug shit here
 	topdown_camera_update();
     UnitMangement_update();
