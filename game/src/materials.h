@@ -101,6 +101,7 @@ void UpdateRenderTargets()
 	if(bmapPPOriginal)
 		bmap_remove(bmapPPOriginal);
 		
+    printf("%f, %f", (double)screen_size.x, (double)screen_size.y);
 	bmapPPOriginal = bmap_createblack(screen_size.x, screen_size.y, 8888);
 	
     camera.bmap = bmapPPOriginal;
@@ -140,9 +141,27 @@ void materials_reinit()
     pp_add(matPPCombine);
 }
 
+int AmazingRendertargetCounter = 0;
+void rendertargetUpdateBlubb()
+{
+    AmazingRendertargetCounter = 1;
+}
+
+void updateRenderTargetsIfNeeded()
+{
+    if(AmazingRendertargetCounter == 1)
+    {
+        materials_reinit();
+    }
+
+    AmazingRendertargetCounter = 0;
+}
+
 void SetupPostprocessing()
 {
     materials_reinit();
+
+    on_d3d_reset = rendertargetUpdateBlubb;
 }
 
 #endif
