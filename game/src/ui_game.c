@@ -16,6 +16,8 @@ void ui_game_init()
 	ui_portrait = pan_create("", 99);
 	ui_minimap = pan_create("", 99);
 	
+	
+	
 	pan_setbutton(ui_game_menu, 0, 0, 1, 151, ui_hide_button_p, ui_hide_button_n, ui_hide_button_o, ui_hide_button_n, ui_show_commando_groups, NULL, NULL);
 	
 	ui_bmap_cbabe[0] = bmap_create("CbFace1.png");
@@ -87,6 +89,25 @@ void ui_game_close()
 
 void ui_game_update()
 {
+	var scale_factor_x = screen_size.x / 1920;
+	var scale_factor_y = screen_size.y / 1080;
+	
+	ui_main_resources->scale_x = scale_factor_x;
+	ui_main_resources->scale_y = scale_factor_y;
+	
+	ui_unit_meta->scale_x = scale_factor_x;
+	ui_unit_meta->scale_y = scale_factor_y;
+	
+	ui_game_menu->scale_x = scale_factor_x;
+	ui_game_menu->scale_y = scale_factor_y;
+	
+	ui_portrait->scale_x = scale_factor_x;
+	ui_portrait->scale_y = scale_factor_y;
+	
+	ui_minimap->scale_x = scale_factor_x;
+	ui_minimap->scale_y = scale_factor_y;
+	
+	
 	ENTITY * ent;
 	int ui_has_ents = 0;
 	int ui_count_sputniks = 0;
@@ -96,14 +117,16 @@ void ui_game_update()
 	
 	if( !ui_command_group_status )
 	{
-		ui_game_menu->pos_x = screen_size.x - bmap_width(ui_bmap_gamemenu) + 100;
-		ui_game_menu->pos_y = screen_size.y * 0.15;
+		ui_game_menu->pos_x = screen_size.x - bmap_width(ui_bmap_gamemenu) * scale_factor_x + 100 * scale_factor_x;
+		ui_game_menu->pos_y = screen_size.y * 0.15 * scale_factor_y;
 	}
 	else
 	{
-		ui_game_menu->pos_x = screen_size.x - bmap_width(ui_bmap_gamemenu);
-		ui_game_menu->pos_y = screen_size.y * 0.15;
+		ui_game_menu->pos_x = screen_size.x - bmap_width(ui_bmap_gamemenu) * scale_factor_x;
+		ui_game_menu->pos_y = screen_size.y * 0.15 * scale_factor_y;
 	}
+	
+	ui_unit_meta->pos_y = screen_size.y - bmap_height(ui_bmap_units) * scale_factor_y - 3;
 	
 	int ui_max_type = 0;
 	
@@ -149,7 +172,7 @@ void ui_game_update()
 		ui_unit_meta->flags &= ~SHOW;
 	}
 	
-	ui_unit_meta->pos_y = screen_size.y - bmap_height(ui_bmap_units) - 3;
+	
 	
 	VECTOR screen;
 	
