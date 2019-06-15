@@ -45,4 +45,4 @@ function main()
 #include "unit.c"
 #include "ang.c"
 #include "scan.c"
-
+#include "map.c"
