@@ -11,7 +11,7 @@
 void game_init(void)
 {
 	ui_game_init();
-    UnitMangement_init();
+    //UnitMangement_init();
 }
 
 void game_open(void)
@@ -23,7 +23,7 @@ void game_open(void)
 	ui_game_open();
 	topdown_camera_open();
 
-    UnitMangement_open();
+    //UnitMangement_open();
 	SPUTNIK_Init();
 	stub_init(); //hook debug shit here
 }
@@ -34,7 +34,7 @@ void game_update(void)
 	SPUTNIK_Update();
 	stub_update(); //hook debug shit here
 	topdown_camera_update();
-    UnitMangement_update();
+    //UnitMangement_update();
 
 }
 
