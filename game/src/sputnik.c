@@ -94,6 +94,28 @@ void SPUTNIK_Update()
 	SUBSYSTEM_LOOP(ptr, SUBSYSTEM_UNIT_SPUTNIK)
 	{
 		jpsAllowMovementForEntity(ptr, false);
+	
+		ENTITY* victim = unit_getVictim(ptr);
+		if (victim != NULL)
+		{
+			if (victim->ENTITY_STATE == ENTITY_STATE_DIE || victim->ENTITY_STATE == ENTITY_STATE_DEAD) 
+			{
+				//meh.
+				var owner;
+				if (ptr->group == GROUP_ENEMY_UNIT)	
+					owner = UNIT_ENEMY;
+				else
+					owner = UNIT_PLAYER;
+				
+				int count = mapGetNearbyUnitsOfTypeForPos(ptr->x, victim->ENTITY_UNITTYPE, owner, 1000, 1);
+				if (count > 0)
+				{
+					ENTITY* ent = jpsGetEntityFromUnitArray(0);
+					unit_setTarget(ptr, ent->x);
+					unit_setVictim(ptr, ent);
+				}
+			}
+		}	
 		
 		if (ptr->DAMAGE_HIT > 0)
 		{
