@@ -737,6 +737,22 @@ int mapGetNearbyUnits(MAP* map, TILE* sourceTile, int range)
 	return pointerArrayNum;
 }
 
+int mapIsAnyUnitNearby(MAP* map, TILE* sourceTile, int range)
+{
+	if(!sourceTile) return NULL;
+	int i,j;
+	for(i = sourceTile->pos[0]-range; i <= sourceTile->pos[0]+range; i++)
+	{
+		for(j = sourceTile->pos[1]-range; j <= sourceTile->pos[1]+range; j++)
+		{
+			TILE* tile = mapTileGet(map, i, j);
+			if(tile)
+				if(tile->numUnits) return 1;
+		}
+	}
+	return 0;
+}
+
 VECTOR* unitFlockingSpeedGet(MAP* map, UNIT* unit, VECTOR* v)
 {
 	static VECTOR _vstatic;
@@ -1135,10 +1151,10 @@ MAP* jpsMapLoadFromFile(char* filename)
 	mapJPSUpdate(map);
 	mapUpdateBmap(map);
 	
-	entJPSDummyPlane = ent_create("jpsPlane.mdl", vector(0,0,-640), NULL);
+	entJPSDummyPlane = ent_create("jpsPlane.mdl", vector(0,0,580), NULL);
 	set(entJPSDummyPlane, PASSABLE | TRANSLUCENT);
 	ent_setskin(entJPSDummyPlane, map->bmp, 1);
-	vec_set(entJPSDummyPlane->scale_x, vector(sizeX/64.0*tileSize*4, sizeY/64.0*tileSize*4, 0));
+	vec_set(entJPSDummyPlane->scale_x, vector(sizeX/64.0*tileSize*6, sizeY/64.0*tileSize*6, 0));
 	entJPSDummyPlane->material = jpsDummyNoFilter_mat;
 	
 	return map;

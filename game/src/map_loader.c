@@ -191,8 +191,8 @@ void maploader_load(char const * fileName)
             normalVector.z = (neighborY - v->y)/255;
             vec_normalize(normalVector, 1.0);
 
-            v->u1 = (float)x / (float)maploader.w;
-            v->v1 = (float)y / (float)maploader.h;
+            v->u1 = 154.0 * (float)x / (float)maploader.w / 256.0;
+            v->v1 = 190.0 * (float)y / (float)maploader.h / 256.0;
 
             v->nx = (float)normalVector.x;
             v->ny = (float)normalVector.y;
@@ -237,6 +237,7 @@ void maploader_load(char const * fileName)
         }
     }
 
+    maploader.terrain.clipfactor = 2;
     collision_mode = 1;
 
     if(key_c)
