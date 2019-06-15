@@ -18,6 +18,10 @@ struct maploader_t
 
 struct maploader_t maploader;
 
+BMAP * maploader_terrain_digital = "terrain_digital.png";
+BMAP * maploader_terrain_analogue = "terrain_analogue.png";
+BMAP * maploader_terrain_splatter = "terrain_splatter.png";
+
 MATERIAL * maploader_material =
 {
   flags = AUTORELOAD;
@@ -40,7 +44,10 @@ void maploader_get_tile_pos(VECTOR * v, int * x, int * y)
 
 void maploader_init()
 {
-	maploader.cells = NULL;
+    maploader.cells = NULL;
+    bmap_to_mipmap(maploader_terrain_digital);
+    bmap_to_mipmap(maploader_terrain_analogue);
+    bmap_to_mipmap(maploader_terrain_splatter);
 }
 
 int maploader_grey_to_type(int gray)
