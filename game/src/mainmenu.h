@@ -4,6 +4,8 @@
 #include "global.h"
 
 int mainmenu_current_response = 0;
+uimenu_window_t * wndMenuMain;
+uimenu_window_t * wndMenuOptions;
 
 BMAP * mainmenu_btn_new_game = "btn_menu_new_game.png";
 BMAP * mainmenu_btn_new_game_hi = "btn_menu_new_game_hi.png";
