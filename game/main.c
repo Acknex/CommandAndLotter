@@ -40,3 +40,8 @@ function main()
 #include "enemy_hit.c"
 #include "camera.c"
 #include "UnitMangement.c"
+#include "stub.c"
+#include "unit.c"
+#include "ang.c"
+#include "scan.c"
+

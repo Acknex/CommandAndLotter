@@ -38,7 +38,7 @@
 #define SPUTNIK_STATE_HIT 6
 
 #define SPUTNIK_FEET 30
-#define SPUTNIK_TARGETDIST 30
+#define SPUTNIK_TARGETDIST 100
 
 SOUND* sputnik_snd_death = "sputnik_death.wav";
 SOUND* sputnik_snd_attack1 = "sputnik_attack1.wav";
@@ -53,8 +53,8 @@ SOUND* sputnik_snd_attack3 = "sputnik_attack3.wav";
 action Sputnik()
 {
    framework_setup(my, SUBSYSTEM_UNIT_SPUTNIK);
-	if(my->SPUTNIK_RUNSPEED == 0) my->SPUTNIK_RUNSPEED = 12;
-	if(my->SPUTNIK_TURNSPEED == 0) my->SPUTNIK_TURNSPEED = 20;
+	if(my->SPUTNIK_RUNSPEED == 0) my->SPUTNIK_RUNSPEED = 3;
+	if(my->SPUTNIK_TURNSPEED == 0) my->SPUTNIK_TURNSPEED = 50;
 	if(my->SPUTNIK_ATTACKSPEED == 0) my->SPUTNIK_ATTACKSPEED = 5;
 	if(my->SPUTNIK_ATTACKRANGE == 0) my->SPUTNIK_ATTACKRANGE = 300;
 	if(my->SPUTNIK_ACTIVEDIST == 0) my->SPUTNIK_ACTIVEDIST = 6000;
@@ -66,6 +66,8 @@ action Sputnik()
 	c_setminmax(me);
 	my->min_z += SPUTNIK_FEET;
 	my->group = GROUP_UNIT;
+	vec_set(my->UNIT_TARGET, my->x);
+	my->SPUTNIK_STATE = SPUTNIK_STATE_WAIT;
 }
 
 void SPUTNIK_Init()
@@ -108,11 +110,6 @@ void SPUTNIK_Update()
 					
 		switch(ptr->SPUTNIK_STATE)    	
 		{
-			case SPUTNIK_STATE_INACTIVE:
-			{
-				SPUTNIK__inactive(ptr);
-				break;
-			}
 
 			case SPUTNIK_STATE_WAIT:
 			{
@@ -122,7 +119,7 @@ void SPUTNIK_Update()
 
 			case SPUTNIK_STATE_WALK:
 			{
-				SPUTNIK__follow(ptr);
+				SPUTNIK__walk(ptr);
 				break;
 			}
 
@@ -174,34 +171,24 @@ void SPUTNIK__hitcheck(ENTITY* ptr)
 	}
 }
 
-void SPUTNIK__inactive(ENTITY* ptr)
-{
-	/* transitions */
-	if(SCAN_IsCameraNear(ptr))
-	{
-		ptr->SPUTNIK_STATE = SPUTNIK_STATE_WAIT;
-	}
-}
-
 void SPUTNIK__wait(ENTITY* ptr)
 {
   	ptr->SPUTNIK_ANIMSTATE += 10 * time_step;
 	ent_animate(ptr, SPUTNIK_WAITANIM, ptr->SPUTNIK_ANIMSTATE, ANM_CYCLE);
 		
 	/* transitions */
-	if(ANG_turnToPos(ptr, ptr->UNIT_TARGET, ptr->SPUTNIK_TURNSPEED, 5) != 0)
+	if (SCAN_IsTargetNear(ptr, ptr->UNIT_TARGET, SPUTNIK_TARGETDIST) == 0)
 	{
 		ptr->SPUTNIK_RUNSPEEDCUR = 0;
 		ptr->SPUTNIK_STATE = SPUTNIK_STATE_WALK;
-	}
-	else if(!SCAN_IsCameraNear(ptr))
-	{
-		ptr->SPUTNIK_STATE = SPUTNIK_STATE_INACTIVE;
 	}
 }
 
 void SPUTNIK__walk(ENTITY* ptr)
 {
+	//DEBUG_VAR(ptr->pan, 20);
+	//DEBUG_VAR(ptr->UNIT_TARGETX, 120);
+	//DEBUG_VAR(ptr->UNIT_TARGETY, 140);
 	ptr->SPUTNIK_RUNSPEEDCUR = ptr->SPUTNIK_RUNSPEED; 
 	ANG_turnToPos(ptr, ptr->UNIT_TARGET, ptr->SPUTNIK_TURNSPEED, 5);
 	VECTOR* to = vector(ptr->SPUTNIK_RUNSPEEDCUR + 20, 0, 0);
@@ -258,7 +245,7 @@ void SPUTNIK__walk(ENTITY* ptr)
 	{
 		ptr->SPUTNIK_DIDATTACK = 0;
 		ptr->SPUTNIK_ANIMSTATEATK = 0;
-		ptr->SPUTNIK_ANIMSTATE += ptr->SPUTNIK_RUNSPEED * time_step;
+		ptr->SPUTNIK_ANIMSTATE += 10 * ptr->SPUTNIK_RUNSPEED * time_step;
 		ent_animate(ptr, SPUTNIK_WALKANIM, ptr->SPUTNIK_ANIMSTATE, ANM_CYCLE);		
 	}
 }

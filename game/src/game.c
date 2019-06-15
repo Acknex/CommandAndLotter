@@ -3,6 +3,8 @@
 #include "ui_game.h"
 #include "framework.h"
 #include "camera.h"
+#include "sputnik.h"
+#include "stub.h"
 #include <acknex.h>
 #include "UnitMangement.h"
 
@@ -20,14 +22,20 @@ void game_open(void)
 
 	ui_game_open();
 	topdown_camera_open();
+
     UnitMangement_open();
+	SPUTNIK_Init();
+	stub_init(); //hook debug shit here
 }
 
 void game_update(void)
 {
 	ui_game_update();
+	SPUTNIK_Update();
+	stub_update(); //hook debug shit here
 	topdown_camera_update();
     UnitMangement_update();
+
 }
 
 void game_close(void)
