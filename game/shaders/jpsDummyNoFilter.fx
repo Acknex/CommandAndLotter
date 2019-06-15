@@ -34,7 +34,8 @@ void DiffuseVS(
    OutPos = mul(InPos, matWorldViewProj); 
 // Transform the normal from object space to world space: 
    OutNormal = normalize(mul(InNormal, matWorld));
-// Pass the texture coordinate to the pixel shader: 
+// Pass the texture coordinate to the pixel shader:
+InTex.x *= 52.0/64.0;
    OutTex = InTex; 
 } 
     
@@ -46,6 +47,7 @@ float4 DiffusePS(
 // Calculate the ambient term: 
    float4 Color = tex2D(ColorMapSampler, InTex); 
 // Calculate final color: 
+Color.a = 0.5;
    return Color; 
 } 
  

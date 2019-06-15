@@ -130,7 +130,7 @@
 	typedef struct _MAP MAP;
 	MAP* mapCurrent = NULL;
 
-ENTITY* entJPSDummyPlane = NULL;
+	ENTITY* entJPSDummyPlane = NULL;
 	/////////////////////////////////////////////////
 
 	#include "console.h"
