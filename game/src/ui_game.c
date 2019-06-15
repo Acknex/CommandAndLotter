@@ -40,8 +40,8 @@ void ui_rescale_radial(PANEL *rad)
 void ui_scale_radial(PANEL *rad, var scale)
 {
 	PANEL *icon = ptr_for_handle(rad->skill_x);
-	rad->size_x = bmap_width(ui_radial_n) * scale;
-	rad->size_y = bmap_height(ui_radial_n) * scale;
+	rad->size_x = bmap_width(ui_radial_n);
+	rad->size_y = bmap_height(ui_radial_n);
 	rad->scale_x = scale;
 	rad->scale_y = scale;
 	icon->scale_x = scale;
@@ -153,8 +153,6 @@ void ui_game_init()
 	ui_radial_sputnik = ui_create_radial_button(ui_icon_sputnik, ui_spawn_event_sputnik);
 	ui_radial_skull = ui_create_radial_button(ui_icon_skull, NULL);
 	ui_radial_esel = ui_create_radial_button(ui_icon_esel, NULL);
-	
-
 	
 	ui_main_resources = pan_create("", 99);
 	ui_unit_meta = pan_create("", 99);
@@ -345,12 +343,8 @@ void ui_game_update()
 		}
 	}
 	
-	
-	
 	if(ui_has_ents)
 	{
-		
-		
 		ui_unit_meta->flags |= SHOW;
 		
 		if( ui_count_sputniks >= ui_count_esel && ui_count_sputniks >= ui_count_cbabes && ui_count_sputniks >= ui_count_skull )
