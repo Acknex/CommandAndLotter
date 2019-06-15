@@ -644,7 +644,7 @@ VECTOR* mapGetVector3DFromVector2D(MAP* map, VECTOR* v3d, VECTOR* v2d)
 	if(!v3d) v3d = &_vstatic;
 	v3d->x = v2d->x*map->tileSize + map->vMin.x;
 	v3d->y = v2d->y*map->tileSize + map->vMin.y;
-	v3d->z = 0;
+	//v3d->z = 0; // do not overwrite height
 	return v3d;
 }
 
@@ -681,11 +681,6 @@ void mapUpdateUnits(MAP* map)
 		while(unit)
 		{
 			TILE* tile = mapTileGet(map, unit->pos2d.x, unit->pos2d.y);
-			/*if(tile)
-			{
-				tile->unitList = listAdd(tile->unitList, unit);
-				tile->numUnits++;
-			}*/
 			if(tile)
 			{
 				if(tile->numUnits[currentPlayer] < MAX_UNITS_PER_TILE)
@@ -699,30 +694,6 @@ void mapUpdateUnits(MAP* map)
 			unit = unit->next;
 		}
 	}
-}
-
-LIST* mapGetNearbyUnits_listbased(MAP* map, TILE* sourceTile, int range)
-{
-	LIST* combinedList = NULL;
-	if(!sourceTile) return NULL;
-	int i,j;
-	for(i = sourceTile->pos[0]-range; i <= sourceTile->pos[0]+range; i++)
-	{
-		for(j = sourceTile->pos[1]-range; j <= sourceTile->pos[1]+range; j++)
-		{
-			TILE* tile = mapTileGet(map, i, j);
-			if(tile)
-			{
-				LIST* list = tile->unitList;
-				while(list)
-				{
-					combinedList = listAdd(combinedList, list->data);
-					list = list->next;
-				}
-			}
-		}
-	}
-	return combinedList;
 }
 
 int mapGetNearbyUnits(MAP* map, TILE* sourceTile, int range)
@@ -739,12 +710,14 @@ int mapGetNearbyUnits(MAP* map, TILE* sourceTile, int range)
 			{
 				int k;
 				int currentPlayer;
-				for(currentPlayer = 0; currentPlayer<MAX_PLAYERS; ++currentPlayer)				
+				for(currentPlayer = 0; currentPlayer<MAX_PLAYERS; ++currentPlayer)
+				{		
 					for(k = 0; k < tile->numUnits[currentPlayer]; k++)
 					{
 						pointerArray[pointerArrayNum++] = tile->unitArray[k];
 						if(pointerArrayNum >= POINTER_ARRAY_MAX) return pointerArrayNum;
 					}
+				}
 			}
 		}
 	}
@@ -805,7 +778,6 @@ VECTOR* unitFlockingSpeedGet(MAP* map, UNIT* unit, VECTOR* v)
 		int size = 12;
 		int unitDrawSize = 2;
 		//draw_line2(vector(unit->pos2d.x*size-unitDrawSize/2,unit->pos2d.y*size-unitDrawSize/2,0), vector(neighbor->pos2d.x*size-unitDrawSize/2,neighbor->pos2d.y*size-unitDrawSize/2,0), vector(255,128,64), 100);
-		
 		
 		UNIT_PRESET* neighborPreset = &unitPresets[neighbor->presetID];
 		VECTOR vDir;
@@ -1015,7 +987,7 @@ void unitMove(MAP* map, UNIT* unit)
 	int size = 12;
 	//draw_line2(vector(unit->pos2d.x*size,unit->pos2d.y*size,0), vector(currentTarget.x*size,currentTarget.y*size,0), vector(0,255,255), 50);
 
-	float maxSpeed = 0.5;
+	float maxSpeed = 0.25;
 	vec_diff(vDir, currentTarget, unit->pos2d);
 	vDir.z = 0;
 	var length = vec_length(vDir);
@@ -1057,9 +1029,9 @@ void mapMoveUnits(MAP* map)
 			if(unit->isActive)
 			{
 				unitMove(map, unit);
-				//if(unit->ent) mapGetVector3DFromVector2D(map, unit->ent.x, unit->pos2d);
+				if(unit->ent) mapGetVector3DFromVector2D(map, unit->ent.x, unit->pos2d);
 				
-				if(unit->HP <= 0 || 1)
+				if(unit->HP <= 0 && 0)
 				{
 					unit->isActive = 0; // delay removal for one frame to void projectiles
 				}
@@ -1186,7 +1158,7 @@ MAP* jpsMapLoadFromFile(char* filename)
 	int mapVersion = file_var_read(fhandle);
 	int sizeX = file_var_read(fhandle);
 	int sizeY = file_var_read(fhandle);
-	var tileSize = 64;
+	var tileSize = 64*4;
 	MAP* map = mapCreate(sizeX, sizeY, vector(-sizeX/2*tileSize,-sizeY/2*tileSize,0), vector(sizeX/2*tileSize,sizeY/2*tileSize,0), tileSize);
 	int i,j;
 	for(i = 0; i < map->size[0]; i++)
@@ -1204,7 +1176,7 @@ MAP* jpsMapLoadFromFile(char* filename)
 	entJPSDummyPlane = ent_create("jpsPlane.mdl", vector(0,0,580), NULL);
 	set(entJPSDummyPlane, PASSABLE | TRANSLUCENT);
 	ent_setskin(entJPSDummyPlane, map->bmp, 1);
-	vec_set(entJPSDummyPlane->scale_x, vector(sizeX/64.0*tileSize*4, sizeY/64.0*tileSize*4, 0));
+	vec_set(entJPSDummyPlane->scale_x, vector(sizeX/64.0*tileSize, sizeY/64.0*tileSize, 0));
 	entJPSDummyPlane->material = jpsDummyNoFilter_mat;
 	
 	return map;

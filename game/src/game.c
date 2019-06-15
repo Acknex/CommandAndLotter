@@ -18,6 +18,7 @@ void game_init(void)
     UnitMangement_init();
     grid_init();
 	buildingPlacement_init();
+	presetsInit();
 }
 
 void game_open(void)
