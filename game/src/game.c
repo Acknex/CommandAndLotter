@@ -2,13 +2,12 @@
 #include "map_loader.h"
 #include "ui_game.h"
 #include "framework.h"
+#include "camera.h"
 #include <acknex.h>
-#include "UnitMangement.h"
 
 void game_init(void)
 {
 	ui_game_init();
-    UnitMangement_init();
 }
 
 void game_open(void)
@@ -18,13 +17,13 @@ void game_open(void)
 	maploader_load("the-core.png");
 
 	ui_game_open();
-    UnitMangement_open();
+	topdown_camera_open();
 }
 
 void game_update(void)
 {
 	ui_game_update();
-    UnitMangement_update();
+	topdown_camera_update();
 }
 
 void game_close(void)
