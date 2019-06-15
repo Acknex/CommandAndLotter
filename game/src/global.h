@@ -18,6 +18,7 @@ typedef int bool;
 #define ENTITY_STATE_HIT 6
 
 
+#define MAXHEALTH skill49 //remove after attaching unit system to entity code
 #define HEALTH skill50 //remove after attaching unit system to entity code
 // old hit system - to be fiddled together with unit system and maybe remove later on
 #define DAMAGE_HIT skill51
