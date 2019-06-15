@@ -31,6 +31,7 @@ function main()
 // Include your code file here
 #include "framework.c"
 #include "game.c"
+#include "ui_menu.c"
 #include "mainmenu.c"
 #include "credits.c"
 #include "music_player.c"
