@@ -47,7 +47,7 @@ float4 DiffusePS(
 // Calculate the ambient term: 
    float4 Color = tex2D(ColorMapSampler, InTex); 
 // Calculate final color: 
-Color.a = 0.25;
+Color.a = 0.1;
    return Color; 
 } 
  
