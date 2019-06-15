@@ -1257,6 +1257,31 @@ int mapGetTileValueAtPos3D(MAP* map, VECTOR* pos3d)
 	return -1;
 }
 
+TILE* mapGetEmptyTileForAI(MAP* map)
+{
+	int ishift = random(map->size[0]);
+	//int jshift = random(map->size[0]);
+	int jstart = 2+random(4);
+	int i,j;
+	for(j = jstart; j < map->size[1]; j++)
+	{
+		for(i = 0; i < map->size[0]; i++)
+		{
+			int i2 = (i+ishift)%map->size[0];
+			//int j2 = (j+jshift)%map->size[1];
+			int j2 = j;
+			if(i2 >= 3 && i2 < map->size[0]-3 && j2 >= 3 && j2 < map->size[1]-3)
+			{
+				TILE* tile = mapTileGet(map,i,j);
+				if(!tile->value)
+				{
+					
+				}
+			}
+		}
+	}
+}
+
 ///////////////////////////////
 // jps.c
 ///////////////////////////////

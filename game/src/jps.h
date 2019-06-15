@@ -170,6 +170,9 @@
 	
 	void mapSetTileValueAtPos3D(MAP* map, VECTOR* pos3d, int value);
 	int mapGetTileValueAtPos3D(MAP* map, VECTOR* pos3d);
+	
+	TILE* mapGetEmptyTileForAI(MAP* map);
+	
 
 	/////////////////////////////////////////////////
 	// more available functions
