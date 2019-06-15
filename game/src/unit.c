@@ -55,7 +55,7 @@ ENTITY* unit_spawn(int unittype, VECTOR* pos, var owner)
 	switch (unittype)
 	{
 		case 0:
-			ent = ent_create("sputnik.mdl", vector(0,0,500), Sputnik);
+			ent = ent_create("sputnik.mdl", pos, Sputnik);
 			break;
 		
 		/*case 1:
@@ -71,13 +71,14 @@ ENTITY* unit_spawn(int unittype, VECTOR* pos, var owner)
 	if (ent != NULL)
 	{
 		ent->SK_ENTITY_JPS_POINTER_TO_UNIT_STRUCT = jpsUnitCreate(PLAYER_ID_PLAYER, unittype, ent);
-		unit_setTarget(ent, ent->x);
-		unit_setVictim(ent,NULL);
 		
 		if (owner == UNIT_ENEMY)
 			ent->group = GROUP_ENEMY_UNIT;
 		else
 			ent->group = GROUP_PLAYER_UNIT;		
+
+		unit_setTarget(ent, pos);
+		unit_setVictim(ent,NULL);
 	}
 	
 	return ent;
