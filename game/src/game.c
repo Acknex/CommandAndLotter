@@ -2,7 +2,7 @@
 #include "map_loader.h"
 #include "ui_game.h"
 #include "framework.h"
-#include "map.h"
+#include "grid.h"
 #include "camera.h"
 #include "sputnik.h"
 #include "stub.h"
