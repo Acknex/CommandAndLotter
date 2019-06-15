@@ -2,8 +2,6 @@
 #define CONSOLE_H
 // made by Rackscha, adapted by Superku
 
-//#define DEVTRUE
-
 	#include <windows.h>
 
 	long WINAPI WriteConsole(int Handle, char* Buffer, int CharsToWrite, int* CharsWritten, int reserved);
@@ -11,7 +9,7 @@
 	long WINAPI SetConsoleActiveScreenBuffer(long hConsoleOutput);
 	long GConsoleBuffer;
 	int consoleInitialized = 0;
-	#ifdef DEVTRUE
+	#ifdef CONSOLE_SHOW
 		int consolePrintTrue = 1;
 		#else
 		int consolePrintTrue = 0;

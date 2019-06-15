@@ -74,7 +74,7 @@ typedef int bool;
 
 //#define GAME_OPEN_DEBUG
 #ifdef GAME_OPEN_DEBUG
-	#define DEVTRUE
+	#define CONSOLE_SHOW
 #endif
 
 #endif // GLOBAL_H

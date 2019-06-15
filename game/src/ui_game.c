@@ -89,6 +89,12 @@ void ui_game_close()
 
 void ui_game_update()
 {
+	BMAP* bmp = mapGetBitmap(NULL);
+	if(bmp)
+	{
+		draw_quad(bmp,vector(400,0,0),NULL,NULL,vector(3,3,0),NULL,100,0);
+	}
+	
 	var scale_factor_x = screen_size.x / 1920;
 	var scale_factor_y = screen_size.y / 1080;
 	
