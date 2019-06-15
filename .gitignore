@@ -3,3 +3,6 @@
 /game/CMakeLists.txt.user
 build-*
 game/marine.*
+*.bak
+*.blend1
+game/src/ackerr.txt

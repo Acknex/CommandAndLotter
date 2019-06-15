@@ -63,7 +63,7 @@ var spawner_produce(ENTITY* ent)
 {
 	if (ent != NULL)
 	{
-		if (ent->group = GROUP_ENEMY_SPAWNER || ent->group = GROUP_PLAYER_SPAWNER)
+		if (ent->group = GROUP_ENEMY_SPAWNER || ent->group == GROUP_PLAYER_SPAWNER)
 		{
 			ent->SPAWNER_QUEUE++;
 			return ent->SPAWNER_QUEUE;
@@ -76,9 +76,21 @@ var spawner_getQueue(ENTITY* ent)
 {
 	if (ent != NULL)
 	{
-		if (ent->group = GROUP_ENEMY_SPAWNER || ent->group = GROUP_PLAYER_SPAWNER)
+		if (ent->group = GROUP_ENEMY_SPAWNER || ent->group == GROUP_PLAYER_SPAWNER)
 		{
 			return ent->SPAWNER_QUEUE;
+		}
+	}
+	return 0;
+}
+
+var spawner_getProgress(ENTITY* ent)
+{
+	if (ent != NULL)
+	{
+		if (ent->group = GROUP_ENEMY_SPAWNER || ent->group == GROUP_PLAYER_SPAWNER)
+		{
+			return 1 - (ent->SPAWNER_BUILDTIMER / SPAWNER_BUILDTIME);
 		}
 	}
 	return 0;
