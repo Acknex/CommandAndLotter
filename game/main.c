@@ -39,7 +39,6 @@ function main()
 #include "ui_game.c"
 #include "map_loader.c"
 #include "sputnik.c"
-#include "enemy_hit.c"
 #include "camera.c"
 #include "UnitMangement.c"
 #include "stub.c"

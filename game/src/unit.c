@@ -36,7 +36,7 @@ var unit_setVictim(ENTITY* ent, ENTITY* victim)
 			{
 				//if (victim->group == GROUP_UNIT)
 				{
-					ent->ENTITY_VICTIM = victim;
+					ent->ENTITY_VICTIM = handle(victim);
 					return 1;
 				}
 			}
@@ -50,7 +50,7 @@ ENTITY* unit_getVictim(ENTITY* ent)
 {
 	if (ent != NULL)
 	{
-		ENTITY* victim = ent->ENTITY_VICTIM;
+		ENTITY* victim = ptr_for_handle(ent->ENTITY_VICTIM);
 		return victim;
 	}
 	return NULL;
@@ -99,4 +99,12 @@ ENTITY* unit_spawn(int unittype, VECTOR* pos, VECTOR* targetPos, var owner)
 var unit_getHealth(ENTITY* ent)
 {
 	return ent->HEALTH / ent->MAXHEALTH;
+}
+
+void unit_setDamage(ENTITY* ent, var damage)
+{
+	if (ent != NULL)
+	{
+		ent->DAMAGE_HIT = damage;
+	}
 }

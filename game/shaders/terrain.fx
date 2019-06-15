@@ -11,14 +11,16 @@ sampler sMaskTex = sampler_state {
 Texture maploader_terrain_digital_bmap;
 Texture maploader_terrain_analogue_bmap;
 Texture maploader_terrain_splatter_bmap;
-Texture maploader_terrain_street_bmap;
+Texture maploader_terrain_street_digital_bmap;
+Texture maploader_terrain_street_analogue_bmap;
 Texture shader_noise_bmap;
 
 sampler sDigital = sampler_state { Texture = <maploader_terrain_digital_bmap>; MipFilter = Linear; };
 sampler sAnalog = sampler_state { Texture = <maploader_terrain_analogue_bmap>; MipFilter = Linear; };
 sampler sSplatter = sampler_state { Texture = <maploader_terrain_splatter_bmap>; MipFilter = Linear; };
 sampler sNoise = sampler_state { Texture = <shader_noise_bmap>; MipFilter = Linear; };
-sampler sStreet = sampler_state { Texture = <maploader_terrain_street_bmap>; MipFilter = Linear; };
+sampler sStreetDigital = sampler_state { Texture = <maploader_terrain_street_digital_bmap>; MipFilter = Linear; };
+sampler sStreetAnalog = sampler_state { Texture = <maploader_terrain_street_analogue_bmap>; MipFilter = Linear; };
 
 
 float4x4 matWorld;
@@ -78,8 +80,8 @@ float4 ps_terraintex3(out_terraintex3 In) : COLOR
     float4 ground_digital = tex2D(sDigital, In.world.xz / 512.0);
     float4 ground_analog  = textureNoTile(In.world.xz / 512.0);
 
-    float4 road_digital = tex2D(sStreet, In.world.xz / 512.0);
-    float4 road_analog  = tex2D(sStreet, In.world.xz / 512.0);
+    float4 road_digital = tex2D(sStreetDigital, In.world.xz / 512.0);
+    float4 road_analog  = tex2D(sStreetAnalog, In.world.xz / 512.0);
 
     float4 digital = lerp(ground_digital, road_digital, road);
     float4 analog = lerp(ground_analog, road_analog, road);
