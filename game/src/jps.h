@@ -172,7 +172,9 @@
 	int mapGetTileValueAtPos3D(MAP* map, VECTOR* pos3d);
 	
 	TILE* mapGetEmptyTileForAI(MAP* map);
-	
+
+// firo, use this:
+int mapGetNearbyUnitsOfTypeForPos(VECTOR *vpos, int typeID, int owner, var maxDistance, int maxNumEntities);
 
 	/////////////////////////////////////////////////
 	// more available functions

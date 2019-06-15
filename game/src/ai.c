@@ -2,16 +2,7 @@
 // ai.c
 //////////////////////////////
 
-struct _AI_SYSTEM
-{
-	int difficulty;
-	int money;
-	int escalationCounter;
-	float elapsedTime, stepTime;
-	int buildingCount[BUILDING_NUMBER];
-};
-typedef struct _AI_SYSTEM AI_SYSTEM;
-AI_SYSTEM *aiSystemInstance = NULL;
+#include "ai.h"
 
 // difficulty from 0 to 2, or more
 void ai_reset(int difficulty)
@@ -22,7 +13,7 @@ void ai_reset(int difficulty)
 	aiSystemInstance->elapsedTime = 0;
 	aiSystemInstance->stepTime = 0;
 	int i;
-	for(i = 0; i < BUILDING_NUMBER; i++) aiSystemInstance->difficulty[i] = 0;
+	for(i = 0; i < BUILDING_NUMBER; i++) aiSystemInstance->buildingCount[i] = 0;
 }
 
 void ai_init(int difficulty)
@@ -36,10 +27,11 @@ void ai_spawn_building(int buildingType)
 {
 	MAP* map = mapGetCurrent();
 	TILE* tile = mapGetEmptyTileForAI(map);
+	cprintf3("\n ai_spawn_building(%d) at frame %d: tile(%p)", buildingType, (int)total_frames, tile);
 	if(tile)
 	{
 		spawner_spawn(0, mapGetVectorFromTile(map, NULL, tile), UNIT_ENEMY);
-		aiSystemInstance->difficulty[buildingType]++;
+		aiSystemInstance->buildingCount[buildingType]++;
 	}
 }
 

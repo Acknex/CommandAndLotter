@@ -742,6 +742,54 @@ int mapGetNearbyUnits(MAP* map, TILE* sourceTile, int range)
 	return pointerArrayNum;
 }
 
+int unit_getType(ENTITY* ent);
+
+// set typeID to -1 to get all objects
+// owner to -1 for both player and enemy units
+int mapGetNearbyUnitsOfTypeForPos(VECTOR *vpos, int typeID, int owner, var maxDistance, int maxNumEntities)
+{
+	MAP* map = mapGetCurrent();
+	TILE* sourceTile = mapGetTileFromVector(map, vpos);
+	pointerArrayNum = 0;
+	if(!sourceTile) return 0;
+	int range = 1+maxDistance/map->tileSize;
+	int ownerMin = 0;
+	int ownerMax = 1;
+	if(owner == 0) ownerMax = 0;
+	if(owner == 1) ownerMin = 1;
+	int i,j;
+	for(i = sourceTile->pos[0]-range; i <= sourceTile->pos[0]+range; i++)
+	{
+		for(j = sourceTile->pos[1]-range; j <= sourceTile->pos[1]+range; j++)
+		{
+			TILE* tile = mapTileGet(map, i, j);
+			if(tile)
+			{
+				int k;
+				int currentPlayer;
+				for(currentPlayer = ownerMin; currentPlayer < ownerMax; ++currentPlayer)
+				{		
+					for(k = 0; k < tile->numUnits[currentPlayer]; k++)
+					{
+						UNIT* unit = tile->unitArray[k];
+						ENTITY* ent = unit->ent;
+						if(ent)
+						{
+							if(owner < 0 || owner == unit_getType(ent))
+							{
+								pointerArray[pointerArrayNum++] = tile->unitArray[k];
+								if(pointerArrayNum >= POINTER_ARRAY_MAX || pointerArrayNum >= maxNumEntities) return pointerArrayNum;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return pointerArrayNum;
+}
+
+
 int mapIsAnyUnitNearby(MAP* map, TILE* sourceTile, int range)
 {
 	if(!sourceTile) return NULL;

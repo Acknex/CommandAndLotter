@@ -14,6 +14,7 @@
 #include "z.h"
 #include "materials.h"
 #include "effects2d.h"
+#include "ai.h"
 
 void game_init(void)
 {
@@ -23,6 +24,7 @@ void game_init(void)
 	buildingPlacement_init();
 	presetsInit();
     effects2d_init();
+	ai_init(1); // parameter = difficulty
 
     effect_load(mtl_model, "units.fx");
 }
@@ -76,6 +78,7 @@ void game_update(void)
     //updateRenderTargetsIfNeeded();
     topdown_camera_update();
     ui_game_update();
+    ai_update();
 	jpsGameUpdate(mapGetCurrent());
 	SPUTNIK_Update();
 	SPAWNER_Update();
