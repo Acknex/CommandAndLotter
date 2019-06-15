@@ -45,6 +45,8 @@
 #define SPAWNER_MAXSMOKE 90
 #define SPAWNER_LOS 2000
 
+#define SPAWNER_LOS 2000
+
 MATERIAL * building_wireframe_material =
 {
   flags = AUTORELOAD | TRANSLUCENT;
