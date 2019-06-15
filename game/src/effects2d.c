@@ -41,7 +41,7 @@ void effects2d_init()
 
     // ATTACK
     effects2d.animations[1].frame_count = 4;
-    effects2d.animations[1].speed = 1;
+    effects2d.animations[1].speed = 0.75;
     effects2d.animations[1].size = 0.5;
     effects2d.animations[1].frames[0] = bmap_create("Attack_C.png");
     effects2d.animations[1].frames[1] = bmap_create("Attack_C1.png");
@@ -50,7 +50,7 @@ void effects2d_init()
 
     // MINE
     effects2d.animations[2].frame_count = 4;
-    effects2d.animations[2].speed = 0.5;
+    effects2d.animations[2].speed = 1.0;
     effects2d.animations[2].size = 0.5;
     effects2d.animations[2].frames[0] = bmap_create("De_Build1.png");
     effects2d.animations[2].frames[1] = bmap_create("De_Build2.png");
