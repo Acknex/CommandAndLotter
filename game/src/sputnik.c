@@ -155,11 +155,11 @@ void SPUTNIK__findNextVictim(ENTITY* ptr)
 		else
 			owner = UNIT_PLAYER;
 		
-		error("TRYFIND");
+		cprintf0("\n SPUTNIK__findNextVictim: TRYFIND...");
 		int count = mapGetNearbyUnitsOfTypeForPos(ptr->x, ptr->ENTITY_VICTIMTYPE, owner, 1000, 1);
 		if (count > 0)
 		{
-			error("FOUND");
+			cprintf1("FOUND!(%d)", count);
 			ENTITY* ent = jpsGetEntityFromUnitArray(0);
 			
 			//set new target and victim
