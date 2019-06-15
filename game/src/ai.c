@@ -26,7 +26,7 @@ void ai_init(int difficulty)
 void ai_spawn_building(int buildingType)
 {
 	MAP* map = mapGetCurrent();
-	TILE* tile = mapGetEmptyTileForAI(map);
+	TILE* tile = mapGetEmptyTileForAI(map, 1);
 	cprintf3("\n ai_spawn_building(%d) at frame %d: tile(%p)", buildingType, (int)total_frames, tile);
 	if(tile)
 	{
@@ -37,7 +37,7 @@ void ai_spawn_building(int buildingType)
 
 void ai_update()
 {
-	aiSystemInstance->elapsedTime += (1.0+aiSystemInstance->difficulty*0.5)*(float)time_step/16.0; // better than using time_frame in this case (game might slow down, AI should not play comparatively faster than)
+	aiSystemInstance->elapsedTime += 3*(1.0+aiSystemInstance->difficulty*0.5)*(float)time_step/16.0; // better than using time_frame in this case (game might slow down, AI should not play comparatively faster than)
 	if(aiSystemInstance->elapsedTime > aiSystemInstance->stepTime)
 	{
 		aiSystemInstance->stepTime += 10;

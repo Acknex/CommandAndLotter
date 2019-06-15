@@ -32,6 +32,7 @@ void mainmenu_close(void);
 
 void mainmenu_set_start(void);
 void mainmenu_show_options(void);
+void mainmenu_hide_options(void);
 void mainmenu_set_credits(void);
 void mainmenu_set_exit(void);
 

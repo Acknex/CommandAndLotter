@@ -1305,7 +1305,7 @@ int mapGetTileValueAtPos3D(MAP* map, VECTOR* pos3d)
 	return -1;
 }
 
-TILE* mapGetEmptyTileForAI(MAP* map)
+TILE* mapGetEmptyTileForAI(MAP* map, int freeBorder)
 {
 	int ishift = random(map->size[0]);
 	//int jshift = random(map->size[0]);
@@ -1320,14 +1320,37 @@ TILE* mapGetEmptyTileForAI(MAP* map)
 			int j2 = j;
 			if(i2 >= 3 && i2 < map->size[0]-3 && j2 >= 3 && j2 < map->size[1]-3)
 			{
-				TILE* tile = mapTileGet(map,i,j);
+				TILE* tile = mapTileGet(map,i2,j2);
 				if(!tile->value)
 				{
-					
+					int tileOkay = 8;
+					if(freeBorder)
+					{
+						tileOkay = 0;
+						int i3,j3;
+						for(i3 = -1; i3 <= 1; i3++)
+						{
+							for(j3 = -1; j3 <= 1; j3++)
+							{
+								if(i3 || j3)
+								{
+									int i4 = i3+i2;
+									int j4 = j3+j2;
+									TILE* tile2 = mapTileGet(map,i4,j4);
+									if(tile2)
+									{
+										if(!tile2->value) tileOkay++;
+									}
+								}
+							}
+						}
+					}
+					if(tileOkay == 8) return tile;
 				}
 			}
 		}
 	}
+	return NULL;
 }
 
 ///////////////////////////////

@@ -240,6 +240,9 @@ void maploader_load(char const * fileName)
                             boom = "tree03.mdl";
 
                         you = ent_create(boom, pos, NULL);
+                        you->red = 100;
+                        you->green = 100;
+                        you->blue = 100;
                         you->pan = random(360);
                         you->tilt = random(30) - 15;
                         // you->emask &= ~DYNAMIC;
