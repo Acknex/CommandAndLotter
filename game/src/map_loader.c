@@ -121,7 +121,7 @@ void maploader_load(char const * fileName)
 
 			((maploader.cells)[maploader.w * y + x]).celltype = type;
 			((maploader.cells)[maploader.w * y + x]).vegetation = col.green / 255.0;
-			((maploader.cells)[maploader.w * y + x]).elevation = col.blue;
+            ((maploader.cells)[maploader.w * y + x]).elevation = col.blue * 3;
 
 		}
 	}
@@ -239,7 +239,6 @@ void maploader_load(char const * fileName)
 
     if(key_c)
         c_updatehull(maploader.terrain, 0);
-    ent_fixnormals(maploader.terrain, 0);
 }
 
 bool maploader_has_map()
