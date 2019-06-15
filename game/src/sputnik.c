@@ -38,7 +38,7 @@ void Sputnik()
 	my->SPUTNIK_RUNSPEED = 30;
 	my->SPUTNIK_TURNSPEED = 50;
 	my->SPUTNIK_ATTACKSPEED = 5;
-	my->SPUTNIK_ATTACKRANGE = 150;
+	my->SPUTNIK_ATTACKRANGE = 170;
 	my->SPUTNIK_ANIMSTATEATK = 0;
 	my->HEALTH = 23;
 	my->MAXHEALTH = my->HEALTH;
@@ -93,16 +93,17 @@ void SPUTNIK_Update()
 	ENTITY * ptr;
 	SUBSYSTEM_LOOP(ptr, SUBSYSTEM_UNIT_SPUTNIK)
 	{
-	jpsAllowMovementForEntity(ptr, false);
-		if (ptr->HEALTH > 0)
-		{
-			SPUTNIK__hitcheck(ptr);
-		}
+		jpsAllowMovementForEntity(ptr, false);
 		
 		if (ptr->DAMAGE_HIT > 0)
 		{
-			if (ptr->ENTITY_HITTHRESHOLD == 0)
-				SPUTNIK__hit(ptr);
+			if (ptr->ENTITY_STATE != ENTITY_STATE_HIT)
+			{
+				ptr->HEALTH = maxv(0, ptr->HEALTH - ptr->DAMAGE_HIT);
+				ptr->ENTITY_STATE = ENTITY_STATE_HIT;
+				ptr->ENTITY_HITTHRESHOLD = 5;				
+			}
+			ptr->DAMAGE_HIT = 0;
 		}
 
 		switch(ptr->ENTITY_STATE)    	
@@ -125,6 +126,12 @@ void SPUTNIK_Update()
 				break;
 			}
 			
+			case ENTITY_STATE_HIT:
+			{
+				SPUTNIK__hit(ptr);
+				break;
+			}
+			
 			default:
 			{
 				break;
@@ -140,30 +147,24 @@ void SPUTNIK_Update()
 
 void SPUTNIK__hit(ENTITY* ptr)
 {
-	ptr->ENTITY_HITTHRESHOLD = 2;				
-
-	ptr->HEALTH = maxv(0, ptr->HEALTH - ptr->DAMAGE_HIT);
-	ptr->DAMAGE_HIT = 0;
-
-	if (ptr->HEALTH <= 0)
+	ptr->ENTITY_HITTHRESHOLD -= time_step;		
+ 	if (ptr->HEALTH <= 0)
 	{
 		ptr->ENTITY_STATE = ENTITY_STATE_DIE;
 		ptr->SPUTNIK_ANIMSTATE = 0;
 		snd_play(sputnik_snd_death, 100, 0);
 		set(ptr, PASSABLE);		
 	}
-}
-
-void SPUTNIK__hitcheck(ENTITY* ptr)
-{
-	if (ptr->ENTITY_HITTHRESHOLD > 0)
+	else if (ptr->ENTITY_HITTHRESHOLD <= 0)
 	{
-		ptr->ENTITY_HITTHRESHOLD -= time_step;
-		
-		if (ptr->ENTITY_HITTHRESHOLD <= 0)
-		{
-			ptr->ENTITY_HITTHRESHOLD = 0;
-		}
+		ptr->ENTITY_STATE = ENTITY_STATE_WAIT_OR_WALK;
+	}
+	else
+	{
+		var percent = (1 - (ptr->ENTITY_HITTHRESHOLD/5)) * 56;
+		if (percent > 28)
+			percent = 56-percent;
+		ent_animate(ptr, SPUTNIK_ATTACKANIM, percent, 0);
 	}
 }
 
