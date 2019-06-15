@@ -42,3 +42,7 @@ HEADERS += \
   src/global.h \
   src/mainmenu.h \
   src/map_loader.h
+
+DISTFILES += \
+  main.wdl \
+  shaders/terrain.fx

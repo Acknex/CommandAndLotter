@@ -2,8 +2,14 @@
 #include "map_loader.h"
 #include "ui_game.h"
 #include "framework.h"
+#include "camera.h"
 #include "sputnik.h"
 #include "stub.h"
+<<<<<<< .mine
+#include "stub.h"
+=======
+
+>>>>>>> .theirs
 #include <acknex.h>
 
 void game_init(void)
@@ -18,6 +24,7 @@ void game_open(void)
 	maploader_load("the-core.png");
 
 	ui_game_open();
+	topdown_camera_open();
 	SPUTNIK_Init();
 	stub_init(); //hook debug shit here
 }
@@ -25,8 +32,13 @@ void game_open(void)
 void game_update(void)
 {
 	ui_game_update();
+<<<<<<< .mine
 	SPUTNIK_Update();
 	stub_update(); //hook debug shit here
+=======
+	topdown_camera_update();
+
+>>>>>>> .theirs
 }
 
 void game_close(void)
