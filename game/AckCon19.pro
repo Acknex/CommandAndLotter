@@ -33,7 +33,8 @@ SOURCES += \
   src/framework.c \
   src/game.c \
   src/mainmenu.c \
-  src/map_loader.c
+  src/map_loader.c \
+  src/UnitMangement.c
 
 HEADERS += \
   src/credits.h \
@@ -41,4 +42,5 @@ HEADERS += \
   src/game.h \
   src/global.h \
   src/mainmenu.h \
-  src/map_loader.h
+  src/map_loader.h \
+  src/UnitMangement.h
