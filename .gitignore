@@ -1,6 +1,7 @@
 *.pro.user
 /build
 /game/CMakeLists.txt.user
+/.vscode
 build-*
 game/marine.*
 *.bak
