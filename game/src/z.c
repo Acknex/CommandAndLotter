@@ -28,7 +28,7 @@ void Z()
 	set(my, SHADOW);
 	vec_scale(my->scale_x, 10); //temp
 	c_setminmax(me);
-	my->ENTITY_STATE = ENTITY_STATE_WAIT;
+	my->ENTITY_STATE = ENTITY_STATE_WAIT_OR_WALK;
 }
 
 void Z_Init()
@@ -49,7 +49,7 @@ void Z_Update()
 		switch(ptr->ENTITY_STATE)    	
 		{
 
-			case ENTITY_STATE_WAIT:
+			case ENTITY_STATE_WAIT_OR_WALK:
 			{
 				Z__wait(ptr);
 				break;
