@@ -408,6 +408,11 @@ function UnitControl()
                  if(you->group==GROUP_ENEMY_UNIT  || you->group == GROUP_ENEMY_SPAWNER){
                     SetVictimForSelectd(you);
                     CmdType = EFFECTS2D_TYPE_ATTACK;
+                    if(unit_getType(you) == UNIT_Z){
+                       CmdType = EFFECTS2D_TYPE_MINE;
+                    }
+
+
                 }
             }
         }

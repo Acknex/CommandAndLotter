@@ -73,6 +73,7 @@ void game_open(void)
 
 void game_update(void)
 {
+    updateRenderTargetsIfNeeded();
     topdown_camera_update();
     ui_game_update();
 	jpsGameUpdate(mapGetCurrent());
