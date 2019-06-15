@@ -59,6 +59,7 @@ void game_open(void)
 void game_update(void)
 {
 	ui_game_update();
+	jpsGameUpdate(mapGetCurrent());
 	SPUTNIK_Update();
 	SPAWNER_Update();
 	stub_update(); //hook debug shit here
