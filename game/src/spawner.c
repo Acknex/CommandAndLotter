@@ -118,7 +118,7 @@ var spawner_getProgress(ENTITY* ent)
 	{
 		if (ent->group == GROUP_ENEMY_SPAWNER || ent->group == GROUP_PLAYER_SPAWNER)
 		{
-			if (ent->ENTITY_STATE == SPAWNER_STATE_CONSTRUCT)
+			if (ent->ENTITY_STATE == SPAWNER_STATE_PRODUCE)
 				return 1 - (ent->SPAWNER_BUILDTIMER / SPAWNER_BUILDTIME);
 		}
 	}

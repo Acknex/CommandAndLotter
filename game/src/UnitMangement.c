@@ -130,18 +130,6 @@ void UnitMangement_init(){
 
 void UnitMangement_open(){
 
-    var x, y;
-    for(x = -1500; x < 1500; x+=300){
-        for(y = -1500; y < 1500; y+=300){
-
-            var z = maploader_get_height(vector(x,y,0));
-			you = unit_spawn(0, vector(x,y,z+90), !UNIT_ENEMY);
-            you.ambient = 0;
-            framework_setup(you, SUBSYSTEM_UNIT_MANAGEMENT);
-        }
-    }
-    vec_set(camera.x, vector(-800,-1064,1000));
-    vec_set(camera.pan, vector(0,-32,0));
 }
 
 
@@ -220,17 +208,19 @@ function MarkUnits()
     if(success != 4){return;}
 
     var i;
-    ENTITY * ent;
 
-    SUBSYSTEM_LOOP(ent, SUBSYSTEM_UNIT_MANAGEMENT){
-        var isInside = 1;
-        for(i = 0; i < 4 && isInside; i++){
-            isInside = CheckIsLeftFrom(Posis[i],Posis[(i+1)%4],ent.x);
-        }
-        if(isInside || (key_shiftl && ent.SELCTED_SKILL)){
-            ent.ambient = SEL_AMBIENT;
-        }else{
-           ent.ambient = 0;
+    ENTITY * ent;
+    for(ent = ent_next(NULL); ent != NULL; ent = ent_next(ent)){
+        if(ent.group==GROUP_PLAYER_UNIT){
+            var isInside = 1;
+            for(i = 0; i < 4 && isInside; i++){
+                isInside = CheckIsLeftFrom(Posis[i],Posis[(i+1)%4],ent.x);
+            }
+            if(isInside || (key_shiftl && ent.SELCTED_SKILL)){
+                ent.ambient = SEL_AMBIENT;
+            }else{
+               ent.ambient = 0;
+            }
         }
     }
 }
@@ -239,9 +229,11 @@ function MarkUnits()
 function SelectMarkedUnits()
 {
     ENTITY * ent;
-    SUBSYSTEM_LOOP(ent, SUBSYSTEM_UNIT_MANAGEMENT){
-        SetUnitSelcted(ent, ent.ambient > 0);
-    }
+    for(ent = ent_next(NULL); ent != NULL; ent = ent_next(ent)){
+        if(ent->group==GROUP_PLAYER_UNIT){
+            SetUnitSelcted(ent, ent.ambient > 0);
+        }
+     }
 }
 
 
@@ -261,12 +253,11 @@ var MouseRightLast = 0;
 
 
 function SetDestForSelectd(VECTOR * Dest)
-{
+{ 
     ENTITY * ent;
-    SUBSYSTEM_LOOP(ent, SUBSYSTEM_UNIT_MANAGEMENT){
-        if(ent.SELCTED_SKILL){
-				unit_setTarget(ent, Dest);
-            //vec_set(ent.UNIT_DEST_SKILL,Dest);
+    for(ent = ent_next(NULL); ent != NULL; ent = ent_next(ent)){
+        if(ent->group==GROUP_PLAYER_UNIT && ent.SELCTED_SKILL){
+            unit_setTarget(ent, Dest);
         }
     }
 }
@@ -293,7 +284,15 @@ function DeselectAllOfSubsystem(int Subsys)
     }
 }
 
-
+function DeselectAllOfGroup(int Group)
+{
+    ENTITY * ent;
+    for(ent = ent_next(NULL); ent != NULL; ent = ent_next(ent)){
+        if(ent->group==Group){
+            DeselectUnit(ent);
+        }
+     }
+}
 
 function NumberKeyPressed(int nr)
 {
@@ -302,23 +301,25 @@ function NumberKeyPressed(int nr)
     var count = 0;
 
     ENTITY * ent;
-    SUBSYSTEM_LOOP(ent, SUBSYSTEM_UNIT_MANAGEMENT){
-        if(key_ctrl){
-            if(ent.SELCTED_SKILL){
-                ent.UNIT_GROUP_SKILL = nr;
-            }else{
-                if(ent.UNIT_GROUP_SKILL == nr){
-                    ent.UNIT_GROUP_SKILL = 0;
+    for(ent = ent_next(NULL); ent != NULL; ent = ent_next(ent)){
+        if(ent->group==GROUP_PLAYER_UNIT){
+            if(key_ctrl){
+                if(ent.SELCTED_SKILL){
+                    ent.UNIT_GROUP_SKILL = nr;
+                }else{
+                    if(ent.UNIT_GROUP_SKILL == nr){
+                        ent.UNIT_GROUP_SKILL = 0;
+                    }
                 }
-            }
-        }else{
-            SetUnitSelcted(ent, ent.UNIT_GROUP_SKILL == nr);
-            if(ent.UNIT_GROUP_SKILL == nr){
-                x+=ent.x;
-                y+=ent.y;
-                count++;
-            }
+            }else{
+                SetUnitSelcted(ent, ent.UNIT_GROUP_SKILL == nr);
+                if(ent.UNIT_GROUP_SKILL == nr){
+                    x+=ent.x;
+                    y+=ent.y;
+                    count++;
+                }
 
+            }
         }
     }
     if(!key_ctrl && key_alt && count){//Gruppe mit Alt-Ausgewählt die auch Units enthält
@@ -337,16 +338,18 @@ function UnitControl()
     if(mouse_left){
         if(MouseLeftLast == 0){
             if(!key_shiftl){
-                DeselectAllOfSubsystem(SUBSYSTEM_UNIT_MANAGEMENT);
+                DeselectAllOfGroup(GROUP_PLAYER_UNIT);
             }
-             DeselectAllOfSubsystem(SUBSYSTEM_SPAWNER);
+            DeselectAllOfSubsystem(SUBSYSTEM_SPAWNER);
 
-            vec_set(temp, vector(mouse_pos.x,mouse_pos.y, camera.clip_far));
-            vec_for_screen(temp,camera);
-            c_trace(camera.x, temp,USE_POLYGON);
-            if(you != 0){
-                if(you.SK_SUBSYSTEM == SUBSYSTEM_UNIT_MANAGEMENT || you.SK_SUBSYSTEM == SUBSYSTEM_SPAWNER){
-                    SelectUnit(you);
+            if(mouse_panel == 0){
+                vec_set(temp, vector(mouse_pos.x,mouse_pos.y, camera.clip_far));
+                vec_for_screen(temp,camera);
+                c_trace(camera.x, temp,USE_POLYGON | IGNORE_PASSENTS);
+                if(you != 0){
+                     if(you->group==GROUP_PLAYER_UNIT || you->group==GROUP_PLAYER_SPAWNER){
+                        SelectUnit(you);
+                    }
                 }
             }
 
@@ -361,8 +364,6 @@ function UnitControl()
             DrawQuadDemo();
             MarkUnits();
         }
-
-
     }else{
        if(MouseLeftLast){
             SelectMarkedUnits();
