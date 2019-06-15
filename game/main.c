@@ -53,3 +53,4 @@ function main()
 #include "fow.c"
 #include "progressbars.c"
 #include "z.c"
+#include "effects2d.c"

@@ -226,16 +226,6 @@ void maploader_load(char const * fileName)
 
             if(random(100) > 50)
             {
-                float z = maploader_tile_zettiness(x, y);
-
-                if(random(100) < 100 * z)
-                {
-                   z_spawn(pos);
-                }
-            }
-
-            if(random(100) > 50)
-            {
                 float v = maploader_tile_vegetation(x, y);
                 if(v > 0.2)
                 {
@@ -268,13 +258,29 @@ void maploader_load(char const * fileName)
 //        you.z = maploader_get_height(you.x);
 //    }
 
-
-
-
     collision_mode = 1;
 
-    if(key_c)
-        c_updatehull(maploader.terrain, 0);
+    for(x = 0; x < maploader.w; x++)
+    {
+        for(y = 0; y < maploader.h; y++)
+        {
+            int type = maploader_tile_type(x, y);
+            if(type != MAPLOADER_TILE_DEFAULT)
+                continue;
+            VECTOR pos;
+            maploader_pos_to_vec(pos, x, y);
+
+            if(random(100) > 50)
+            {
+                float z = maploader_tile_zettiness(x, y);
+
+                if(random(100) < 100 * z)
+                {
+                   z_spawn(pos);
+                }
+            }
+        }
+    }
 }
 
 bool maploader_has_map()

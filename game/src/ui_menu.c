@@ -73,6 +73,8 @@ void uimenu_add_element_to_window(uimenu_window_t * window, uimenu_element_t * e
     if(element == NULL) error("UIMENU: element must not be NULL");
 
     element->_parent = window;
+    if(element->_related != NULL) element->_related->_parent = window;
+
     element->_next = window->_first;
     window->_first = element;
 }
@@ -81,7 +83,7 @@ uimenu_element_t * uimenu_make_text(var x, var y, var width, var height, char * 
 {
     uimenu_element_t * element = uimenu_element_create(UIMENU_TYPE_TEXT, x, y, width, height);
     
-    element->skill[UIMENU_SKILL_TEXT] = text;
+    element->skill[UIMENU_SKILL_TEXT] = str_create(text);
     if(colorBGR == NULL)
         element->skill[UIMENU_SKILL_COLOR] = vector(255, 255, 255);
     else
@@ -105,6 +107,41 @@ uimenu_element_t * uimenu_make_button(var x, var y, var width, var height, BMAP 
     element->callback = callback;
 
     return element;
+}
+
+uimenu_element_t * uimenu_make_button(var x, var y, BMAP * bmap, BMAP * bmapHover, BMAP * bmapActive, void * callback)
+{
+    return uimenu_make_button(x, y, bmap_width(bmap), bmap_height(bmap), bmap, bmapHover, bmapActive, callback);
+}
+
+uimenu_element_t * uimenu_make_simple_button(var x, var y, var width, var height, char * text, FONT * font, void * callback)
+{
+    FONT * finalFont = font;
+    if(font == NULL)
+        finalFont = uimenu_default_font;
+    
+    uimenu_element_t * element = uimenu_element_create(UIMENU_TYPE_TEXTBUTTON, x, y, width, height);
+
+    element->_related = uimenu_make_text(x + 10, y + 5, width, height, text, vector(0, 0, 0), finalFont);
+    element->callback = callback;
+
+    return element;    
+}
+
+uimenu_element_t * uimenu_make_simple_button(var x, var y, var height, char * text, FONT * font, void * callback)
+{
+    FONT * finalFont = font;
+    if(font == NULL)
+        finalFont = uimenu_default_font;
+
+    var stringWidth = str_width(text, finalFont) + 20;
+
+    uimenu_element_t * element = uimenu_element_create(UIMENU_TYPE_TEXTBUTTON, x, y, stringWidth, height);
+
+    element->_related = uimenu_make_text(x + 10, y + 5, stringWidth, height, text, vector(0, 0, 0), finalFont);
+    element->callback = callback;
+
+    return element;    
 }
 
 uimenu_element_t * uimenu_make_image(var x, var y, var width, var height, BMAP * bmap)
@@ -184,10 +221,37 @@ void uimenu_window_initialize(uimenu_window_t * window)
         window->_content_panel->bmap = window->_content_panel_bg_bmap;
     }
 
+    if(window->_forced_background != NULL)
+        window->_content_panel->bmap = window->_forced_background;
+
     if(window->_first != NULL)
         uimenu_element_initialize(window, window->_first);
 
     window->_is_initialized = true;    
+}
+
+BMAP * uimenu_make_button_graphic(int width, int height, int pressed)
+{
+    BMAP * final = bmap_createblack(width, height, 565);
+    BMAP * canvas = bmap_createblack(width, height, 565);
+
+    bmap_fill(final, vector(UIMENU_WINDOW_WINDOW_COLOR_B * 0.75, UIMENU_WINDOW_WINDOW_COLOR_G * 0.75, UIMENU_WINDOW_WINDOW_COLOR_R * 0.75), 100);
+    bmap_fill(canvas, vector(UIMENU_WINDOW_WINDOW_COLOR_B * 1.25, UIMENU_WINDOW_WINDOW_COLOR_G * 1.25, UIMENU_WINDOW_WINDOW_COLOR_R * 1.25), 100);
+
+    if(!pressed)
+    {
+        bmap_blitpart(final, canvas, vector(0, 0, 0), vector(width - 1, height - 1, 0), vector(0, 0, 0), vector(width - 1, height - 1, 0));
+    }
+    else
+    {
+        bmap_blitpart(final, canvas, vector(1, 1, 0), vector(width - 1, height - 1, 0), vector(0, 0, 0), vector(width - 1, height - 1, 0));
+    }
+
+    bmap_fill(canvas, vector(UIMENU_WINDOW_WINDOW_COLOR_B, UIMENU_WINDOW_WINDOW_COLOR_G, UIMENU_WINDOW_WINDOW_COLOR_R), 100);
+    bmap_blitpart(final, canvas, vector(1, 1, 0), vector(width - 2, height - 2, 0), vector(0, 0, 0), vector(width - 2, height - 2, 0));
+
+    bmap_purge(canvas);
+    return final;    
 }
 
 void uimenu_element_initialize(uimenu_window_t * window, uimenu_element_t * element)
@@ -200,6 +264,21 @@ void uimenu_element_initialize(uimenu_window_t * window, uimenu_element_t * elem
     {
         switch(element->type)
         {
+            case UIMENU_TYPE_TEXTBUTTON:
+                element->bmap = uimenu_make_button_graphic(element->width, element->height, 0);
+                element->bmap_hover = element->bmap;
+                element->bmap_active = uimenu_make_button_graphic(element->width, element->height, 1);
+
+                element->element_index = pan_setbutton(window->_content_panel, 0, 0, 
+                element->x, 
+                element->y, 
+                element->bmap_active, // bmapOn
+                element->bmap, // bmapOff
+                element->bmap, // bmapHover
+                element->bmap, // bmapHoverOff
+                NULL, NULL, NULL);
+                break;
+
             case UIMENU_TYPE_BUTTON:
                 element->element_index = pan_setbutton(window->_content_panel, 0, 0, 
                 element->x, 
@@ -210,32 +289,41 @@ void uimenu_element_initialize(uimenu_window_t * window, uimenu_element_t * elem
                 element->bmap, // bmapHoverOff
                 element->callback, NULL, NULL);
                 break;
+
             case UIMENU_TYPE_TEXT:
                 element->element_index = pan_setstring(window->_content_panel, 0,
-                element->x, 
-                element->y, 
-                element->skill[UIMENU_SKILL_FONT], 
-                str_create(element->skill[UIMENU_SKILL_TEXT]));
+                    element->x, 
+                    element->y, 
+                    (FONT*)element->skill[UIMENU_SKILL_FONT], 
+                    (STRING*)element->skill[UIMENU_SKILL_TEXT]);
                 pan_setcolor(window->_content_panel, 1, element->element_index, element->skill[UIMENU_SKILL_COLOR]);
                 break;
 
             case UIMENU_TYPE_SOLIDCOLOR:
                 element->bmap = bmap_createblack(element->width, element->height, 565);
                 bmap_fill(element->bmap, element->skill[UIMENU_SKILL_COLOR], 100);
+                // !! Intentional fall-through !!
+            case UIMENU_TYPE_IMAGE:
                 element->element_index = pan_setwindow(window->_content_panel, 0, 
                 element->x,
                 element->y,
                 element->width, 
                 element->height,
                 element->bmap, 0, 0);
-
-
                 break;
 
             default:
                 // error("UIMENU: Invalid element type");
                 break;
         }
+
+        if(element->_related != NULL)
+        {
+            if(element->_related->_is_initialized == FALSE)
+                uimenu_element_initialize(window, element->_related);
+        }
+
+        element->_is_initialized = true;
     }
     
     if(element->_next != NULL)
@@ -316,11 +404,11 @@ void uimenu_window_to_top(uimenu_window_t * window)
     uimenu_last_layer += 100;
 }
 
-VECTOR * uimenu_get_element_window_offset(uimenu_element_t * element)
+VECTOR * uimenu_get_element_screen_offset(uimenu_element_t * element)
 {
     if(element == NULL) error("UIMENU: element must not be NULL");
 
-    return vector( ((uimenu_window_t*)element->_parent)->x + element->x, ((uimenu_window_t*)element->_parent)->y + element->y, 0);
+    return vector( ((uimenu_window_t*)element->_parent)->_content_panel->pos_x + element->x, ((uimenu_window_t*)element->_parent)->_content_panel->pos_y + element->y, 0);
 }
 
 VECTOR * uimenu_get_cursor_offset_to_window(uimenu_window_t * window)
@@ -332,7 +420,7 @@ VECTOR * uimenu_get_cursor_offset_to_window(uimenu_window_t * window)
 
 int uimenu_is_cursor_in_window_titlebar(uimenu_window_t * window)
 {
-    if(window == NULL) error("UIMENU: element must not be NULL");
+    if(window == NULL) error("UIMENU: window must not be NULL");
 
     VECTOR * cursorOffsetToWindow = uimenu_get_cursor_offset_to_window(window);
     if(cursorOffsetToWindow->x > UIMENU_WINDOW_BORDER_SIZE && cursorOffsetToWindow->x < (window->width - UIMENU_WINDOW_BORDER_SIZE))
@@ -346,22 +434,84 @@ int uimenu_is_cursor_in_window_titlebar(uimenu_window_t * window)
     return FALSE;    
 }
 
+int uimenu_is_cursor_in_element(uimenu_element_t * element)
+{
+    if(element == NULL) error("UIMENU: element must not be NULL");
+
+    VECTOR * elementScreenOffset = uimenu_get_element_screen_offset(element);
+    if(mouse_pos.x >= elementScreenOffset->x && mouse_pos.x <= (elementScreenOffset->x + element->width))
+    {
+        if(mouse_pos.y >= elementScreenOffset->y && mouse_pos.y <= (elementScreenOffset->y + element->height))
+        {
+            return TRUE;
+        }
+    }
+
+    return FALSE;    
+}
+
 void uimenu_window_show(uimenu_window_t * window)
 {
-    window->_panel->flags |= SHOW;
-    if(window->_is_borderless == FALSE)
-        window->_content_panel->flags |= SHOW;
+    if(window == NULL) return; // Fail gracefully
 
-    window->_is_visible = TRUE;
+    if(window->_is_initialized)
+    {
+        window->_panel->flags |= SHOW;
+        if(window->_is_borderless == FALSE)
+            window->_content_panel->flags |= SHOW;
+
+        window->_is_visible = TRUE;
+    }
 }
 
 void uimenu_window_hide(uimenu_window_t * window)
 {
-    window->_panel->flags &= ~SHOW;
-    if(window->_is_borderless == FALSE)
-        window->_content_panel->flags &= ~SHOW;
+    if(window == NULL) return; // Fail gracefully
 
-    window->_is_visible = FALSE;
+    if(window->_is_initialized)
+    {
+        window->_panel->flags &= ~SHOW;
+        if(window->_is_borderless == FALSE)
+            window->_content_panel->flags &= ~SHOW;
+
+        window->_is_visible = FALSE;
+    }
+}
+
+void uimenu_element_update(uimenu_element_t * element)
+{
+    if(element == NULL) return; // Fail gracefully
+
+    if(element->type == UIMENU_TYPE_TEXTBUTTON)
+    {
+        if(uimenu_is_cursor_in_element(element))
+        {
+            if(mouse_left)
+            {
+                element->skill[UIMENU_SKILL_PRESSED] = TRUE;
+            }
+            else if(element->skill[UIMENU_SKILL_PRESSED] == TRUE && !mouse_left)
+            {
+                element->skill[UIMENU_SKILL_PRESSED] = FALSE;
+                
+                // Callback click event
+                function callback();
+                callback = element->callback;
+                if(callback != NULL)
+                {
+                    callback();
+                }
+            }
+        }
+        else if(element->skill[UIMENU_SKILL_PRESSED] == TRUE)
+        {
+            // Don't trigger if mouse moves outside
+            element->skill[UIMENU_SKILL_PRESSED] = FALSE;
+        }
+    }
+
+    if(element->_next)
+        uimenu_element_update(element->_next);
 }
 
 void uimenu_window_update(uimenu_window_t * window)
@@ -369,23 +519,28 @@ void uimenu_window_update(uimenu_window_t * window)
     if(window == NULL) return; // Fail gracefully
 
     // Drag+Move window code
-    if(window->_is_visible == TRUE && window->_is_borderless == FALSE)
+    if(window->_is_visible == TRUE)
     {
-        if(window->_is_moving == FALSE && mouse_left && uimenu_is_cursor_in_window_titlebar(window))
+        if(window->_is_borderless == FALSE)
         {
-            window->_is_moving = TRUE;
-            window->_moving_start_offset = uimenu_get_cursor_offset_to_window(window);
+            if(window->_is_moving == FALSE && mouse_left && uimenu_is_cursor_in_window_titlebar(window))
+            {
+                window->_is_moving = TRUE;
+                window->_moving_start_offset = uimenu_get_cursor_offset_to_window(window);
+            }
+            else if(window->_is_moving && mouse_left)
+            {
+                window->x = mouse_pos.x - window->_moving_start_offset->x;
+                window->y = mouse_pos.y - window->_moving_start_offset->y;
+                window->_is_dirty = TRUE;
+            }
+            else if(window->_is_moving && !mouse_left)
+            {
+                window->_is_moving = FALSE;
+            }
         }
-        else if(window->_is_moving && mouse_left)
-        {
-            window->x = mouse_pos.x - window->_moving_start_offset->x;
-            window->y = mouse_pos.y - window->_moving_start_offset->y;
-            window->_is_dirty = TRUE;
-        }
-        else if(window->_is_moving && !mouse_left)
-        {
-            window->_is_moving = FALSE;
-        }
+        
+        uimenu_element_update(window->_first);
     }
 
     uimenu_sync_panel_with_window(window);

@@ -9,6 +9,7 @@ var CamFPS;
 #include "camera.h"
 #include "global.h"
 #include "unit.h"
+#include "jps.h"
 
 #ifdef DebugMode
     var test1; //für debugzwecke
@@ -360,10 +361,17 @@ function UnitControl()
                 vec_for_screen(temp,camera);
                 c_trace(camera.x, temp,USE_POLYGON | IGNORE_PASSENTS | IGNORE_SPRITES);
                 if(you != 0){
-                     if(you->group==GROUP_PLAYER_UNIT || you->group==GROUP_PLAYER_SPAWNER || you->group==GROUP_ENEMY_UNIT || you->group==GROUP_ENEMY_SPAWNER){
-                        SelectUnit(you);
-                    }
-                }
+                         if(you->group==GROUP_PLAYER_UNIT || you->group==GROUP_PLAYER_SPAWNER || you->group==GROUP_ENEMY_UNIT || you->group==GROUP_ENEMY_SPAWNER){
+
+                            MAP* map = mapGetCurrent();
+                            TILE *tile = mapGetTileFromVector(map, target.x);
+                            if(tile){
+                                if(tile->visibility == FOW_SCOUTED){
+                                    SelectUnit(you);
+                                }
+                            }
+                        }
+                 }
             }
 
             ClickPoint2D_A[0]= ClickPoint2D_B[0] = mouse_pos.x;
