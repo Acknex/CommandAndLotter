@@ -1,4 +1,4 @@
-#include "map.h"
+#include "grid.h"
 
 int *grid_state;
 int grid_xSize;
@@ -32,7 +32,7 @@ void grid_close()
 
 /******************/
 
-int grid_coord2idx(int x, int y)
+int grid_CoordToID(int x, int y)
 {
 	return x + y*grid_xSize;
 }
@@ -50,12 +50,25 @@ int grid_idx2Y(int idx)
 
 void grid_setState(int x, int y, int state)
 {
-	grid_state[grid_coord2idx(x,y)] = state;
+	grid_setState_byID(grid_coord2idx(x,y));
 }
 
 void grid_getState(int x, int y)
 {
-	return grid_state[grid_coord2idx(x,y)];
+	return grid_getState_byID(grid_coord2idx(x,y));
+}
+
+
+void grid_setState_byID(int id, state)
+{
+	grid_state[id] = state;
+	
+}
+int grid_getState_byID(int id)
+{
+	return grid_state[id];
+	
 }
 
 /******************/
+
