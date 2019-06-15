@@ -106,6 +106,13 @@ JPSPATH *jpsPathCreate(int maxLength)
 	return jpsPath;
 }
 
+void jpsPathDestroy(JPSPATH *jpsPath)
+{
+	if(!jpsPath) return;
+	if(jpsPath->tiles) sys_free(jpsPath->tiles);
+	sys_free(jpsPath);
+}
+
 void mapTilesInitialize(MAP* map)
 {
 	int i,j,k,i2,j2;
@@ -125,6 +132,12 @@ void mapTilesInitialize(MAP* map)
 	}
 }
 
+MAP* mapGetCurrent()
+{
+	if(!mapCurrent) error("mapGetCurrent: !mapCurrent");
+	return mapCurrent;
+}
+
 MAP *mapCreate(int sizeX, int sizeY, VECTOR *vMin, VECTOR *vMax, var tileSize)
 {
 	MAP *map = (MAP*)sys_malloc(sizeof(MAP));
@@ -140,6 +153,7 @@ MAP *mapCreate(int sizeX, int sizeY, VECTOR *vMin, VECTOR *vMax, var tileSize)
 	vec_set(map->vMax, vMax);
 	vec_diff(map->vSize, vMax, vMin);
 	map->tileSize = tileSize;
+	mapCurrent = map;
 	
 	return map;
 }
@@ -608,14 +622,14 @@ VECTOR* mapGetVectorFromTile(MAP* map, VECTOR* v, TILE* tile)
 	return v;
 }
 
-VECTOR* mapGetVector2DFromVector3D(MAP* map, VECTOR* v, VECTOR* v2d)
+VECTOR* mapGetVector2DFromVector3D(MAP* map, VECTOR* v2d, VECTOR* v3d)
 {
 	static VECTOR _vstatic;
-	if(!v) v = &_vstatic;
-	v->x = v2d->x*map->tileSize + map->vMin.x;
-	v->y = v2d->y*map->tileSize + map->vMin.y;
-	v->z = 0;
-	return v;
+	if(!v2d) v2d = &_vstatic;
+	v2d->x = (v3d->x-map->vMin.x)/map->tileSize;
+	v2d->y = (v3d->y-map->vMin.y)/map->tileSize;
+	v2d->z = 0;
+	return v2d;
 }
 
 TILE* mapGetTileFromVector(MAP* map, VECTOR* v)
@@ -646,7 +660,7 @@ void mapUpdateUnits(MAP* map)
 	int currentPlayer;
 	for(currentPlayer = 0; currentPlayer < MAX_PLAYERS; currentPlayer++)
 	{
-		UNIT *unit = gameState.unitFirst[currentPlayer];
+		UNIT *unit = map->unitFirst[currentPlayer];
 		while(unit)
 		{
 			TILE* tile = mapTileGet(map, unit->pos2d.x, unit->pos2d.y);
@@ -980,7 +994,7 @@ void mapMoveUnits(MAP* map)
 	for(currentPlayer = 0; currentPlayer < MAX_PLAYERS; currentPlayer++)
 	{
 		UNIT* prev = NULL;
-		UNIT *unit = gameState.unitFirst[currentPlayer];
+		UNIT *unit = map->unitFirst[currentPlayer];
 		while(unit)
 		{
 			UNIT* next = unit->next;
@@ -989,7 +1003,7 @@ void mapMoveUnits(MAP* map)
 			{
 				unitMove(map, unit);
 				
-				if(unit->HP <= 0)
+				if(unit->HP <= 0 || 1)
 				{
 					unit->isActive = 0; // delay removal for one frame to void projectiles
 				}
@@ -998,7 +1012,7 @@ void mapMoveUnits(MAP* map)
 			else
 			{
 				if(prev) prev->next = next;
-				else gameState.unitFirst[currentPlayer] = next;
+				else map->unitFirst[currentPlayer] = next;
 				sys_free(unit);
 			}
 			unit = next;
@@ -1020,19 +1034,29 @@ void unitInitializeFromPreset(UNIT *unit, int presetID)
 	unit->HP = unitPreset->maxHP;
 }
 
-UNIT* unitCreate(int playerID, int presetID, VECTOR* pos2d) //TILE* tile)
+UNIT* jpsUnitCreate(int playerID, int unitType, ENTITY* ent)
 {
+	MAP* map = mapGetCurrent();
+	if(playerID < 0 || playerID >= MAX_PLAYERS) error("jpsUnitCreate: bad playerID!");
 	UNIT *unit = (UNIT*)sys_malloc(sizeof(UNIT));
 	memset(unit, 0, sizeof(UNIT));
+	unit->ent = ent;
 	unit->isActive = 1;
 	unit->playerID = playerID;
-	vec_set(unit->pos2d, pos2d);
-	vec_set(unit->target2d, pos2d);
-	vec_set(unit->prevTarget2d, pos2d);
-	unitInitializeFromPreset(unit, presetID);
-	unit->next = gameState.unitFirst[playerID];
-	gameState.unitFirst[playerID] = unit;
+	mapGetVector2DFromVector3D(map, unit->pos2d, ent->x);
+	vec_set(unit->target2d, unit->pos2d);
+	vec_set(unit->prevTarget2d, unit->pos2d);
+	unitInitializeFromPreset(unit, unitType);
+	unit->next = mapCurrent->unitFirst[playerID];
+	mapCurrent->unitFirst[playerID] = unit;
 	return unit;
+}
+
+void jpsUnitDestroy(UNIT* unit)
+{
+	if(!unit) return;
+	if(unit->jpsPath) jpsPathDestroy(unit->jpsPath);
+	sys_free(unit);
 }
 
 void unitSetTargetFromTile(MAP* map, UNIT* unit, TILE* targetTile)
@@ -1050,7 +1074,7 @@ void unitSetTargetFromTile(MAP* map, UNIT* unit, TILE* targetTile)
 
 void unitAllSetTargetFromTile(MAP* map, int playerID, TILE* targetTile)
 {
-	UNIT *unit = gameState.unitFirst[playerID];
+	UNIT *unit = map->unitFirst[playerID];
 	while(unit)
 	{
 		unitSetTargetFromTile(map, unit, targetTile);
@@ -1078,7 +1102,7 @@ void mapSaveToFile(MAP* map, char* filename)
 	file_close(fhandle);
 }
 
-MAP* mapLoadFromFile(char* filename)
+MAP* jpsMapLoadFromFile(char* filename)
 {
 	var fhandle = file_open_read(filename);
 	if(!fhandle) return NULL;

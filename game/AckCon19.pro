@@ -43,7 +43,26 @@ SOURCES += \
   src/sputnik.c \
   src/stub.c \
   src/ui_game.c \
-  src/unit.c
+  src/unit.c \
+    src/ang.c \
+    src/camera.c \
+    src/credits.c \
+    src/enemy_hit.c \
+    src/framework.c \
+    src/game.c \
+    src/grid.c \
+    src/mainmenu.c \
+    src/map_loader.c \
+    src/music_player.c \
+    src/particle.c \
+    src/scan.c \
+    src/spawner.c \
+    src/sputnik.c \
+    src/stub.c \
+    src/ui_game.c \
+    src/unit.c \
+    src/UnitMangement.c \
+    main.c
 
 HEADERS += \
   shaders/terrain.fx \
@@ -62,7 +81,26 @@ HEADERS += \
   src/sputnik.h \
   src/stub.h \
   src/ui_game.h \
-  src/unit.h
+  src/unit.h \
+    src/ang.h \
+    src/camera.h \
+    src/credits.h \
+    src/enemy_hit.h \
+    src/framework.h \
+    src/game.h \
+    src/global.h \
+    src/grid.h \
+    src/mainmenu.h \
+    src/map_loader.h \
+    src/music_player.h \
+    src/particle.h \
+    src/scan.h \
+    src/spawner.h \
+    src/sputnik.h \
+    src/stub.h \
+    src/ui_game.h \
+    src/unit.h \
+    src/UnitMangement.h
 
 DISTFILES += \
   main.wdl \

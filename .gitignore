@@ -5,3 +5,4 @@ build-*
 game/marine.*
 *.bak
 *.blend1
+game/src/ackerr.txt

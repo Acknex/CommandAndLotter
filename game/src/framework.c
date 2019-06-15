@@ -4,6 +4,7 @@
 #include "game.h"
 #include "credits.h"
 #include "music_player.h"
+#include "jps.h"
 
 #include <acknex.h>
 #include <windows.h>
@@ -120,7 +121,11 @@ void framework_cleanup()
         you = ent;
         ent = ent_next(ent);
         if(you->SK_ENTITY_DEAD)
+        {
+        		UNIT *unit = jpsUnitGetFromEntity(you);
+        		if(unit) jpsUnitDestroy(unit);
             ptr_remove(you);
+        }
     }
 }
 
