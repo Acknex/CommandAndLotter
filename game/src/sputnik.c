@@ -15,6 +15,7 @@
 #define SPUTNIK_ANIMSTATE skill21
 #define SPUTNIK_ANIMSTATEATK skill22
 #define SPUTNIK_DIDATTACK skill26
+#define SPUTNIK_RUNCOUNTER skill27
 
 
 #define SPUTNIK_WALKANIM "walk"
@@ -52,9 +53,10 @@ void SPUTNIK_Init()
 {
 }
 
+
 void SPUTNIK__wait_or_walk(ENTITY * ptr)
 {
-	UNIT* unit = jpsUnitGetFromEntity(ptr);
+	UNIT* unit = jpsAllowMovementForEntity(ptr, true);
 	if(!unit) return;
 	
 	/*MAP* map = mapGetCurrent();
@@ -79,15 +81,19 @@ void SPUTNIK__wait_or_walk(ENTITY * ptr)
 	
 	
 	vec_set(ptr->x, unit->pos3d);
-	if(unit->isMoving)
-	{
 		VECTOR diff, temp;
 		vec_diff(diff, unit->pos3d, unit->prevPos3d);
-		if(vec_to_angle(temp, diff) > 0.01) ptr->pan += ang(temp.x-ptr->pan)*0.5*time_step;
+		var len = vec_to_angle(temp, diff)/time_step;
+		if(len > 0.25) ptr->SPUTNIK_RUNCOUNTER = 8;
+	//if(unit->isMoving) ptr->SPUTNIK_RUNCOUNTER = 12;
+	if(ptr->SPUTNIK_RUNCOUNTER > 0)
+	{
+		ptr->SPUTNIK_RUNCOUNTER = maxv(ptr->SPUTNIK_RUNCOUNTER-time_step,0);
+		if(len > 0.25) ptr->pan += ang(temp.x-ptr->pan)*0.5*time_step;
 
 		ptr->SPUTNIK_DIDATTACK = 0;
 		ptr->SPUTNIK_ANIMSTATEATK = 0;
-		ptr->SPUTNIK_ANIMSTATE += 0.5 * ptr->SPUTNIK_RUNSPEED * time_step;
+		ptr->SPUTNIK_ANIMSTATE += len*0.425*time_step;//0.5 * ptr->SPUTNIK_RUNSPEED * time_step;
 		ent_animate(ptr, SPUTNIK_WALKANIM, ptr->SPUTNIK_ANIMSTATE, ANM_CYCLE);		
 	}
 	else
@@ -108,6 +114,7 @@ void SPUTNIK_Update()
 	ENTITY * ptr;
 	SUBSYSTEM_LOOP(ptr, SUBSYSTEM_UNIT_SPUTNIK)
 	{
+	jpsAllowMovementForEntity(ptr, false);
 		if (ptr->HEALTH > 0)
 		{
 			SPUTNIK__hitcheck(ptr);
