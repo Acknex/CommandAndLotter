@@ -10,6 +10,7 @@ var CamFPS;
 #include <acknex.h>
 #include "framework.h"
 #include "map_loader.h"
+#include "camera.h"
 
 #ifdef DebugMode
     var test1; //für debugzwecke
@@ -273,6 +274,10 @@ function DebugDrawDests()
 
 function NumberKeyPressed(int nr)
 {
+    var x = 0;
+    var y = 0;
+    var count = 0;
+
     ENTITY * ent;
     SUBSYSTEM_LOOP(ent, SUBSYSTEM_UNIT_MANAGEMENT){
         if(key_ctrl){
@@ -281,7 +286,18 @@ function NumberKeyPressed(int nr)
             }
         }else{
             SetUnitSelcted(ent, ent.UNIT_GROUP_SKILL == nr);
+            if(ent.UNIT_GROUP_SKILL == nr){
+                x+=ent.x;
+                y+=ent.y;
+                count++;
+            }
+
         }
+    }
+    if(!key_ctrl && key_alt && count){
+        x /= count;
+        y /= count;
+        topdown_camera_set_pos(vector(x,y,0));
     }
 }
 
