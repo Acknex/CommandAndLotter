@@ -90,12 +90,17 @@ ENTITY* unit_spawn(int unittype, VECTOR* pos, VECTOR* targetPos, var owner)
 	
 	if (ent != NULL)
 	{
-		ent->SK_ENTITY_JPS_POINTER_TO_UNIT_STRUCT = jpsUnitCreate(PLAYER_ID_PLAYER, unittype, ent);
 		
 		if (owner == UNIT_ENEMY)
+		{
 			ent->group = GROUP_ENEMY_UNIT;
+			ent->SK_ENTITY_JPS_POINTER_TO_UNIT_STRUCT = jpsUnitCreate(PLAYER_ID_AI, unittype, ent);
+		}
 		else
+		{
 			ent->group = GROUP_PLAYER_UNIT;		
+			ent->SK_ENTITY_JPS_POINTER_TO_UNIT_STRUCT = jpsUnitCreate(PLAYER_ID_PLAYER, unittype, ent);
+		}
 
 		ent->ENTITY_UNITTYPE = unittype;
 		unit_setTarget(ent, targetPos);
