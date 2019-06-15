@@ -8,6 +8,7 @@ var CamFPS;
 
 #include <acknex.h>
 #include "framework.h"
+#include "map_loader.h"
 
 #ifdef DebugMode
     var test1; //für debugzwecke
@@ -134,8 +135,9 @@ void UnitMangement_open(){
     for(x = -1500; x < -500; x+=100){
         for(y = -1500; y < -500; y+=100){
 
-            c_trace(vector(x,y,1000), vector(x,y,-10000), USE_POLYGON);
-            you = ent_create("marine.mdl",hit.x,NULL);
+            var z = maploader_get_height(vector(x,y,0));
+
+            you = ent_create("marine.mdl",vector(x,y,z),NULL);
             you.ambient = 0;
             if(you.y == 0){
                 you.ambient = 200;
@@ -160,8 +162,8 @@ function PosToMap(VECTOR * vec, var x, var y)
     vec_set(temp, vector(x,y, camera.clip_far));
     if(vec_for_screen(temp,camera) != 0)
     {
-        c_trace(camera.x,temp.x,USE_POLYGON);
-        vec_set(vec,target);
+        VECTOR * p = maploader_trace(camera.x, temp.x);
+        vec_set(vec,p);
     }
 }
 
