@@ -18,6 +18,8 @@ void game_open(void)
 {
 	framework_load_level(NULL);
 
+    sun_light = 100;
+
 	maploader_load("the-core.png");
 
 	ui_game_open();

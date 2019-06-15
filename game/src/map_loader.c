@@ -125,18 +125,32 @@ void maploader_load(char const * fileName)
 		if(y >= maploader.h) y = maploader.h - 1;
 
 		v->y = maploader_tile_height(x, y);
+        int neighborX = minv(x + 1, maploader.w-1);
+        int neighborY = minv(y + 1, maploader.h-1);
+        var neighborXValue = maploader_tile_height(neighborX, y);
+        var neighborYValue = maploader_tile_height(x, neighborY);
+
+        VECTOR normalVector;
+        normalVector.x = (neighborX - v->y)/255;
+        normalVector.y = 1.0;
+        normalVector.z = (neighborY - v->y)/255;
+        vec_normalize(normalVector, 1.0);
 
 		v->u1 = (float)x / (float)maploader.w;
 		v->v1 = (float)y / (float)maploader.h;
+
+        v->nx = (float)normalVector.x;
+        v->ny = (float)normalVector.y;
+        v->nz = (float)normalVector.z;
 
 		ent_setvertex(maploader.terrain, &c, i);
 	}
 
 	c_updatehull(maploader.terrain, 0);
+    ent_fixnormals(maploader.terrain, 0);
 
-	maploader.terrain = maploader_material;
-
-	effect_load(maploader_material, "terrain.fx");
+    effect_load(maploader_material, "terrain.fx");
+    maploader.terrain.material = maploader_material;
 }
 
 bool maploader_has_map()
