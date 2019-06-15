@@ -21,11 +21,18 @@ struct maploader_t maploader;
 BMAP * maploader_terrain_digital = "terrain_digital.png";
 BMAP * maploader_terrain_analogue = "terrain_analogue.png";
 BMAP * maploader_terrain_splatter = "terrain_splatter.png";
+BMAP * maploader_terrain_street = "terrain_street.png";
 
-MATERIAL * maploader_material =
+MATERIAL * maploader_terrain_material =
 {
-  flags = AUTORELOAD;
-  emissive_blue = 255;
+    effect = "terrain.fx";
+    flags = PASS_SOLID | AUTORELOAD;
+}
+
+MATERIAL * maploader_water_material =
+{
+    effect = "water.fx";
+    flags = TRANSLUCENT | AUTORELOAD;
 }
 
 
@@ -59,6 +66,7 @@ void maploader_init()
     bmap_to_mipmap(maploader_terrain_digital);
     bmap_to_mipmap(maploader_terrain_analogue);
     bmap_to_mipmap(maploader_terrain_splatter);
+    bmap_to_mipmap(maploader_terrain_street);
 }
 
 int maploader_grey_to_type(int gray)
@@ -85,6 +93,7 @@ void maploader_load(char const * fileName)
 	BMAP * bmp = bmap_create(fileName);
 	if(bmp == NULL)
 		error("failed to load level");
+    bmap_to_mipmap(bmp);
 	var format = bmap_lock(bmp, 0);
 
 	maploader.w = bmap_width(bmp);
@@ -102,9 +111,20 @@ void maploader_load(char const * fileName)
 			var alpha;
 			pixel_to_vec(&col, &alpha, format, pixel);
 
-			((maploader.cells)[maploader.w * y + x]).celltype = maploader_grey_to_type(col.red);
+            /*
+            int type = maploader_grey_to_type(col.red);
+
+            if(x < 3 || y < 3 || x >= maploader.w-3 || y >= maploader.h -3) {
+                col.red = 0xC0;
+                type = MAPLOADER_TILE_HOLE;
+                pixel = pixel_for_vec(&col, alpha, format);
+                pixel_to_bmap(bmp, x, y, pixel);
+            }
+            */
+
+			((maploader.cells)[maploader.w * y + x]).celltype = 0;
 			((maploader.cells)[maploader.w * y + x]).vegetation = col.green / 255.0;
-			((maploader.cells)[maploader.w * y + x]).elevation = col.blue;
+            ((maploader.cells)[maploader.w * y + x]).elevation = col.blue * 3;
 		}
 	}
 
@@ -115,6 +135,15 @@ void maploader_load(char const * fileName)
 	int size_y = maploader_cellsize * maploader.h + maploader_cellsize - 1;
 
     collision_mode = 0;
+
+    you = ent_createterrain(
+        bmp,
+        vector(0, 0, 0),
+        2,
+        2,
+        size_x * maploader_trisize
+    );
+    you.material = maploader_water_material;
 
     maploader.terrain = ent_createterrain(
         bmp,
@@ -162,8 +191,8 @@ void maploader_load(char const * fileName)
             normalVector.z = (neighborY - v->y)/255;
             vec_normalize(normalVector, 1.0);
 
-            v->u1 = (float)x / (float)maploader.w;
-            v->v1 = (float)y / (float)maploader.h;
+            v->u1 = 154.0 * (float)x / (float)maploader.w / 256.0;
+            v->v1 = 190.0 * (float)y / (float)maploader.h / 256.0;
 
             v->nx = (float)normalVector.x;
             v->ny = (float)normalVector.y;
@@ -176,14 +205,16 @@ void maploader_load(char const * fileName)
 
     set(maploader.terrain, PASSABLE);
 
-    effect_load(maploader_material, "terrain.fx");
-    maploader.terrain.material = maploader_material;
+    maploader.terrain.material = maploader_terrain_material;
 
     random_seed(1337);
     for(x = 0; x < maploader.w; x++)
     {
         for(y = 0; y < maploader.h; y++)
         {
+            int type = maploader_tile_type(x, y);
+            if(type != MAPLOADER_TILE_DEFAULT)
+                continue;
             if(random(100) < 50)
                 continue;
             float v = maploader_tile_vegetation(x, y);
@@ -205,12 +236,25 @@ void maploader_load(char const * fileName)
             }
         }
     }
+    maploader.terrain.clipfactor = 2;
+
+    int i; for(i = 0; i < 100; i++)
+    {
+        you = ent_create(
+            "StrasseGerade.mdl",
+            vector(580 * i, 0, 0),
+            NULL
+        );
+        you.z = maploader_get_height(you.x);
+    }
+
+
+
 
     collision_mode = 1;
 
     if(key_c)
         c_updatehull(maploader.terrain, 0);
-    ent_fixnormals(maploader.terrain, 0);
 }
 
 bool maploader_has_map()

@@ -1,8 +1,4 @@
 
-#define SELCTED_SKILL skill[39]
-#define UNIT_DEST_SKILL skill[40]
-#define UNIT_GROUP_SKILL skill[43]
-
 #define DebugMode
 
 var CamFPS;
@@ -139,14 +135,13 @@ void UnitMangement_open(){
         for(y = -1500; y < 1500; y+=300){
 
             var z = maploader_get_height(vector(x,y,0));
-            you = ent_create("sputnik.mdl",vector(x,y,z+90),NULL);
+			you = unit_spawn(0, vector(x,y,z+90), !UNIT_ENEMY);
             you.ambient = 0;
             framework_setup(you, SUBSYSTEM_UNIT_MANAGEMENT);
         }
     }
     vec_set(camera.x, vector(-800,-1064,1000));
     vec_set(camera.pan, vector(0,-32,0));
-
 }
 
 
@@ -162,11 +157,12 @@ function PosToMap(VECTOR * vec, var x, var y)
     if(vec_for_screen(temp,camera) != 0)
     {
         VECTOR * p = maploader_trace(camera.x, temp.x);
-        if(p == 0){
-            error("p ist null");
+        if(p){
+            vec_set(vec,p);
+            return 1;
         }
-        vec_set(vec,p);
     }
+    return 0;
 }
 
 function CheckIsLeftFrom(VECTOR* Base, VECTOR* V1, VECTOR * V2)
@@ -215,16 +211,18 @@ function MarkUnits()
 {
     VECTOR Posis[4];
 
-    PosToMap(Posis[0], maxv(ClickPoint2D_A[0],ClickPoint2D_B[0]), minv(ClickPoint2D_A[1],ClickPoint2D_B[1]));
-    PosToMap(Posis[1], maxv(ClickPoint2D_A[0],ClickPoint2D_B[0]), maxv(ClickPoint2D_A[1],ClickPoint2D_B[1]));
-    PosToMap(Posis[2], minv(ClickPoint2D_A[0],ClickPoint2D_B[0]), maxv(ClickPoint2D_A[1],ClickPoint2D_B[1]));
-    PosToMap(Posis[3], minv(ClickPoint2D_A[0],ClickPoint2D_B[0]), minv(ClickPoint2D_A[1],ClickPoint2D_B[1]));
+    var success = 0;
+    success += PosToMap(Posis[0], maxv(ClickPoint2D_A[0],ClickPoint2D_B[0]), minv(ClickPoint2D_A[1],ClickPoint2D_B[1]));
+    success += PosToMap(Posis[1], maxv(ClickPoint2D_A[0],ClickPoint2D_B[0]), maxv(ClickPoint2D_A[1],ClickPoint2D_B[1]));
+    success += PosToMap(Posis[2], minv(ClickPoint2D_A[0],ClickPoint2D_B[0]), maxv(ClickPoint2D_A[1],ClickPoint2D_B[1]));
+    success += PosToMap(Posis[3], minv(ClickPoint2D_A[0],ClickPoint2D_B[0]), minv(ClickPoint2D_A[1],ClickPoint2D_B[1]));
+
+    if(success != 4){return;}
 
     var i;
     ENTITY * ent;
 
     SUBSYSTEM_LOOP(ent, SUBSYSTEM_UNIT_MANAGEMENT){
-
         var isInside = 1;
         for(i = 0; i < 4 && isInside; i++){
             isInside = CheckIsLeftFrom(Posis[i],Posis[(i+1)%4],ent.x);
@@ -267,7 +265,8 @@ function SetDestForSelectd(VECTOR * Dest)
     ENTITY * ent;
     SUBSYSTEM_LOOP(ent, SUBSYSTEM_UNIT_MANAGEMENT){
         if(ent.SELCTED_SKILL){
-            vec_set(ent.UNIT_DEST_SKILL,Dest);
+				unit_setTarget(ent, Dest);
+            //vec_set(ent.UNIT_DEST_SKILL,Dest);
         }
     }
 }
@@ -286,13 +285,15 @@ function DebugDrawDests()
     }
 }
 
-function DeselectAll()
+function DeselectAllOfSubsystem(int Subsys)
 {
     ENTITY * ent;
-    SUBSYSTEM_LOOP(ent, SUBSYSTEM_UNIT_MANAGEMENT){
+    SUBSYSTEM_LOOP(ent, Subsys){
         DeselectUnit(ent);
     }
 }
+
+
 
 function NumberKeyPressed(int nr)
 {
@@ -320,7 +321,7 @@ function NumberKeyPressed(int nr)
 
         }
     }
-    if(!key_ctrl && key_alt && count){
+    if(!key_ctrl && key_alt && count){//Gruppe mit Alt-Ausgewählt die auch Units enthält
         x /= count;
         y /= count;
         topdown_camera_set_pos(vector(x,y,0));
@@ -336,29 +337,28 @@ function UnitControl()
     if(mouse_left){
         if(MouseLeftLast == 0){
             if(!key_shiftl){
-                DeselectAll();
+                DeselectAllOfSubsystem(SUBSYSTEM_UNIT_MANAGEMENT);
             }
+             DeselectAllOfSubsystem(SUBSYSTEM_SPAWNER);
+
             vec_set(temp, vector(mouse_pos.x,mouse_pos.y, camera.clip_far));
             vec_for_screen(temp,camera);
             c_trace(camera.x, temp,USE_POLYGON);
             if(you != 0){
-                if(you.SK_SUBSYSTEM == SUBSYSTEM_UNIT_MANAGEMENT){
+                if(you.SK_SUBSYSTEM == SUBSYSTEM_UNIT_MANAGEMENT || you.SK_SUBSYSTEM == SUBSYSTEM_SPAWNER){
                     SelectUnit(you);
                 }
             }
 
-            ClickPoint2D_A[0]=mouse_pos.x;
-            ClickPoint2D_A[1]=mouse_pos.y;
-
-            ClickPoint2D_B[0]=mouse_pos.x;
-            ClickPoint2D_B[1]=mouse_pos.y;
+            ClickPoint2D_A[0]= ClickPoint2D_B[0] = mouse_pos.x;
+            ClickPoint2D_A[1]= ClickPoint2D_B[1] = mouse_pos.y;
 
         }else{
             ClickPoint2D_B[0]=mouse_pos.x;
             ClickPoint2D_B[1]=mouse_pos.y;
-            DrawQuadDemo();
         }
-        if(abs(ClickPoint2D_A[0]-ClickPoint2D_B[0])+abs(ClickPoint2D_A[1]-ClickPoint2D_B[1])  >5){
+        if(abs(ClickPoint2D_A[0]-ClickPoint2D_B[0]) > 2 && abs(ClickPoint2D_A[1]-ClickPoint2D_B[1])> 2){
+            DrawQuadDemo();
             MarkUnits();
         }
 

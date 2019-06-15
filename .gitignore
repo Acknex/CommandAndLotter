@@ -1,5 +1,10 @@
 *.pro.user
 /build
 /game/CMakeLists.txt.user
+/.vscode
 build-*
 game/marine.*
+*.bak
+*.blend1
+game/src/ackerr.txt
+game/ackerr.txt

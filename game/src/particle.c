@@ -1,5 +1,5 @@
 #include "particle.h"
-#include <particles.c>
+//#include <particles.c>
 
 #define EYE_LASERDIST skill24
 //#define EYE_LASERDIST skill25
@@ -17,7 +17,8 @@ void PARTICLE__explode_fade(PARTICLE* p)
 
 void PARTICLE__explode_init(PARTICLE* p)
 {
-	vec_randomize(&p->vel_x,40);
+	//reimplement if required
+	//vec_randomize(&p->vel_x,40);
 	vec_set(&p->blue,vector(5,174,86));
 	set(p,MOVE | BRIGHT | BEAM);
 	p->lifespan = 20+random(1);

@@ -32,6 +32,7 @@ function main()
 // Include your code file here
 #include "framework.c"
 #include "game.c"
+#include "ui_menu.c"
 #include "mainmenu.c"
 #include "credits.c"
 #include "music_player.c"
@@ -46,5 +47,8 @@ function main()
 #include "ang.c"
 #include "scan.c"
 #include "grid.c"
-#include "particle.h"
+#include "particle.c"
 #include "spawner.c"
+#include "building.c"
+#include "jps.c"
+#include "fow.c"

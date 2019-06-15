@@ -1,25 +1,24 @@
-//enable: Shadow Map on Blue
-//help: Terrain contains a shadow map on the Skin1 blue channel.
-//help: With PS 1.1 (GeForce3), sun & dynamic lights are then disabled.
-//id: 14
-#define SHADOWMAP
 
 Texture entSkin1;
 
 sampler sMaskTex = sampler_state {
     Texture = <entSkin1>;
     MipFilter = Linear;
+    MinFilter = Linear;
+    MagFilter = Linear;
 };
 
 Texture maploader_terrain_digital_bmap;
 Texture maploader_terrain_analogue_bmap;
 Texture maploader_terrain_splatter_bmap;
+Texture maploader_terrain_street_bmap;
 Texture shader_noise_bmap;
 
 sampler sDigital = sampler_state { Texture = <maploader_terrain_digital_bmap>; MipFilter = Linear; };
 sampler sAnalog = sampler_state { Texture = <maploader_terrain_analogue_bmap>; MipFilter = Linear; };
 sampler sSplatter = sampler_state { Texture = <maploader_terrain_splatter_bmap>; MipFilter = Linear; };
 sampler sNoise = sampler_state { Texture = <shader_noise_bmap>; MipFilter = Linear; };
+sampler sStreet = sampler_state { Texture = <maploader_terrain_street_bmap>; MipFilter = Linear; };
 
 
 float4x4 matWorld;
@@ -42,14 +41,10 @@ out_terraintex3 vs_terraintex3(
 )
 {
 	out_terraintex3 Out;
-
-    float4 terrain_attribs = tex2D(sMaskTex, inTexCoord0);
-
-    Out.pos = mul(inPos, matWorldViewProj);
-    Out.normal = mul(inNormal, (float3x3)matWorld);
-    Out.world = mul(inPos, matWorld);
+	Out.pos = mul(inPos, matWorldViewProj);
+	Out.normal = mul(inNormal, (float3x3)matWorld);
+	Out.world = mul(inPos, matWorld);
 	Out.uv = inTexCoord0.xy;
-
 	return Out;
 }
 
@@ -76,27 +71,42 @@ float4 ps_terraintex3(out_terraintex3 In) : COLOR
 {
     float4 attribs = tex2D(sMaskTex, In.uv);
 
-    float4 pattern = tex2D(sSplatter, In.world.xz / 512.0);
+    float road = attribs.r;
+    float vegetation = attribs.g;
+    float elevation = attribs.b;
 
-    float4 analog = textureNoTile(In.world.xz / 512.0);
+    float4 ground_digital = tex2D(sDigital, In.world.xz / 512.0);
+    float4 ground_analog  = textureNoTile(In.world.xz / 512.0);
+
+    float4 road_digital = tex2D(sStreet, In.world.xz / 512.0);
+    float4 road_analog  = tex2D(sStreet, In.world.xz / 512.0);
+
+    float4 digital = lerp(ground_digital, road_digital, road);
+    float4 analog = lerp(ground_analog, road_analog, road);
 
     float4 surface = lerp(
-        tex2D(sDigital, In.world.xz / 256.0),
+        digital,
         analog,
-        pow(length(analog), 0.2) * smoothstep(0.0, 1.0, attribs.g)
+        smoothstep(0.0, 1.0, 0.5 + 100.0 * (vegetation - 0.5 * analog.a))
     );
 
-
-    return surface * (0.5 + attribs.b);
+    float4 final = lerp(
+      surface * (0.8 + elevation),
+      float4(0,0,0,0),
+      clamp(-0.001 * In.world.y, 0.0, 1.0)
+    );
+    final.a = 1.0;
+    return final;
 }
 
 technique terraintex3_13
 {
 	pass one
 	{
-        shademode = flat;
-
-		VertexShader = compile vs_2_0 vs_terraintex3();
-		PixelShader = compile ps_2_0 ps_terraintex3();
+		AlphaBlendEnable = false;
+		ZWriteEnable = true;
+		ZEnable = true;
+		VertexShader = compile vs_3_0 vs_terraintex3();
+		PixelShader = compile ps_3_0 ps_terraintex3();
 	}
 }

@@ -1,9 +1,11 @@
 #include "framework.h"
 #include "global.h"
+#include "ui_menu.h"
 #include "mainmenu.h"
 #include "game.h"
 #include "credits.h"
 #include "music_player.h"
+#include "jps.h"
 
 #include <acknex.h>
 #include <windows.h>
@@ -120,7 +122,11 @@ void framework_cleanup()
         you = ent;
         ent = ent_next(ent);
         if(you->SK_ENTITY_DEAD)
+        {
+            UNIT *unit = jpsUnitGetFromEntity(you);
+            if(unit) jpsUnitDestroy(unit);
             ptr_remove(you);
+        }
     }
 }
 
@@ -143,16 +149,21 @@ void framework_update()
     on_esc = NULL;
 #endif
 
+    if(framework.state != FRAMEWORK_STATE_STARTUP)
+    {
+        uimenu_update();
+    }
+
     switch(framework.state)
     {
     case FRAMEWORK_STATE_STARTUP:
         if(framework.frameCounter == 1)
         {
             // spiel im ersten frame initialisieren
-						music_init();
-						mainmenu_init();
-						game_init();
-						credits_init();
+            music_init();
+            mainmenu_init();
+            game_init();
+            credits_init();
 #ifdef DEBUG_FRAMEWORK_FASTSTART
             if(settings.skipIntro)
                 framework_transfer(FRAMEWORK_STATE_LOAD);
@@ -173,7 +184,7 @@ void framework_update()
             switch(response)
             {
             case MAINMENU_RESPONSE_STARTGAME:
-								framework_transfer(FRAMEWORK_STATE_GAME);
+                framework_transfer(FRAMEWORK_STATE_GAME);
                 break;
             case MAINMENU_RESPONSE_CREDIT:
                 framework_transfer(FRAMEWORK_STATE_CREDITS);
@@ -197,7 +208,7 @@ void framework_update()
     case FRAMEWORK_STATE_GAME:
         game_update();
         if(game_is_done())
-					framework_transfer(FRAMEWORK_STATE_MAINMENU);
+            framework_transfer(FRAMEWORK_STATE_MAINMENU);
         break;
 
     default:
@@ -246,7 +257,7 @@ void framework_update()
             break;
 
         case FRAMEWORK_STATE_MAINMENU:
-						mainmenu_open();
+            mainmenu_open();
             break;
 
         case FRAMEWORK_STATE_CREDITS:
@@ -256,7 +267,7 @@ void framework_update()
         case FRAMEWORK_STATE_GAME:
             // game was already openend
             // by LOAD stateg
-						game_open();
+            game_open();
             break;
 
         default:

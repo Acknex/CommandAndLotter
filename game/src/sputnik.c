@@ -27,7 +27,7 @@
 #define SPUTNIK_FEET 30
 #define SPUTNIK_TARGETDIST 100
 
-SOUND* sputnik_snd_death = "sputnik_death.wav";
+SOUND* sputnik_snd_death   = "sputnik_death.wav";
 SOUND* sputnik_snd_attack1 = "sputnik_attack1.wav";
 SOUND* sputnik_snd_attack2 = "sputnik_attack2.wav";
 SOUND* sputnik_snd_attack3 = "sputnik_attack3.wav";
@@ -42,12 +42,13 @@ void Sputnik()
 	my->SPUTNIK_ATTACKRANGE = 300;
 	my->SPUTNIK_ANIMSTATEATK = 0;
 	my->HEALTH = 23;//HEALTH_SPUTNIK; TODO HOOK TO UNIT SYSTEM
+	my->MAXHEALTH = 23;//HEALTH_SPUTNIK; TODO HOOK TO UNIT SYSTEM
 	ENEMY_HIT_init(my);
-	vec_scale(&my->scale_x, 1.2);
 	set(my, SHADOW);
 	c_setminmax(me);
 	my->min_z += SPUTNIK_FEET;
 	my->ENTITY_STATE = ENTITY_STATE_WAIT;
+	my->ENTITY_DAMAGE = 5;
 }
 
 void SPUTNIK_Init()
@@ -208,12 +209,14 @@ void SPUTNIK__attack(ENTITY* ptr)
 	{
 		if (ptr->SPUTNIK_DIDATTACK == 0)
 		{
-			//me = ptr;
-			//var mode = IGNORE_ME;
-			//c_trace(ptr->x, ptr->)
-#ifdef Adjust_attack_code_to_new_project
-			playerAddHealth(-DAMAGE_SPUTNIK);
-#endif
+			me = ptr;
+			var mode = IGNORE_ME | IGNORE_WORLD | IGNORE_PUSH | IGNORE_SPRITES | IGNORE_CONTENT | ACTIVATE_SHOOT;
+			if (ptr->group == GROUP_PLAYER_UNIT)
+				c_ignore(GROUP_PLAYER_UNIT, GROUP_PLAYER_SPAWNER,0);
+			else
+				c_ignore(GROUP_ENEMY_UNIT, GROUP_ENEMY_SPAWNER,0);
+			//ENEMY_HIT_setAttack()
+			c_trace(ptr->x, unit_getTarget(ptr), mode);			
 		}
 		ptr->SPUTNIK_DIDATTACK = 1;
 	}
