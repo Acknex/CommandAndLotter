@@ -18,6 +18,7 @@ void game_init(void)
     UnitMangement_init();
     grid_init();
 	buildingPlacement_init();
+	presetsInit();
 }
 
 void game_open(void)
@@ -62,6 +63,7 @@ void game_open(void)
 void game_update(void)
 {
 	ui_game_update();
+	jpsGameUpdate(mapGetCurrent());
 	SPUTNIK_Update();
 	SPAWNER_Update();
 	stub_update(); //hook debug shit here

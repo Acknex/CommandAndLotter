@@ -22,11 +22,17 @@ void setmousepos()
 	mouseupdate = 1;
 }
 
+void producesputnik()
+{
+	spawner_produce(fancytower);
+}
+
 void stub_init()
 {
 	mouse_mode = 4;
 	on_mouse_left = setmousepos;
-	fancysputnik = unit_spawn(0, vector(0,0,500), UNIT_PLAYER);
+	on_p = producesputnik;
+	//fancysputnik = unit_spawn(0, vector(0,0,500), UNIT_PLAYER);
 	fancytarget = ent_create(SPHERE_MDL, vector(100,100,500), NULL);
 	fancytower = spawner_spawn(0, vector(100,1000,500), SPAWNER_PLAYER);
 	vec_scale (&fancytarget->scale_x, 5);	
@@ -34,11 +40,12 @@ void stub_init()
 
 void stub_update()
 {
+	return;
 	if (mouseupdate == 1)
 	{
 		mouseupdate = 0;
 		stubtoggle = 1 - stubtoggle;
-		unit_setTarget(fancysputnik, mousevec);
+		//unit_setTarget(fancysputnik, mousevec);
 		if (stubtoggle > 0)
 			unit_setVictim(fancysputnik, fancytarget);
 		else

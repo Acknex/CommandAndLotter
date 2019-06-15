@@ -41,8 +41,8 @@ void Sputnik()
 	my->SPUTNIK_ATTACKSPEED = 5;
 	my->SPUTNIK_ATTACKRANGE = 300;
 	my->SPUTNIK_ANIMSTATEATK = 0;
-	my->HEALTH = 23;//HEALTH_SPUTNIK; TODO HOOK TO UNIT SYSTEM
-	my->MAXHEALTH = 23;//HEALTH_SPUTNIK; TODO HOOK TO UNIT SYSTEM
+	my->HEALTH = 23;
+	my->MAXHEALTH = my->HEALTH;
 	ENEMY_HIT_init(my);
 	set(my, SHADOW);
 	c_setminmax(me);
@@ -108,7 +108,6 @@ void SPUTNIK_Update()
 		{
 			ptr->z = maploader_get_height(ptr->x) - ptr->min_z + SPUTNIK_FEET;			
 		}
-		
 	}	
 }
 
@@ -138,7 +137,6 @@ void SPUTNIK__hitcheck(ENTITY* ptr)
 		{
 			ptr->SPUTNIK_HITTHRESHOLD = 0;
 			ptr->event = ENEMY_HIT_event;
-			vec_zero(ptr->DAMAGE_VEC);
 		}
 	}
 }

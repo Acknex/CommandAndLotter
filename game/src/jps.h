@@ -155,11 +155,16 @@
 
 	VECTOR* mapGetVectorFromTile(MAP* map, VECTOR* v, TILE* tile);
 
-	VECTOR* mapGetVector2DFromVector3D(MAP* map, VECTOR* v, VECTOR* v2d);
+	VECTOR* mapGetVector2DFromVector3D(MAP* map, VECTOR* v2d, VECTOR* v3d);
+	VECTOR* mapGetVector3DFromVector2D(MAP* map, VECTOR* v3d, VECTOR* v2d);
+
+	void unitSetTargetFromVector2D(MAP* map, UNIT* unit, VECTOR *vTarget);
 
 	TILE* mapGetTileFromVector(MAP* map, VECTOR* v);
 
 	BMAP* mapGetBitmap(MAP* map);
+
+	void jpsGameUpdate(MAP* map);
 
 	/////////////////////////////////////////////////
 	// more available functions
@@ -209,8 +214,6 @@
 	void* pointerArray[POINTER_ARRAY_MAX]; // yes!
 	int pointerArrayNum = 0;
 
-	LIST* mapGetNearbyUnits_listbased(MAP* map, TILE* sourceTile, int range);
-
 	int mapGetNearbyUnits(MAP* map, TILE* sourceTile, int range);
 	int mapIsAnyUnitNearby(MAP* map, TILE* sourceTile, int range);
 	int mapIsAnyFriendlyUnitNearby(MAP* map, TILE* sourceTile, int range, int playerNumber);
@@ -225,7 +228,6 @@
 
 	void mapMoveUnits(MAP* map);
 
-	void gameUpdate(MAP* map);
 
 	void unitInitializeFromPreset(UNIT *unit, int presetID);
 
