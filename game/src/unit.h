@@ -15,6 +15,5 @@ ENTITY* unit_spawn(int unittype, VECTOR* pos, var owner);
 VECTOR* unit_getTarget(ENTITY* ent);
 ENTITY* unit_getVictim(ENTITY* ent);
 var unit_getHealth(ENTITY* ent);
-var unit_getMaxHealth(ENTITY* ent);
 
 #endif

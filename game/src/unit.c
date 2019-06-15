@@ -84,10 +84,5 @@ ENTITY* unit_spawn(int unittype, VECTOR* pos, var owner)
 
 var unit_getHealth(ENTITY* ent)
 {
-	return ent->HEALTH;
-}
-
-var unit_getMaxHealth(ENTITY* ent)
-{
-	return ent->MAXHEALTH;
+	return ent->HEALTH / ent->MAXHEALTH;
 }
