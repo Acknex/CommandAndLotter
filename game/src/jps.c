@@ -859,7 +859,7 @@ VECTOR* unitFlockingSpeedGet(MAP* map, UNIT* unit, VECTOR* v)
 		VECTOR vDir;
 		vec_diff(vDir, unit->pos2d, neighbor->pos2d);
 		var length = vec_length(vDir);
-		var range = 1.75*(unitPreset->radius + neighborPreset->radius);
+		var range = 2*(unitPreset->radius + neighborPreset->radius);
 		
 		if(length < range)
 		{
@@ -1073,7 +1073,7 @@ void unitMove(MAP* map, UNIT* unit)
 	vFlock.z = 0;
 	//vec_scale(vFlock, 0.1);
 	var length = vec_length(vFlock);
-	if(length > maxSpeed*2) vec_normalize(vFlock, maxSpeed*2);
+	if(length > maxSpeed*4) vec_normalize(vFlock, maxSpeed*4);
 	vec_add(vDir, vFlock);
 	var length = vec_length(vDir);
 	if(length > maxSpeed) vec_normalize(vDir, maxSpeed);

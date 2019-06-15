@@ -84,7 +84,10 @@ ENTITY* spawner_spawn(int unittype, VECTOR* pos, var owner)
 	{
 		mapSetTileValueAtPos3D(mapGetCurrent(), pos, 1); // 1 == solid, non-traversable
 		mapJPSUpdate(mapGetCurrent());
-		fov_uncover(pos, SPAWNER_LOS);
+		
+		if(owner == PLAYER_ID_PLAYER)
+			fov_uncover(pos, SPAWNER_LOS);
+		
 		ent->ENTITY_UNITTYPE = unittype;
 		if (owner == SPAWNER_ENEMY)
 			ent->group = GROUP_ENEMY_SPAWNER;

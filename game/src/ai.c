@@ -44,7 +44,7 @@ void ai_spawn_unit(int unitType)
 	ENTITY* ptr = aiSystemInstance->entBuildings[buildingType][(int)random(aiSystemInstance->buildingCount[buildingType])];
 	ptr->SPAWNER_SPAWNANGLE += 137.5;
 	ptr->SPAWNER_SPAWNANGLE %= 360;
-	VECTOR* targetPos = vector(700,0,0);
+	VECTOR* targetPos = vector(256+random(800),0,0);
 	VECTOR* angle = vector(ang(ptr->SPAWNER_SPAWNANGLE), 0, 0);
 	vec_rotate(targetPos, angle);
 	//vec_add(targetPos, ptr->x);
@@ -54,7 +54,9 @@ void ai_spawn_unit(int unitType)
 
 void ai_update()
 {
-	float timeAdd = 2*(1.0+aiSystemInstance->difficulty*0.5)*(float)time_step/16.0; // better than using time_frame in this case (game might slow down, AI should not play comparatively faster than)
+	static int dummyUnitCountForNow = 0;
+	if(dummyUnitCountForNow >= 50) return;
+	float timeAdd = (1.0+aiSystemInstance->difficulty*0.5)*(float)time_step/16.0; // better than using time_frame in this case (game might slow down, AI should not play comparatively faster than)
 	aiSystemInstance->elapsedTime += timeAdd;
 	if(aiSystemInstance->elapsedTime > aiSystemInstance->stepTime)
 	{
@@ -62,10 +64,11 @@ void ai_update()
 		ai_spawn_building(0);
 	}
 	aiSystemInstance->unitBuildTimer += timeAdd;
-	if(aiSystemInstance->unitBuildTimer > 4)
+	if(aiSystemInstance->unitBuildTimer > 6)
 	{
-		aiSystemInstance->unitBuildTimer -= 4;
+		aiSystemInstance->unitBuildTimer -= 6;
 		ai_spawn_unit(0);
+		dummyUnitCountForNow++;
 	}
 }
 
