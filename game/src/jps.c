@@ -770,7 +770,7 @@ VECTOR* unitFlockingSpeedGet(MAP* map, UNIT* unit, VECTOR* v)
 	//LIST* unitList = mapGetNearbyUnits(map, unit->tile, 2);
 	//while(unitList)
 	//UNIT* neighbor = (UNIT*)unitList->data;
-	int numNeighbors = mapGetNearbyUnits(map, unit->tile, 2);
+	int numNeighbors = mapGetNearbyUnits(map, unit->tile, 1);
 	int i;
 	for(i = 0; i < numNeighbors; i++)
 	{
