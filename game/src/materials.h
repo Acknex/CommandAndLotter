@@ -100,8 +100,7 @@ void UpdateRenderTargets()
 	
 	if(bmapPPOriginal)
 		bmap_remove(bmapPPOriginal);
-		
-    printf("%f, %f", (double)screen_size.x, (double)screen_size.y);
+
 	bmapPPOriginal = bmap_createblack(screen_size.x, screen_size.y, 8888);
 	
     camera.bmap = bmapPPOriginal;
