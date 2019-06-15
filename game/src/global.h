@@ -82,6 +82,6 @@ typedef int bool;
 
 
 //#define GAME_OPEN_DEBUG
-#define CONSOLE_SHOW
+//#define CONSOLE_SHOW
 
 #endif // GLOBAL_H
