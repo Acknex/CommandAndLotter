@@ -671,7 +671,7 @@ void mapUpdateUnits(MAP* map)
 				tile->unitList = NULL;
 			}*/
 			for(currentPlayer = 0; currentPlayer < MAX_PLAYERS; currentPlayer++)
-				tile->numUnits[currentPlayer] = 0;
+			tile->numUnits[currentPlayer] = 0;
 		}
 	}
 	
@@ -735,8 +735,8 @@ int mapIsAnyUnitNearby(MAP* map, TILE* sourceTile, int range)
 			TILE* tile = mapTileGet(map, i, j);
 			int currentPlayer;
 			if(tile)
-				for(currentPlayer = 0; currentPlayer<MAX_PLAYERS; ++currentPlayer)	
-					if(tile->numUnits[currentPlayer]) return 1;
+			for(currentPlayer = 0; currentPlayer<MAX_PLAYERS; ++currentPlayer)	
+			if(tile->numUnits[currentPlayer]) return 1;
 		}
 	}
 	return 0;
@@ -754,7 +754,7 @@ int mapIsAnyFriendlyUnitNearby(MAP* map, TILE* sourceTile, int range, int player
 			TILE* tile = mapTileGet(map, i, j);
 			int currentPlayer;
 			if(tile)
-				if(tile->numUnits[playerNumber]) return 1;
+			if(tile->numUnits[playerNumber]) return 1;
 		}
 	}
 	return 0;
@@ -949,7 +949,7 @@ int unitMoveWithCollision(MAP* map, UNIT* unit, VECTOR *vSpeed)
 							hitTrue = 1;
 							////draw_line2(vector(prevPos.x*size-unitDrawSize/2,prevPos.y*size-unitDrawSize/2,0), vector((tile->pos[0]+0.5)*size,(tile->pos[1]+0.5)*size,0), vector(64,64,255), 50);
 						}
-						else draw_line2(vector(prevPos.x*size-unitDrawSize/2,prevPos.y*size-unitDrawSize/2,0), vector((tile->pos[0]+0.5)*size,(tile->pos[1]+0.5)*size,0), vector(64,255,64), 50);
+						//else draw_line2(vector(prevPos.x*size-unitDrawSize/2,prevPos.y*size-unitDrawSize/2,0), vector((tile->pos[0]+0.5)*size,(tile->pos[1]+0.5)*size,0), vector(64,255,64), 50);
 					}
 				}
 			}
@@ -987,7 +987,7 @@ void unitMove(MAP* map, UNIT* unit)
 	int size = 12;
 	//draw_line2(vector(unit->pos2d.x*size,unit->pos2d.y*size,0), vector(currentTarget.x*size,currentTarget.y*size,0), vector(0,255,255), 50);
 
-	float maxSpeed = 0.25;
+	float maxSpeed = 0.125;
 	vec_diff(vDir, currentTarget, unit->pos2d);
 	vDir.z = 0;
 	var length = vec_length(vDir);
@@ -1028,8 +1028,11 @@ void mapMoveUnits(MAP* map)
 			UNIT_PRESET* unitPreset = &unitPresets[unit->presetID];
 			if(unit->isActive)
 			{
+				vec_set(unit->prevPos3d, unit->pos3d);
 				unitMove(map, unit);
-				if(unit->ent) mapGetVector3DFromVector2D(map, unit->ent.x, unit->pos2d);
+				mapGetVector3DFromVector2D(map, unit->pos3d, unit->pos2d);
+				unit->isMoving = (unit->pos3d.x-unit->prevPos3d.x || unit->pos3d.y-unit->prevPos3d.y);
+				//if(unit->ent) mapGetVector3DFromVector2D(map, unit->ent.x, unit->pos2d);
 				
 				if(unit->HP <= 0 && 0)
 				{
