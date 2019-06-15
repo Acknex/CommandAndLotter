@@ -54,3 +54,4 @@ function main()
 #include "progressbars.c"
 #include "z.c"
 #include "effects2d.c"
+#include "ai.c"
