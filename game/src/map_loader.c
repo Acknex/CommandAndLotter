@@ -16,6 +16,12 @@ struct maploader_t
 
 struct maploader_t maploader;
 
+MATERIAL * maploader_material =
+{
+	effect = "terrain.fx";
+  flags = AUTORELOAD;
+}
+
 void maploader_init()
 {
 	maploader.cells = NULL;
@@ -87,13 +93,15 @@ void maploader_load(char const * fileName)
 
 	int i;
 	int cnt = ent_status(maploader.terrain, 1);
-	for(i = 1; i <= cnt; i++)
+	for(i = 0; i < cnt; i++)
 	{
 		CONTACT c;
 		ent_getvertex(maploader.terrain, &c, i);
 
-		x = (c.x + maploader.terrain->x + trisize * size_x / 2) / (trisize * cellsize);
-		y = (c.y + maploader.terrain->y + trisize * size_y / 2) / (trisize * cellsize);
+		D3DVERTEX * v = c.v;
+
+		x = (v->x + trisize * size_x / 2) / (trisize * cellsize);
+		y = (v->z + trisize * size_y / 2) / (trisize * cellsize);
 
 //		diag("x=");
 //		diag(str_for_int(NULL, x));
@@ -106,13 +114,17 @@ void maploader_load(char const * fileName)
 		if(x >= maploader.w) x = maploader.w - 1;
 		if(y >= maploader.h) y = maploader.h - 1;
 
-		c.v->y = maploader_tile_height(x, y);
+		v->y = maploader_tile_height(x, y);
 
-		c.v->u1 = (float)x / (float)maploader.w;
-		c.v->v1 = (float)y / (float)maploader.h;
+		v->u1 = (float)x / (float)maploader.w;
+		v->v1 = (float)y / (float)maploader.h;
 
 		ent_setvertex(maploader.terrain, &c, i);
 	}
+
+	c_updatehull(maploader.terrain, 0);
+
+	maploader.terrain = maploader_material;
 }
 
 bool maploader_has_map()
