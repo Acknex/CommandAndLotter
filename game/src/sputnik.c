@@ -59,27 +59,6 @@ void SPUTNIK__wait_or_walk(ENTITY * ptr)
 	UNIT* unit = jpsAllowMovementForEntity(ptr, true);
 	if(!unit) return;
 	
-	/*MAP* map = mapGetCurrent();
-	JPSPATH *jpsPath = unit->jpsPath;
-	if(jpsPath && unit->tile)
-	{
-		if(jpsPath->length > 0)
-		{
-			DEBUG_VAR(jpsPath->length,400);
-			int i;
-			for(i = 1; i < jpsPath->length; i++)
-			{
-				TILE* prevTile = (jpsPath->tiles)[i-1];
-				TILE* nextTile = (jpsPath->tiles)[i];
-				VECTOR vPrev, vNext;
-				mapGetVector3DFromVector2D(map, vPrev, vector(prevTile->pos[0]+0.5, prevTile->pos[1]+0.5, 0));
-				mapGetVector3DFromVector2D(map, vNext, vector(nextTile->pos[0]+0.5, nextTile->pos[1]+0.5, 0));
-				draw_line3D2(vPrev, vNext, COLOR_GREEN, 75);
-			}
-		}
-	}*/
-	
-	
 	vec_set(ptr->x, unit->pos3d);
 		VECTOR diff, temp;
 		vec_diff(diff, unit->pos3d, unit->prevPos3d);

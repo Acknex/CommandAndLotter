@@ -84,6 +84,8 @@ ENTITY* spawner_spawn(int spawnertype, VECTOR* pos, var owner)
 
 	if (ent != NULL)
 	{
+		mapSetTileValueAtPos3D(mapGetCurrent(), pos, 1); // 1 == solid, non-traversable
+		mapJPSUpdate(mapGetCurrent());
 		fov_uncover(pos, SPAWNER_LOS);
 		ent->SPAWNER_UNITTYPE = spawnertype;
 		if (owner == SPAWNER_ENEMY)
@@ -431,6 +433,8 @@ void SPAWNER__die(ENTITY* ptr)
 	/* transitions */
 	if(ptr->SPAWNER_DIETIMER <= 0)
 	{
+		mapSetTileValueAtPos3D(mapGetCurrent(), ptr->x, 0); // 1 == solid, non-traversable
+		mapJPSUpdate(mapGetCurrent());
 		reset(ptr, SHADOW);
 		ptr->SPAWNER_DIETIMER  = 0;
 		ptr->ENTITY_STATE = SPAWNER_STATE_DEAD;

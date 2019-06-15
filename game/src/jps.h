@@ -168,6 +168,8 @@
 	
 	UNIT* jpsAllowMovementForEntity(ENTITY* ptr, int allow);
 	
+	void mapSetTileValueAtPos3D(MAP* map, VECTOR* pos3d, int value);
+	int mapGetTileValueAtPos3D(MAP* map, VECTOR* pos3d);
 
 	/////////////////////////////////////////////////
 	// more available functions
