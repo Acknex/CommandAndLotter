@@ -40,24 +40,22 @@ void effects2d_init()
     effects2d.animations[0].frames[4] = bmap_create("Cursor5.png");
 
     // ATTACK
-    effects2d.animations[1].frame_count = 5;
+    effects2d.animations[1].frame_count = 4;
     effects2d.animations[1].speed = 1;
     effects2d.animations[1].size = 0.5;
-    effects2d.animations[1].frames[0] = bmap_create("Cursor1.png");
-    effects2d.animations[1].frames[1] = bmap_create("Cursor2.png");
-    effects2d.animations[1].frames[2] = bmap_create("Cursor3.png");
-    effects2d.animations[1].frames[3] = bmap_create("Cursor4.png");
-    effects2d.animations[1].frames[4] = bmap_create("Cursor5.png");
+    effects2d.animations[1].frames[0] = bmap_create("Attack_C.png");
+    effects2d.animations[1].frames[1] = bmap_create("Attack_C1.png");
+    effects2d.animations[1].frames[2] = bmap_create("Attack_C2.png");
+    effects2d.animations[1].frames[3] = bmap_create("Attack_C3.png");
 
     // MINE
-    effects2d.animations[2].frame_count = 5;
-    effects2d.animations[2].speed = 1;
+    effects2d.animations[2].frame_count = 4;
+    effects2d.animations[2].speed = 0.5;
     effects2d.animations[2].size = 0.5;
-    effects2d.animations[2].frames[0] = bmap_create("Cursor1.png");
-    effects2d.animations[2].frames[1] = bmap_create("Cursor2.png");
-    effects2d.animations[2].frames[2] = bmap_create("Cursor3.png");
-    effects2d.animations[2].frames[3] = bmap_create("Cursor4.png");
-    effects2d.animations[2].frames[4] = bmap_create("Cursor5.png");
+    effects2d.animations[2].frames[0] = bmap_create("De_Build1.png");
+    effects2d.animations[2].frames[1] = bmap_create("De_Build2.png");
+    effects2d.animations[2].frames[2] = bmap_create("De_Build3.png");
+    effects2d.animations[2].frames[3] = bmap_create("De_Build4.png");
 }
 
 void effects2d_open()
