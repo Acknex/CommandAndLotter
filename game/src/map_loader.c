@@ -1,4 +1,5 @@
 #include "map_loader.h"
+#include <d3d9.h>
 
 typedef struct
 {
@@ -94,59 +95,70 @@ void maploader_load(char const * fileName)
 	int size_x = maploader_cellsize * maploader.w + maploader_cellsize - 1;
 	int size_y = maploader_cellsize * maploader.h + maploader_cellsize - 1;
 
-	maploader.terrain = ent_createterrain(
-		bmp,
-		vector(0, 0, 0),
-		size_x,
-		size_y,
-		maploader_trisize
-	);
+    collision_mode = 0;
 
-	int i;
-	int cnt = ent_status(maploader.terrain, 1);
-	for(i = 0; i < cnt; i++)
-	{
-		CONTACT c;
-		ent_getvertex(maploader.terrain, &c, i);
+    maploader.terrain = ent_createterrain(
+        bmp,
+        vector(0, 0, 0),
+        size_x,
+        size_y,
+        maploader_trisize
+    );
 
-		D3DVERTEX * v = c.v;
+    int meshcnt = ent_status(maploader.terrain, 16);
 
-		maploader_get_tile_pos(vector(v->x, v->z, 0), &x, &y);
+    int iMesh;
+    for(iMesh = 0; iMesh < meshcnt; iMesh++)
+    {
+        LPD3DXMESH mesh = ent_getmesh(maploader.terrain, iMesh, 0);
 
-//		diag("x=");
-//		diag(str_for_int(NULL, x));
-//		diag(" y=");
-//		diag(str_for_int(NULL, y));
-//		diag("\n");
+        D3DVERTEX * vertices;
+        mesh->LockVertexBuffer(0, &vertices);
 
-		if(x <= 0) x = 0;
-		if(y <= 0) y = 0;
-		if(x >= maploader.w) x = maploader.w - 1;
-		if(y >= maploader.h) y = maploader.h - 1;
+        int i;
+        int cnt = mesh->GetNumVertices();
+        for(i = 0; i < cnt; i++)
+        {
+            // CONTACT c;
+            // ent_getvertex(maploader.terrain, &c, i);
 
-		v->y = maploader_tile_height(x, y);
-        int neighborX = minv(x + 1, maploader.w-1);
-        int neighborY = minv(y + 1, maploader.h-1);
-        var neighborXValue = maploader_tile_height(neighborX, y);
-        var neighborYValue = maploader_tile_height(x, neighborY);
+            D3DVERTEX * v = &vertices[i];
 
-        VECTOR normalVector;
-        normalVector.x = (neighborX - v->y)/255;
-        normalVector.y = 1.0;
-        normalVector.z = (neighborY - v->y)/255;
-        vec_normalize(normalVector, 1.0);
+            maploader_get_tile_pos(vector(v->x, v->z, 0), &x, &y);
 
-		v->u1 = (float)x / (float)maploader.w;
-		v->v1 = (float)y / (float)maploader.h;
+            if(x <= 0) x = 0;
+            if(y <= 0) y = 0;
+            if(x >= maploader.w) x = maploader.w - 1;
+            if(y >= maploader.h) y = maploader.h - 1;
 
-        v->nx = (float)normalVector.x;
-        v->ny = (float)normalVector.y;
-        v->nz = (float)normalVector.z;
+            v->y = maploader_tile_height(x, y);
+            int neighborX = minv(x + 1, maploader.w-1);
+            int neighborY = minv(y + 1, maploader.h-1);
+            var neighborXValue = maploader_tile_height(neighborX, y);
+            var neighborYValue = maploader_tile_height(x, neighborY);
 
-		ent_setvertex(maploader.terrain, &c, i);
-	}
+            VECTOR normalVector;
+            normalVector.x = (neighborX - v->y)/255;
+            normalVector.y = 1.0;
+            normalVector.z = (neighborY - v->y)/255;
+            vec_normalize(normalVector, 1.0);
 
-	c_updatehull(maploader.terrain, 0);
+            v->u1 = (float)x / (float)maploader.w;
+            v->v1 = (float)y / (float)maploader.h;
+
+            v->nx = (float)normalVector.x;
+            v->ny = (float)normalVector.y;
+            v->nz = (float)normalVector.z;
+
+            // ent_setvertex(maploader.terrain, &c, i);
+        }
+        mesh->UnlockVertexBuffer();
+    }
+
+    collision_mode = 1;
+
+    if(!key_c)
+        c_updatehull(maploader.terrain, 0);
     ent_fixnormals(maploader.terrain, 0);
 
     effect_load(maploader_material, "terrain.fx");
