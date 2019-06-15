@@ -4,7 +4,6 @@
 
 
 BMAP* FogBmap = "fow_fog2.png";
-VECTOR MousePosFog;
 
 void FogEvent(PARTICLE *p)
 {
@@ -20,8 +19,6 @@ void FogEvent(PARTICLE *p)
         p.lifespan = 0;
     }
 }
-
-int fov_px, fov_py;
 
 void Fog(PARTICLE *p)
 {
@@ -73,16 +70,14 @@ void fow_update()
 		{
 			TILE *tile = mapTileGet(map, x,y);
 			if(tile->visibility == FOW_HIDDEN){
-				if(mapIsAnyFriendlyUnitNearby(map, tile, FOW_SIGHT_RANGE, 0)) {
+				//if(mapIsAnyFriendlyUnitNearby(map, tile, FOW_SIGHT_RANGE, UNIT_PLAYER)) 
+				if(mapIsAnyUnitNearby(map, tile, FOW_SIGHT_RANGE)) 
+				{
+				//	printf("friendly");
 					tile->visibility = FOW_SCOUTED;	
 				}
 			}
 				
 		}
-
-
-    //PosToMap(MousePosFog,mouse_pos.x,mouse_pos.y);
-    //MousePosFog.z = 500;
-    
 #endif
 }
