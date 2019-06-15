@@ -34,7 +34,7 @@ void buildingPlacement_open()
 void buildingPlacement_movePreview()
 {
 	VECTOR *_hit = get_pos_under_cursor();
-	if(_hit != NULL) 
+	if(_hit != NULL)
 	{
 		TILE* tile = mapGetTileFromVector(mapCurrent, _hit);
 		if(tile != NULL)
@@ -43,11 +43,11 @@ void buildingPlacement_movePreview()
 			mapGetVectorFromTile(mapCurrent, &targetPos, tile);
 			targetPos.z = _hit.z;
 			vec_set(&buildingPlacement_previewModel->x, targetPos);
-		}	
+		}
 	}
 }
 
-	
+
 
 void buildingPlacement_beginConstruction(int selection)
 {
@@ -80,13 +80,13 @@ void buildingPlacement_placeConstruction()
 		default:
 			error("unbekannter Gebauedetyp");
 	}
-	
+
 	buildingPlacement_endConstruction();
 }
 
 void buildingPlacement_update()
 {
-	if(buildingPlacement_selection == BUILDING_NONE && !mouse_left) 
+	if(buildingPlacement_selection == BUILDING_NONE && !mouse_left)
 	{
         if(key_1)
 			buildingPlacement_beginConstruction(BUILDING_TOWER);
@@ -97,13 +97,13 @@ void buildingPlacement_update()
         if(key_4)
             buildingPlacement_beginConstruction(BUILDING_BANK);
 	}
-	
-	if(buildingPlacement_selection != BUILDING_NONE) 
+
+	if(buildingPlacement_selection != BUILDING_NONE)
 	{
 		buildingPlacement_movePreview();
-		if(mouse_left) 
+		if(mouse_left)
 			buildingPlacement_placeConstruction();
-		if(mouse_right) 
+		if(mouse_right)
 			buildingPlacement_endConstruction();
 	}
 }
