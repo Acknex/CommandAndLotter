@@ -15,8 +15,13 @@ void FogEvent(PARTICLE *p)
 	MAP *map = mapGetCurrent();
 	TILE *tile = mapGetTileFromVector(map, vector(p->skill_a, p->skill_b, 0));
 	
-    if(tile->visibility == FOW_SCOUTED)
-        p.lifespan = 0;
+    if(tile->visibility == FOW_SCOUTED) 
+    {
+    	p->alpha -= 10*time_step;
+    	if(p->alpha <= 0)
+    		p.lifespan = 0;
+	}
+        
 }
 
 void Fog(PARTICLE *p)
