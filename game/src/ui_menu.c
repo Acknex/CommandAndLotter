@@ -230,7 +230,7 @@ void uimenu_window_initialize(uimenu_window_t * window)
     window->_is_initialized = true;    
 }
 
-BMAP * uimenu_make_button_graphic(int width, int height, int pressed)
+BMAP * uimenu_make_button_graphic(int width, int height, int pressed, int tab)
 {
     BMAP * final = bmap_createblack(width, height, 565);
     BMAP * canvas = bmap_createblack(width, height, 565);
@@ -238,17 +238,17 @@ BMAP * uimenu_make_button_graphic(int width, int height, int pressed)
     bmap_fill(final, vector(UIMENU_WINDOW_WINDOW_COLOR_B * 0.75, UIMENU_WINDOW_WINDOW_COLOR_G * 0.75, UIMENU_WINDOW_WINDOW_COLOR_R * 0.75), 100);
     bmap_fill(canvas, vector(UIMENU_WINDOW_WINDOW_COLOR_B * 1.25, UIMENU_WINDOW_WINDOW_COLOR_G * 1.25, UIMENU_WINDOW_WINDOW_COLOR_R * 1.25), 100);
 
-    if(!pressed)
-    {
-        bmap_blitpart(final, canvas, vector(0, 0, 0), vector(width - 1, height - 1, 0), vector(0, 0, 0), vector(width - 1, height - 1, 0));
-    }
-    else
-    {
-        bmap_blitpart(final, canvas, vector(1, 1, 0), vector(width - 1, height - 1, 0), vector(0, 0, 0), vector(width - 1, height - 1, 0));
-    }
+    // if(!pressed)
+    // {
+    bmap_blitpart(final, canvas, vector(pressed, pressed, 0), vector(width - 1, height - 1, 0), vector(0, 0, 0), vector(width - 1, height - 1, 0));
+    // }
+    // else
+    // {
+    //     bmap_blitpart(final, canvas, vector(1, 1, 0), vector(width - 1, height - 1, 0), vector(0, 0, 0), vector(width - 1, height - 1, 0));
+    // }
 
     bmap_fill(canvas, vector(UIMENU_WINDOW_WINDOW_COLOR_B, UIMENU_WINDOW_WINDOW_COLOR_G, UIMENU_WINDOW_WINDOW_COLOR_R), 100);
-    bmap_blitpart(final, canvas, vector(1, 1, 0), vector(width - 2, height - 2, 0), vector(0, 0, 0), vector(width - 2, height - 2, 0));
+    bmap_blitpart(final, canvas, vector(1, 1, 0), vector(width - 2, height - 2 - tab, 0), vector(0, 0, 0), vector(width - 2, height - 2 - tab, 0));
 
     bmap_purge(canvas);
     return final;    
@@ -265,9 +265,9 @@ void uimenu_element_initialize(uimenu_window_t * window, uimenu_element_t * elem
         switch(element->type)
         {
             case UIMENU_TYPE_TEXTBUTTON:
-                element->bmap = uimenu_make_button_graphic(element->width, element->height, 0);
+                element->bmap = uimenu_make_button_graphic(element->width, element->height, 0, 0);
                 element->bmap_hover = element->bmap;
-                element->bmap_active = uimenu_make_button_graphic(element->width, element->height, 1);
+                element->bmap_active = uimenu_make_button_graphic(element->width, element->height, 1, 0);
 
                 element->element_index = pan_setbutton(window->_content_panel, 0, 0, 
                 element->x, 
@@ -526,17 +526,18 @@ void uimenu_window_update(uimenu_window_t * window)
             if(window->_is_moving == FALSE && mouse_left && uimenu_is_cursor_in_window_titlebar(window))
             {
                 window->_is_moving = TRUE;
-                window->_moving_start_offset = uimenu_get_cursor_offset_to_window(window);
+                vec_set(window->_moving_start_offset, uimenu_get_cursor_offset_to_window(window));
             }
             else if(window->_is_moving && mouse_left)
             {
-                window->x = mouse_pos.x - window->_moving_start_offset->x;
-                window->y = mouse_pos.y - window->_moving_start_offset->y;
+                window->x = mouse_pos.x - window->_moving_start_offset[0];
+                window->y = mouse_pos.y - window->_moving_start_offset[1];
                 window->_is_dirty = TRUE;
             }
             else if(window->_is_moving && !mouse_left)
             {
                 window->_is_moving = FALSE;
+                window->_is_dirty = TRUE;
             }
         }
         

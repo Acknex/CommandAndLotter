@@ -79,7 +79,7 @@ typedef struct uimenu_window_t
     uimenu_element_t * _first; // Linked list
     struct uimenu_window_t * _next; 
     struct uimenu_window_t * _parent;
-    VECTOR * _moving_start_offset;
+    var _moving_start_offset[3];
     int _is_initialized;
     int _is_visible;
     int _is_borderless;
@@ -92,7 +92,7 @@ typedef struct uimenu_window_t
     BMAP * _forced_background;
 } uimenu_window_t;
 
-uimenu_window_t * uimenu_window_create(var x, var y, var width, var height, STRING * title);
+uimenu_window_t * uimenu_window_create(var x, var y, var width, var height, char * title);
 uimenu_window_t * uimenu_window_create_borderless(var x, var y, var width, var height);
 uimenu_element_t * uimenu_element_create(int type, var x, var y, var width, var height);
 
