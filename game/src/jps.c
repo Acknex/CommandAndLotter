@@ -690,7 +690,7 @@ void mapUpdateUnits(MAP* map)
 			{
 				if(tile->numUnits[currentPlayer] < MAX_UNITS_PER_TILE)
 				{
-					tile->unitArray[tile->numUnits] = unit;
+					tile->unitArray[tile->numUnits[currentPlayer]] = unit;
 					tile->numUnits[currentPlayer]++;
 				}
 			}
