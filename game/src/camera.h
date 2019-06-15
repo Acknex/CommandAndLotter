@@ -10,5 +10,7 @@ void topdown_camera_open();
 void topdown_camera_update();
 
 void topdown_camera_set_pos(VECTOR*);
+
+VECTOR *get_pos_under_cursor();
  
 #endif CAMERA_H

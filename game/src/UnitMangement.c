@@ -1,8 +1,4 @@
 
-#define SELCTED_SKILL skill[39]
-#define UNIT_DEST_SKILL skill[40]
-#define UNIT_GROUP_SKILL skill[43]
-
 #define DebugMode
 
 var CamFPS;
@@ -162,11 +158,12 @@ function PosToMap(VECTOR * vec, var x, var y)
     if(vec_for_screen(temp,camera) != 0)
     {
         VECTOR * p = maploader_trace(camera.x, temp.x);
-        if(p == 0){
-            error("p ist null");
+        if(p){
+            vec_set(vec,p);
+            return 1;
         }
-        vec_set(vec,p);
     }
+    return 0;
 }
 
 function CheckIsLeftFrom(VECTOR* Base, VECTOR* V1, VECTOR * V2)
@@ -215,10 +212,13 @@ function MarkUnits()
 {
     VECTOR Posis[4];
 
-    PosToMap(Posis[0], maxv(ClickPoint2D_A[0],ClickPoint2D_B[0]), minv(ClickPoint2D_A[1],ClickPoint2D_B[1]));
-    PosToMap(Posis[1], maxv(ClickPoint2D_A[0],ClickPoint2D_B[0]), maxv(ClickPoint2D_A[1],ClickPoint2D_B[1]));
-    PosToMap(Posis[2], minv(ClickPoint2D_A[0],ClickPoint2D_B[0]), maxv(ClickPoint2D_A[1],ClickPoint2D_B[1]));
-    PosToMap(Posis[3], minv(ClickPoint2D_A[0],ClickPoint2D_B[0]), minv(ClickPoint2D_A[1],ClickPoint2D_B[1]));
+    var success = 0;
+    success += PosToMap(Posis[0], maxv(ClickPoint2D_A[0],ClickPoint2D_B[0]), minv(ClickPoint2D_A[1],ClickPoint2D_B[1]));
+    success += PosToMap(Posis[1], maxv(ClickPoint2D_A[0],ClickPoint2D_B[0]), maxv(ClickPoint2D_A[1],ClickPoint2D_B[1]));
+    success += PosToMap(Posis[2], minv(ClickPoint2D_A[0],ClickPoint2D_B[0]), maxv(ClickPoint2D_A[1],ClickPoint2D_B[1]));
+    success += PosToMap(Posis[3], minv(ClickPoint2D_A[0],ClickPoint2D_B[0]), minv(ClickPoint2D_A[1],ClickPoint2D_B[1]));
+
+    if(success != 4){return;}
 
     var i;
     ENTITY * ent;

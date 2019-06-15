@@ -30,6 +30,14 @@ typedef int bool;
 #define ENTITY_VICTIM skill57
 #define ENTITY_DAMAGE skill58
 
+
+#define SELCTED_SKILL skill[39]
+#define UNIT_DEST_SKILL skill[40]
+#define UNIT_GROUP_SKILL skill[43]
+
+#define SK_ENTITY_JPS_POINTER_TO_UNIT_STRUCT skill97
+#define jpsUnitGetFromEntity(ent) ((UNIT*)ent->SK_ENTITY_JPS_POINTER_TO_UNIT_STRUCT)
+
 //! Markiert die Entity als "TOT" und sorgt dafür, dass sie zu Ende des Frames gelöscht wird.
 #define SK_ENTITY_DEAD skill98
 
@@ -41,6 +49,7 @@ typedef int bool;
 //skill50-67 reserved for module use
 
 #define SUBSYSTEM_FRAMEWORK         1
+#define SUBSYSTEM_CONSTRUCTION      98
 #define SUBSYSTEM_SPAWNER           99
 #define SUBSYSTEM_UNIT_SPUTNIK      100
 #define SUBSYSTEM_UNIT_EYE          101
@@ -59,5 +68,14 @@ typedef int bool;
 #define GROUP_PLAYER_SPAWNER 11
 #define GROUP_ENEMY_UNIT     12
 #define GROUP_ENEMY_SPAWNER  13
+
+#define PLAYER_ID_PLAYER 0
+#define PLAYER_ID_AI 1
+
+
+//#define GAME_OPEN_DEBUG
+#ifdef GAME_OPEN_DEBUG
+	#define DEVTRUE
+#endif
 
 #endif // GLOBAL_H
