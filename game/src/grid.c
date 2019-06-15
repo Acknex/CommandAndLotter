@@ -50,12 +50,12 @@ int grid_idx2Y(int idx)
 
 void grid_setState(int x, int y, int state)
 {
-	grid_setState_byID(grid_coord2idx(x,y));
+	grid_setState_byID(grid_CoordToID(x,y), state);
 }
 
 void grid_getState(int x, int y)
 {
-	return grid_getState_byID(grid_coord2idx(x,y));
+	return grid_getState_byID(grid_CoordToID(x,y));
 }
 
 
