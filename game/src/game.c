@@ -10,6 +10,7 @@
 #include <acknex.h>
 #include "UnitMangement.h"
 #include "building.h"
+#include "fow.h"
 
 void game_init(void)
 {
@@ -45,6 +46,8 @@ void game_open(void)
 	topdown_camera_open();
 
     UnitMangement_open();
+    fow_open();
+
 	SPUTNIK_Init();
 	SPAWNER_Init();
 	stub_init(); //hook debug shit here
@@ -65,6 +68,7 @@ void game_update(void)
 	stub_update(); //hook debug shit here
 	topdown_camera_update();
     UnitMangement_update();
+    fow_update();
 	buildingPlacement_update();
 }
 

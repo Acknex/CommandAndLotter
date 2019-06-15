@@ -142,7 +142,6 @@ void UnitMangement_open(){
     }
     vec_set(camera.x, vector(-800,-1064,1000));
     vec_set(camera.pan, vector(0,-32,0));
-
 }
 
 

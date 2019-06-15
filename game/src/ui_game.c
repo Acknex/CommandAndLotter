@@ -95,29 +95,33 @@ PANEL* ui_create_radial_button(BMAP *initial_icon)
 void update_or_create_lifebar(ENTITY *ent)
 {
 	var health = unit_getHealth(ent);
-	var percent = 100 * health;
+	var fac = health;
 	
-	VECTOR screen;
-	vec_set(screen, ent.x);
-	vec_to_screen(screen, camera);
+	VECTOR sc;
+	vec_set(sc, ent.x);
+	vec_to_screen(sc, camera);
+	vec_sub(sc, vector(15, 35, 0));
+	
+	
+	var p1 = 30 * (1 - fac);
+	var p2 = 30 * fac;
 	
 	if(ui_life_indicator[ui_lifebar_counter])
 	{
-		pan_setwindow(ui_life_indicator[ui_lifebar_counter], 1, 0, 0, 100 - percent, 8, ui_bmap_dead_indicator, 0, 0);
-		pan_setwindow(ui_life_indicator[ui_lifebar_counter], 2, 100 - percent, 0, percent, 8, ui_bmap_life_indicator, 0, 0);
-		ui_life_indicator[ui_lifebar_counter]->pos_x = screen.x;
-		ui_life_indicator[ui_lifebar_counter]->pos_y = screen.y;
-		ui_life_indicator[ui_lifebar_counter]->flags |= SHOW;
+		pan_setwindow(ui_life_indicator[ui_lifebar_counter], 1, 0, 0, p1, 2, ui_bmap_dead_indicator, 0, 0);
+		pan_setwindow(ui_life_indicator[ui_lifebar_counter], 2, p1, 0, p2, 2, ui_bmap_life_indicator, 0, 0);
 	}
 	else
 	{
-		ui_life_indicator[ui_lifebar_counter] = pan_create("", 4);
-		pan_setwindow(ui_life_indicator[ui_lifebar_counter], 0, 0, 0, 100 - percent, 8, ui_bmap_dead_indicator, 0, 0);
-		pan_setwindow(ui_life_indicator[ui_lifebar_counter], 0, 100 - percent, 0, percent, 8, ui_bmap_life_indicator, 0, 0);
-		ui_life_indicator[ui_lifebar_counter]->pos_x = screen.x;
-		ui_life_indicator[ui_lifebar_counter]->pos_y = screen.y;
-		ui_life_indicator[ui_lifebar_counter]->flags |= SHOW;
+		ui_life_indicator[ui_lifebar_counter] = pan_create("", 1);
+		pan_setwindow(ui_life_indicator[ui_lifebar_counter], 0, 0, 0, p1, 2, ui_bmap_dead_indicator, 0, 0);
+		pan_setwindow(ui_life_indicator[ui_lifebar_counter], 0, p1, 0, p2, 2, ui_bmap_life_indicator, 0, 0);
 	}
+	
+	ui_life_indicator[ui_lifebar_counter]->skill_x = handle(ent);
+	ui_life_indicator[ui_lifebar_counter]->pos_x = sc.x;
+	ui_life_indicator[ui_lifebar_counter]->pos_y = sc.y;
+	ui_life_indicator[ui_lifebar_counter]->flags |= (SHOW | UNTOUCHABLE);
 	
 	ui_lifebar_counter++;
 }
@@ -165,13 +169,6 @@ void ui_game_init()
 	bmap_fill(ui_bmap_dead_indicator, vector(0, 0, 255), 100);
 	bmap_fill(ui_bmap_life_indicator, vector(0, 255, 0), 100);
 	
-	int i; for(i = 0; i < 200; i++)
-	{
-		ui_life_indicator[i] = pan_create("", 1);
-		pan_setwindow(ui_life_indicator[i], 0, 0, 0, 0, 0, ui_bmap_dead_indicator, 0, 0);
-		pan_setwindow(ui_life_indicator[i], 0, 0, 0, 0, 0, ui_bmap_life_indicator, 0, 0);
-	}
-	
 	ui_unit_meta->bmap = ui_bmap_units;
 	ui_unit_meta->pos_x = 3;
 	
@@ -204,6 +201,18 @@ void ui_game_close()
 
 void ui_game_update()
 {
+	
+	int i; for(i = 0; i < ui_lifebar_counter; i++)
+	{
+		ENTITY *ent = ptr_for_handle(ui_life_indicator[i]->skill_x);
+		if(ent)
+		{
+			if( !ent->skill[39] )
+			{
+				ui_life_indicator[i]->flags &= ~SHOW;
+			}
+		}
+	}
 
 	scale_factor_x = screen_size.x / 1920;
 	scale_factor_y = screen_size.y / 1080;
@@ -232,6 +241,8 @@ void ui_game_update()
 	
 	ui_minimap->scale_x = scale_factor_x;
 	ui_minimap->scale_y = scale_factor_x;
+	
+	
 	
 	ui_lifebar_counter = 0;
 	
@@ -262,14 +273,22 @@ void ui_game_update()
 	{
 		if( ent->skill[39] )
 		{
-			ent->MAXHEALTH = 100;
-			ent->HEALTH = integer(random(100));
+			if(!ent->MAXHEALTH || !ent->HEALTH)
+			{
+				ent->MAXHEALTH = 100;
+				ent->HEALTH = integer(random(100));
+			}
 			ui_has_ents = 1;
 			if( str_cmp(ent->type, "sputnik.mdl") )
 			{
 				ui_count_sputniks++;
 			}
 			update_or_create_lifebar(ent);
+			
+			int i; for(i = 0; i < ui_lifebar_counter; i++)
+			{
+				
+			}
 		}
 	}
 	
@@ -372,6 +391,8 @@ void ui_game_update()
 	else if ( ui_anim_unit_state == UI_ANIM_UNIT_OFF )
 	{
 		pan_setwindow(ui_unit_meta, 1, 0, 0, 0, 0, (ui_bmap_cbabe)[0], 0, 0);
+		
+		
 	}
 	
 	
@@ -384,22 +405,10 @@ void ui_game_update()
 	{
 		vec_set(screen, last_building.x);
 		vec_to_screen(screen, camera);
-		
-		ui_life_indicator[0]->pos_x = screen.x - 50;
-		ui_life_indicator[0]->pos_y = screen.y - 40;
 	}
 	
 	if( ui_anim_state == UI_ANIM_RESTARTED )
 	{
-		int i; for(i = 0; i < 200; i++)
-		{
-			ui_life_indicator[i]->flags &= ~SHOW;
-		}
-		
-		pan_setwindow(ui_life_indicator[0], 1, 0, 0, 76, 8, ui_bmap_dead_indicator, 0, 0);
-		pan_setwindow(ui_life_indicator[0], 2, 76, 0, 24, 8, ui_bmap_life_indicator, 0, 0);
-		ui_life_indicator[0]->flags |= SHOW;
-		
 		ui_orbit_radial(ui_radial_cbabe,screen.x, screen.y, 270, 200);
 		ui_orbit_radial(ui_radial_delete,screen.x, screen.y, 230, 200);
 		ui_orbit_radial(ui_radial_counter,screen.x, screen.y, 190, 200);
@@ -478,15 +487,16 @@ void ui_game_update()
 		ui_hide_radial(ui_radial_delete);
 		ui_radial_counter->flags &= ~SHOW;
 		
-		int i; for(i = 0; i < 200; i++)
-		{
-			ui_life_indicator[i]->flags &= ~SHOW;
-		}
+		
 		
 		ui_scale1 = 0.1;
 		ui_scale2 = 0.1;
 		ui_scale3 = 0.1;
 	}
+	
+	
+	
+	
 }
 
 var ui_game_isdone()
