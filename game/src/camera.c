@@ -12,7 +12,6 @@ void topdown_camera_open()
 
 void topdown_camera_update() 
 {
-
 #ifdef DEBUG
 	if(def_camera == 0)
 #endif
@@ -39,4 +38,10 @@ void topdown_camera_update()
 		
 		vec_set(&camera.x, vec_add(offset, topdown_camera_center));
 	}
+}
+
+
+void topdown_camera_set_pos(VECTOR* target_pos)
+{
+	vec_set(&topdown_camera_center, target_pos);
 }
