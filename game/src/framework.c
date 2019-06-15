@@ -79,7 +79,9 @@ void framework_init()
     // SetupPostprocessing();
 #endif
 
-    on_frame = framework_update;
+		mouse_mode = 4;
+
+		on_frame = framework_update;
 }
 
 void framework_setup(ENTITY * ent, int subsystem)

@@ -1,16 +1,3 @@
-//enable: Shadow Map on Blue
-//help: Terrain contains a shadow map on the Skin1 blue channel.
-//help: With PS 1.1 (GeForce3), sun & dynamic lights are then disabled.
-//id: 14
-#define SHADOWMAP
-
-#include <define>
-#include <transform>
-#include <sun>
-#include <lights>
-#include <fog>
-#include <normal>
-
 Texture entSkin1; // Red/green for blending, blue for shadow
 Texture entSkin2; // Basic tiled terrain texture
 Texture entSkin3; // Red masked tiled texture
@@ -24,16 +11,19 @@ sampler sBaseTex = sampler_state { Texture = <entSkin2>; MipFilter = Linear; };
 sampler sRedTex = sampler_state { Texture = <entSkin3>; MipFilter = Linear; };
 sampler sGreenTex = sampler_state {	Texture = <entSkin4>; MipFilter = Linear;	};
 
+float4x4 matWorld;
+float4x4 matWorldViewProj;
+
 //////////////////////////////////////////////////////////////////////
 struct out_terraintex3 // Output to the pixelshader fragment
 {
 	float4 Pos		: POSITION;
-	float4 Color	: COLOR0;
-	float  Fog		: FOG;
+	// float4 Color	: COLOR0;
+	// float  Fog		: FOG;
 	float2 MaskCoord: TEXCOORD0;
-	float2 BaseCoord: TEXCOORD1;
-	float2 RedCoord : TEXCOORD2;
-	float2 GreenCoord: TEXCOORD3;
+	// float2 BaseCoord: TEXCOORD1;
+	// float2 RedCoord : TEXCOORD2;
+	// float2 GreenCoord: TEXCOORD3;
 };
 
 out_terraintex3 vs_terraintex3(
@@ -42,33 +32,18 @@ out_terraintex3 vs_terraintex3(
 	float2 inTexCoord0 : TEXCOORD0)
 {
 	out_terraintex3 Out;
-
-	Out.Pos = DoTransform(inPos); // transform to screen coordinates
-
-// rotate and normalize the normal
-	float3 N = DoNormal(inNormal);
-	float3 P = mul(inPos,matWorld);
-
-	Out.Color = fAmbient; // Add ambient and sun light
-	for (int i=0; i<8; i++)  // Add 8 dynamic lights
-		Out.Color += DoLight(P,N,i);
-	Out.Fog = DoFog(inPos); // Add fog
-
-// scale the texture coordinates for the masked textures
+	Out.Pos = mul(matWorldViewProj, inPos); // transform to screen coordinates
 	Out.MaskCoord = inTexCoord0.xy;
-	Out.BaseCoord = inTexCoord0.xy * vecSkill41.y;
-	Out.RedCoord = inTexCoord0.xy * vecSkill41.z;
-	Out.GreenCoord = inTexCoord0.xy * vecSkill41.w;
 	return Out;
 }
 
 float4 ps_terraintex3(out_terraintex3 In): COLOR
 {
-	float4 MaskColor = tex2D(sMaskTex,In.MaskCoord);
-	return MaskColor.ggga;
+	float4 MaskColor = tex2D(sMaskTex, In.MaskCoord);
+	return float4(1,0,0,1);
 }
 
-technique terraintex3_13
+technique terraintex
 {
 	pass one
 	{
