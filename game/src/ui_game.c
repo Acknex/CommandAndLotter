@@ -220,7 +220,22 @@ void ui_game_update()
 	BMAP* bmp = mapGetBitmap(NULL);
 	if(bmp)
 	{
-		draw_quad(bmp,vector(400,0,0),NULL,NULL,vector(2,2,0),NULL,100,0);
+		int size = 4;
+		draw_quad(bmp,vector(000,0,0),NULL,NULL,vector(size,size,0),NULL,100,0);
+		int unitDrawSize = 4;
+		int currentPlayer;
+		for(currentPlayer = 0; currentPlayer < MAX_PLAYERS; currentPlayer++)
+		{
+			UNIT *unit = mapCurrent.unitFirst[currentPlayer];
+			while(unit)
+			{
+				if(unit->isActive)
+				{
+					draw_quad(NULL,vector(unit->pos2d.x*size-unitDrawSize/2,unit->pos2d.y*size-unitDrawSize/2,0),NULL,vector(4,4,0),NULL,COLOR_RED,50,0);
+				}
+				unit = unit->next;
+			}
+		}
 	}
 	
 	var scale_factor_x = screen_size.x / 1920;

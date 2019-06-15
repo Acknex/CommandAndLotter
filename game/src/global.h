@@ -69,7 +69,7 @@ typedef int bool;
 #define PLAYER_ID_AI 1
 
 
-#define GAME_OPEN_DEBUG
+//#define GAME_OPEN_DEBUG
 #ifdef GAME_OPEN_DEBUG
 	#define CONSOLE_SHOW
 #endif

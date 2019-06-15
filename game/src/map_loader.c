@@ -238,7 +238,7 @@ void maploader_load(char const * fileName)
     }
     maploader.terrain.clipfactor = 2;
 
-    int i; for(i = 0; i < 100; i++)
+    int i; for(i = -15; i <= 15; i++)
     {
         you = ent_create(
             "StrasseGerade.mdl",
