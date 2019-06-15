@@ -36,8 +36,6 @@ PANEL *ui_life_indicator[2000];
 PANEL *ui_portrait;
 PANEL *ui_minimap;
 
-var a_stupid_var = 1234;
-
 BMAP *ui_radial_prototype1 = "ui_placeholder_unit.png";
 BMAP *ui_radial_prototype2 = "ui_placeholder_counter.png";
 
@@ -80,6 +78,8 @@ var ui_scale1 = 0.1;
 var ui_scale2 = 0.1;
 var ui_scale3 = 0.1;
 var ui_switch_frame = 0;
+var a_stupid_var = 1234;
+var a_dummy_var = 0;
 
 int ui_frame_order[19] = {0, 1, 0, 1, 2, 1, 0, 1, 1, 2, 0, 2, 0, 0, 1, 2, 0, 1, 2};
 int ui_selected_max_type = 0;

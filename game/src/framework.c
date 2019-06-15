@@ -69,6 +69,7 @@ void framework_init()
     // settings_register_signal(framework_update_settings);
 
     max_entities = 5000;
+    max_particles = 500000;
     particle_mode = 8;
     collision_mode = 2;
     preload_mode = 3; // preload a lot
