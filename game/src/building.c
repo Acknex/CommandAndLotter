@@ -73,7 +73,7 @@ void buildingPlacement_placeConstruction()
         case BUILDING_TREE:
         case BUILDING_BANK:
 		//case ..
-		if(!buildingPlacement_previewModel) error("AHA");
+		if(!buildingPlacement_previewModel) error("buildingPlacement_placeConstruction: !buildingPlacement_previewModel !!!");
 			spawner_spawn(buildingPlacement_selection, &buildingPlacement_previewModel->x, SPAWNER_PLAYER);
 		//case nichtspawnergebaeude
 		break;
