@@ -154,6 +154,8 @@ void maploader_load(char const * fileName)
         }
         mesh->UnlockVertexBuffer();
     }
+    
+    set(maploader.terrain, PASSABLE);
 
     collision_mode = 1;
 
