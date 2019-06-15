@@ -12,6 +12,7 @@
 #include "building.h"
 #include "fow.h"
 #include "z.h"
+#include "materials.h"
 
 void game_init(void)
 {
@@ -20,6 +21,8 @@ void game_init(void)
     grid_init();
 	buildingPlacement_init();
 	presetsInit();
+
+    effect_load(mtl_model, "units.fx");
 }
 
 void game_open(void)
@@ -49,6 +52,8 @@ void game_open(void)
 
     UnitMangement_open();
     fow_open();
+
+    SetupPostprocessing();
 
 	SPUTNIK_Init();
 	SPAWNER_Init();
