@@ -737,6 +737,22 @@ int mapGetNearbyUnits(MAP* map, TILE* sourceTile, int range)
 	return pointerArrayNum;
 }
 
+int mapIsAnyUnitNearby(MAP* map, TILE* sourceTile, int range)
+{
+	if(!sourceTile) return NULL;
+	int i,j;
+	for(i = sourceTile->pos[0]-range; i <= sourceTile->pos[0]+range; i++)
+	{
+		for(j = sourceTile->pos[1]-range; j <= sourceTile->pos[1]+range; j++)
+		{
+			TILE* tile = mapTileGet(map, i, j);
+			if(tile)
+				if(tile->numUnits) return 1;
+		}
+	}
+	return 0;
+}
+
 VECTOR* unitFlockingSpeedGet(MAP* map, UNIT* unit, VECTOR* v)
 {
 	static VECTOR _vstatic;
