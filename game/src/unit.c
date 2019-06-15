@@ -51,6 +51,11 @@ ENTITY* unit_getVictim(ENTITY* ent)
 	if (ent != NULL)
 	{
 		ENTITY* victim = ptr_for_handle(ent->ENTITY_VICTIM);
+		if (victim != NULL)
+		{
+			if (victim->ENTITY_STATE == ENTITY_STATE_DIE || victim->ENTITY_STATE == ENTITY_STATE_DEAD)
+				return NULL;
+		}
 		return victim;
 	}
 	return NULL;
@@ -66,15 +71,18 @@ ENTITY* unit_spawn(int unittype, VECTOR* pos, VECTOR* targetPos, var owner)
 	ENTITY* ent = NULL;
 	switch (unittype)
 	{
-		case 0:
+		case UNIT_SPUTNIK:
 			ent = ent_create("sputnik.mdl", pos, Sputnik);
 			break;
 		
-		/*case 1:
+		case UNIT_LERCHE:
 			break;
 		
-		case 2:
-			break;*/
+		case UNIT_EYE:
+			break;
+		
+		case UNIT_BABE:
+			break;
 		
 		default:
 			break;
@@ -89,6 +97,7 @@ ENTITY* unit_spawn(int unittype, VECTOR* pos, VECTOR* targetPos, var owner)
 		else
 			ent->group = GROUP_PLAYER_UNIT;		
 
+		ent->ENTITY_UNITTYPE = unittype;
 		unit_setTarget(ent, targetPos);
 		unit_setVictim(ent,NULL);
 	}
@@ -107,4 +116,13 @@ void unit_setDamage(ENTITY* ent, var damage)
 	{
 		ent->DAMAGE_HIT = damage;
 	}
+}
+
+int uint_getType(ENTITY* ent)
+{
+	if (ent != NULL)
+	{
+		return ent->ENTITY_UNITTYPE;	
+	}
+	return -1;
 }

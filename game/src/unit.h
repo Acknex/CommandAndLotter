@@ -17,5 +17,6 @@ VECTOR* unit_getTarget(ENTITY* ent);
 ENTITY* unit_getVictim(ENTITY* ent);
 var unit_getHealth(ENTITY* ent);
 void unit_setDamage(ENTITY* ent, var damage);
+int uint_getType(ENTITY* ent);
 
 #endif

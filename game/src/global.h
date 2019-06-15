@@ -17,6 +17,14 @@ typedef int bool;
 #define ENTITY_STATE_DEAD 5
 #define ENTITY_STATE_HIT 6
 
+#define UNIT_INVALID -1
+#define UNIT_SPUTNIK  0
+#define UNIT_LERCHE   1
+#define UNIT_EYE      2
+#define UNIT_BABE     3
+#define UNIT_Z        4
+
+
 
 #define DAMAGE_HIT skill51
 #define MAXHEALTH skill52
@@ -26,6 +34,7 @@ typedef int bool;
 #define ENTITY_VICTIM skill57
 #define ENTITY_DAMAGE skill58
 #define ENTITY_HITTHRESHOLD skill59
+#define ENTITY_UNITTYPE skill60
 
 #define SELCTED_SKILL skill[39]
 #define UNIT_DEST_SKILL skill[40]
