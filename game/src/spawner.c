@@ -64,15 +64,22 @@ ENTITY* spawner_spawn(int spawnertype, VECTOR* pos, var owner)
     ENTITY *wireframe;
 	switch (spawnertype)
 	{
-		case 0:
-			ent = ent_create("the_tower.mdl", pos, Spawner);
+        case 0:
+            ent = ent_create("the_tower.mdl", pos, Spawner);
             wireframe = ent_create("the_tower_wireframe.mdl", pos, NULL);
-			break;
-
-		case 1:
-			ent = ent_create("lark_farm.mdl", pos, Spawner);
+            break;
+        case 1:
+            ent = ent_create("lark_farm.mdl", pos, Spawner);
             wireframe = ent_create("lark_farm_wireframe.mdl", pos, NULL);
-			break;
+            break;
+        case 2:
+            ent = ent_create("eye_tree_you.mdl", pos, Spawner);
+            wireframe = ent_create("eye_tree_you_wireframe.mdl", pos, NULL);
+            break;
+        case 3:
+            ent = ent_create("bank_of_zorro.mdl", pos, Spawner);
+            wireframe = ent_create("bank_of_zorro_wireframe.mdl", pos, NULL);
+            break;
 	}
 
 	if (ent != NULL)
@@ -246,7 +253,7 @@ void SPAWNER__hitcheck(ENTITY* ptr)
 
 void SPAWNER__construct(ENTITY* ptr)
 {
-  	ptr->SPAWNER_PROGRESS += 10 * time_step;
+    ptr->SPAWNER_PROGRESS += 5 * time_step;
 	if (ptr->SPAWNER_PROGRESS >= 100)
 	{
 		ptr->SPAWNER_PROGRESS = 100;
@@ -257,6 +264,7 @@ void SPAWNER__construct(ENTITY* ptr)
     var percentage = ptr->SPAWNER_PROGRESS * (ptr.max_z + 200) / 100;
     ptr->skill41 = floatv(percentage);
     ptr->skill42 = floatv(ptr->max_x * 0.5);
+    ptr->skill43 = floatv(clamp((80.0 - ptr->SPAWNER_PROGRESS)/20.0, 0.0, 1.0));
 
     ptr->skill45 = floatv(ptr->x);
     ptr->skill46 = floatv(ptr->z);

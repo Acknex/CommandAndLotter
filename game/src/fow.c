@@ -15,9 +15,13 @@ void FogEvent(PARTICLE *p)
 	MAP *map = mapGetCurrent();
 	TILE *tile = mapGetTileFromVector(map, vector(p->skill_a, p->skill_b, 0));
 	
-    if(tile->visibility == FOW_SCOUTED){
-        p.lifespan = 0;
-    }
+    if(tile->visibility == FOW_SCOUTED) 
+    {
+    	p->alpha -= 10*time_step;
+    	if(p->alpha <= 0)
+    		p.lifespan = 0;
+	}
+        
 }
 
 void Fog(PARTICLE *p)
@@ -57,7 +61,7 @@ void fow_open()
 			
 			VECTOR pos;
 			mapGetVectorFromTile(map, &pos, tile);
-			pos.z = 500;
+			pos.z = 1000;
 			
 			
 			tile->visibility = FOW_HIDDEN;
@@ -87,23 +91,52 @@ void fov_uncover(VECTOR *pos, var range)
 		}
 }
 
+
+//var fow_updatedelay = 0;
+int fow_calcoffset = 0;
+int fow_calcoffsetMAX = 16;
 void fow_update()
 {
 #ifdef USE_FOW
 	MAP *map = mapGetCurrent();
-
-	int x, y;
-	for(x = 0; x<map->size[0]; ++x)
-		for(y = 0; y<map->size[1]; ++y)
+	
+	int mapSize = map->size[0]*map->size[1];
+	int i;
+	for(i = fow_calcoffset; i< mapSize; i = i+fow_calcoffsetMAX)
+	{
+		TILE *tile = &((map->tiles)[i]);
+		if(tile->visibility == FOW_HIDDEN)
 		{
-			TILE *tile = mapTileGet(map, x,y);
-			if(tile->visibility == FOW_HIDDEN){
-				if(mapIsAnyFriendlyUnitNearby(map, tile, FOW_SIGHT_RANGE, PLAYER_ID_PLAYER)) 
-				{
-					tile->visibility = FOW_SCOUTED;	
-				}
+			if(mapIsAnyFriendlyUnitNearby(map, tile, FOW_SIGHT_RANGE, PLAYER_ID_PLAYER)) 
+			{
+				tile->visibility = FOW_SCOUTED;	
 			}
-				
 		}
+	}
+	fow_calcoffset++;
+	fow_calcoffset = fow_calcoffset%fow_calcoffsetMAX;
+	
+	/*
+	fow_updatedelay += time_step;
+	if(fow_updatedelay > 1) 
+	{
+		fow_updatedelay = 0;
+		
+		int x, y;
+		for(x = 0; x<map->size[0]; ++x)
+			for(y = 0; y<map->size[1]; ++y)
+			{
+				TILE *tile = mapTileGet(map, x,y);
+				if(tile->visibility == FOW_HIDDEN){
+					if(mapIsAnyFriendlyUnitNearby(map, tile, FOW_SIGHT_RANGE, PLAYER_ID_PLAYER)) 
+					{
+						tile->visibility = FOW_SCOUTED;	
+					}
+				}
+					
+			}
+	}
+	*/
+	
 #endif
 }

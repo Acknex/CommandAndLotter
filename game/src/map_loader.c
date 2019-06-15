@@ -21,7 +21,8 @@ struct maploader_t maploader;
 BMAP * maploader_terrain_digital = "terrain_digital.png";
 BMAP * maploader_terrain_analogue = "terrain_analogue.png";
 BMAP * maploader_terrain_splatter = "terrain_splatter.png";
-BMAP * maploader_terrain_street = "terrain_street.png";
+BMAP * maploader_terrain_street_digital = "terrain_street.png";
+BMAP * maploader_terrain_street_analogue = "terrain_street2.png";
 
 MATERIAL * maploader_terrain_material =
 {
@@ -66,7 +67,8 @@ void maploader_init()
     bmap_to_mipmap(maploader_terrain_digital);
     bmap_to_mipmap(maploader_terrain_analogue);
     bmap_to_mipmap(maploader_terrain_splatter);
-    bmap_to_mipmap(maploader_terrain_street);
+    bmap_to_mipmap(maploader_terrain_street_digital);
+    bmap_to_mipmap(maploader_terrain_street_analogue);
 }
 
 int maploader_grey_to_type(int gray)
@@ -136,14 +138,14 @@ void maploader_load(char const * fileName)
 
     collision_mode = 0;
 
-    you = ent_createterrain(
-        bmp,
-        vector(0, 0, 0),
-        2,
-        2,
-        size_x * maploader_trisize
-    );
-    you.material = maploader_water_material;
+//    you = ent_createterrain(
+//        bmp,
+//        vector(0, 0, 0),
+//        2,
+//        2,
+//        size_x * maploader_trisize
+//    );
+//    you.material = maploader_water_material;
 
     maploader.terrain = ent_createterrain(
         bmp,

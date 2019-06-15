@@ -3,8 +3,11 @@
 
 #define BUILDING_NONE -1
 #define BUILDING_TOWER 0
+#define BUILDING_FARM 1
+#define BUILDING_TREE 2
+#define BUILDING_BANK 3
 
-#define BUILDING_NUMBER 1
+#define BUILDING_NUMBER 4
 
 char* buildingPlacement_assets[BUILDING_NUMBER];
 char* buildingPlacement_constructionAssets[BUILDING_NUMBER];
