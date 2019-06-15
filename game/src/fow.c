@@ -34,15 +34,45 @@ void FogOfWarTest()
 
 }
 
+bool fow_active = 0;
+
+
+#define FOW_HIDDEN 0
+#define FOW_SCOUTED 1
+#define FOW_SIGHT_RANGE 1
+
 void fow_open()
 {
     if(key_f){
+    	fow_active = 1;
         FogOfWarTest();
+        
+		MAP *map = mapGetCurrent();
+	
+		int x, y;
+		for(x = 0; x<map->size[0]; ++x)
+			for(y = 0; y<map->size[1]; ++y)
+			{
+				TILE *tile = mapTileGet(map, x,y);
+				tile->visibility = FOW_SCOUTED;
+			}
     }
 }
 
-
 void fow_update()
 {
+	if(fow_active)
+	{
+		MAP *map = mapGetCurrent();
 	
+		int x, y;
+		for(x = 0; x<map->size[0]; ++x)
+			for(y = 0; y<map->size[1]; ++y)
+			{
+				TILE *tile = mapTileGet(map, x,y);
+				if(tile->visibility == FOW_HIDDEN)
+					if(mapIsAnyFriendlyUnitNearby(map, tile, FOW_SIGHT_RANGE, SPAWNER_PLAYER))
+						tile->visibility = FOW_SCOUTED;	
+			}
+	}
 }
