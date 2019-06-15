@@ -15,7 +15,6 @@
 
 #define SPUTNIK_ANIMSTATE skill21
 #define SPUTNIK_ANIMSTATEATK skill22
-#define SPUTNIK_SOUNDHANDLE skill25
 #define SPUTNIK_DIDATTACK skill26
 #define SPUTNIK_HITTHRESHOLD skill27
 
@@ -48,8 +47,6 @@ void Sputnik()
 	set(my, SHADOW);
 	c_setminmax(me);
 	my->min_z += SPUTNIK_FEET;
-	my->group = GROUP_UNIT;
-	vec_set(my->UNIT_TARGET, my->x);
 	my->ENTITY_STATE = ENTITY_STATE_WAIT;
 }
 
@@ -72,13 +69,7 @@ void SPUTNIK_Update()
       {
       	SPUTNIK__hit(ptr);
 		}
-		
-		if (ptr->SPUTNIK_SOUNDHANDLE && (snd_playing(ptr->SPUTNIK_SOUNDHANDLE) == 0))
-		{
-			snd_remove(ptr->SPUTNIK_SOUNDHANDLE);
-			ptr->SPUTNIK_SOUNDHANDLE = 0;
-		}
-					
+
 		switch(ptr->ENTITY_STATE)    	
 		{
 
@@ -91,6 +82,12 @@ void SPUTNIK_Update()
 			case ENTITY_STATE_WALK:
 			{
 				SPUTNIK__walk(ptr);
+				break;
+			}
+
+			case ENTITY_STATE_ATTACK:
+			{
+				SPUTNIK__attack(ptr);
 				break;
 			}
 
@@ -118,7 +115,6 @@ void SPUTNIK__hit(ENTITY* ptr)
 {
 	ptr->event = NULL;
 	ptr->SPUTNIK_HITTHRESHOLD = 3;				
-	ptr->push = -100;
 
 	ptr->HEALTH = maxv(0, ptr->HEALTH - ptr->DAMAGE_HIT);
 	ptr->DAMAGE_HIT = 0;
@@ -152,58 +148,33 @@ void SPUTNIK__wait(ENTITY* ptr)
 	ent_animate(ptr, SPUTNIK_WAITANIM, ptr->SPUTNIK_ANIMSTATE, ANM_CYCLE);
 		
 	/* transitions */
-	if (SCAN_IsTargetNear(ptr, ptr->UNIT_TARGET, SPUTNIK_TARGETDIST) == 0)
+	// Unit is near enough to attack
+	if (SCAN_IsEntityNear(ptr, unit_getVictim(ptr), ptr->SPUTNIK_ATTACKRANGE))
+	{
+		ptr->ENTITY_STATE = ENTITY_STATE_ATTACK;
+	}
+	else if (SCAN_IsTargetNear(ptr, unit_getTarget(ptr), SPUTNIK_TARGETDIST) == 0)
 	{
 		ptr->ENTITY_STATE = ENTITY_STATE_WALK;
+	}
+	else
+	{
+		//keep waiting
 	}
 }
 
 void SPUTNIK__walk(ENTITY* ptr)
 {
-	ANG_turnToPos(ptr, ptr->UNIT_TARGET, ptr->SPUTNIK_TURNSPEED, 5);
+	ANG_turnToPos(ptr, unit_getTarget(ptr), ptr->SPUTNIK_TURNSPEED, 5);
 	VECTOR moveVec;
 
 	vec_set(&moveVec, vector(ptr->SPUTNIK_RUNSPEED * time_step, 0, 0));
 	vec_rotate(&moveVec, vector(ptr->pan, 0, 0));
 	vec_add(&ptr->x, moveVec);
 	
-	
-#ifdef Adjust_attack_code_to_new_project
-	// Unit is near enough to attack
-	if (SCAN_IsUnitnSight(ptr, ptr->SPUTNIK_ATTACKRANGE, 90))
-	{
-		if ((ptr->SPUTNIK_ANIMSTATEATK == 0) || (ptr->SPUTNIK_ANIMSTATEATK >= 100))
-		{
-			ptr->SPUTNIK_ANIMSTATEATK = 0;
-			switch(integer(random(2)))
-			{
-				case 0: snd_play(sputnik_snd_attack1, 100, 0); break;
-				case 1: snd_play(sputnik_snd_attack2, 100, 0); break;
-				case 2: snd_play(sputnik_snd_attack3, 100, 0); break;
-			}
-		}
-		ptr->SPUTNIK_ANIMSTATEATK += ptr->SPUTNIK_ATTACKSPEED * time_step;
-		ptr->SPUTNIK_ANIMSTATEATK = minv(ptr->SPUTNIK_ANIMSTATEATK, 100);
-		ptr->SPUTNIK_ANIMSTATE = 0;
-		ent_animate(ptr, SPUTNIK_ATTACKANIM, ptr->SPUTNIK_ANIMSTATEATK, 0);
-		
-		if (ptr->SPUTNIK_ANIMSTATEATK > 50)
-		{
-			if (ptr->SPUTNIK_DIDATTACK == 0)
-			{
-				playerAddHealth(-DAMAGE_SPUTNIK);
-			}
-			ptr->SPUTNIK_DIDATTACK = 1;
-		}
-		else
-		{
-			ptr->SPUTNIK_DIDATTACK = 0;
-		}
-	}
-	else 
-#endif
-	
-	if (SCAN_IsTargetNear(ptr, ptr->UNIT_TARGET, SPUTNIK_TARGETDIST))
+	/* transitions */
+	// Unit reached target
+	if (SCAN_IsTargetNear(ptr, unit_getTarget(ptr), SPUTNIK_TARGETDIST))
 	{
 		ptr->ENTITY_STATE = ENTITY_STATE_WAIT;
 	}
@@ -214,6 +185,48 @@ void SPUTNIK__walk(ENTITY* ptr)
 		ptr->SPUTNIK_ANIMSTATE += 0.5 * ptr->SPUTNIK_RUNSPEED * time_step;
 		ent_animate(ptr, SPUTNIK_WALKANIM, ptr->SPUTNIK_ANIMSTATE, ANM_CYCLE);		
 	}
+}
+
+void SPUTNIK__attack(ENTITY* ptr)
+{
+	if (ptr->SPUTNIK_ANIMSTATEATK == 0)
+	{
+		switch(integer(random(2)))
+		{
+			case 0: snd_play(sputnik_snd_attack1, 100, 0); break;
+			case 1: snd_play(sputnik_snd_attack2, 100, 0); break;
+			case 2: snd_play(sputnik_snd_attack3, 100, 0); break;
+		}
+	}
+	ptr->SPUTNIK_ANIMSTATEATK += ptr->SPUTNIK_ATTACKSPEED * time_step;
+	ptr->SPUTNIK_ANIMSTATEATK = minv(ptr->SPUTNIK_ANIMSTATEATK, 100);
+	ptr->SPUTNIK_ANIMSTATE = 0;
+	ent_animate(ptr, SPUTNIK_ATTACKANIM, ptr->SPUTNIK_ANIMSTATEATK, 0);
+	
+	if (ptr->SPUTNIK_ANIMSTATEATK > 50)
+	{
+		if (ptr->SPUTNIK_DIDATTACK == 0)
+		{
+			//me = ptr;
+			//var mode = IGNORE_ME;
+			//c_trace(ptr->x, ptr->)
+#ifdef Adjust_attack_code_to_new_project
+			playerAddHealth(-DAMAGE_SPUTNIK);
+#endif
+		}
+		ptr->SPUTNIK_DIDATTACK = 1;
+	}
+	else
+	{
+		ptr->SPUTNIK_DIDATTACK = 0;
+	}
+
+	if (ptr->SPUTNIK_ANIMSTATEATK >= 100)
+	{
+		ptr->SPUTNIK_ANIMSTATEATK = 0;
+		ptr->ENTITY_STATE = ENTITY_STATE_WAIT;
+	}
+
 }
 
 void SPUTNIK__die(ENTITY* ptr)

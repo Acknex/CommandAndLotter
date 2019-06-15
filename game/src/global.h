@@ -51,6 +51,7 @@ typedef int bool;
 #define SUBSYSTEM_LOOP(ptr,system) for(ptr = ent_next(NULL); ptr != NULL; ptr = ent_next(ptr)) if(ptr->SK_SUBSYSTEM == (system))
 
 /* do not modify unless you really know what you do! */
-#define GROUP_UNIT 10
+#define GROUP_PLAYER_UNIT 10
+#define GROUP_ENEMY_UNIT  11
 
 #endif // GLOBAL_H
