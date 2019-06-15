@@ -51,8 +51,6 @@
 		struct _TILE *prev;
 	};
 	typedef struct _TILE TILE;
-	TILE* startTile = NULL;
-	TILE* targetTile = NULL;
 
 	struct _JPSPATH
 	{
