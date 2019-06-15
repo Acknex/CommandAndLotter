@@ -75,9 +75,9 @@ void fov_uncover(VECTOR *pos, var range)
 		{
 			TILE *otherTile = mapTileGet(map, i, j);
 			VECTOR otherPos;
-			apGetVectorFromTile(map, &otherPos, otherTile)
+			mapGetVectorFromTile(map, &otherPos, otherTile);
 			
-			if(vec_dist(pos, otherPos) < range)
+			if(vec_dist(pos, &otherPos) < range)
 				otherTile->visibility = FOW_SCOUTED;
 		}
 }
