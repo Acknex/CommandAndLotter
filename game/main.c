@@ -1,10 +1,5 @@
 #define PRAGMA_PATH "src"
 
-#define DEBUG
-
-#ifdef DEBUG
-#include <default.c>
-#endif
 
 #define wait _ich_bin_verboten_
 #undef wait_for
@@ -31,4 +26,4 @@ function main()
 #include "music_player.c"
 #include "ui_game.c"
 #include "map_loader.c"
-
+#include "UnitMangement.c"
