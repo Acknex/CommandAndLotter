@@ -52,7 +52,7 @@ void game_open(void)
 	SPUTNIK_Init();
 	SPAWNER_Init();
 	stub_init(); //hook debug shit here
-	
+
 	grid_open(50,50);
 	buildingPlacement_open();
 	#ifdef GAME_OPEN_DEBUG
@@ -62,12 +62,12 @@ void game_open(void)
 
 void game_update(void)
 {
-	ui_game_update();
+    topdown_camera_update();
+    ui_game_update();
 	jpsGameUpdate(mapGetCurrent());
 	SPUTNIK_Update();
 	SPAWNER_Update();
 	stub_update(); //hook debug shit here
-	topdown_camera_update();
     UnitMangement_update();
     fow_update();
 	buildingPlacement_update();
