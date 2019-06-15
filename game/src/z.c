@@ -1,7 +1,6 @@
 #include "global.h"
 #include "framework.h"
 #include "z.h"
-#include "enemy_hit.h"
 #include "map_loader.h"
 
 #define Z_VALUE 10
@@ -18,17 +17,17 @@ ENTITY* z_spawn(VECTOR* pos)
 {
 	ENTITY* ent;
 	ent = ent_create(CUBE_MDL, pos, Z);
+	ent->group = GROUP_ENEMY_UNIT; //should be neutral group
 	return ent;
 }
 
 void Z()
 {
-   framework_setup(my, SUBSYSTEM_Z);
-	ENEMY_HIT_init(my);
+	framework_setup(my, SUBSYSTEM_Z);
 	set(my, SHADOW);
 	vec_scale(my->scale_x, 10); //temp
 	c_setminmax(me);
-	my->ENTITY_STATE = ENTITY_STATE_WAIT_OR_WALK;
+	my->ENTITY_STATE = ENTITY_STATE_WAIT_OR_WALK;	
 }
 
 void Z_Init()
@@ -42,10 +41,11 @@ void Z_Update()
 	SUBSYSTEM_LOOP(ptr, SUBSYSTEM_Z)
 	{
 			
-		if (ptr->DAMAGE_HIT > 0)
-      {
-      	Z__hit(ptr);
+		if (ptr->DAMAGE_HIT > 0 && ptr->ENTITY_STATE != ENTITY_STATE_DIE && ptr->ENTITY_STATE != ENTITY_STATE_DEAD)
+      	{
+      		Z__hit(ptr);
 		}
+		
 		switch(ptr->ENTITY_STATE)    	
 		{
 
@@ -67,14 +67,13 @@ void Z_Update()
 			}
 		}	
 	
-		ptr->z = maploader_get_height(ptr->x) - ptr->min_z;			
+		ptr->z = maploader_get_height(ptr->x) - ptr->min_z+200;			
 		
 	}	
 }
 
 void Z__hit(ENTITY* ptr)
 {
-	ptr->event = NULL;
 	ptr->ENTITY_STATE = ENTITY_STATE_DIE;
 	ptr->ENTITY_ANIM = 100;
 	snd_play(z_collect_snd, 100, 0);
@@ -90,9 +89,9 @@ void Z__wait(ENTITY* ptr)
 
 void Z__die(ENTITY* ptr)
 {
-	ptr->ENTITY_ANIM -= 5 * time_step;
-	ptr->scale_x = maxv(ptr->scale_x - ptr->ENTITY_ANIM*0.01, 0);
-	ptr->scale_y = maxv(ptr->scale_y - ptr->ENTITY_ANIM*0.01, 0);
+	ptr->ENTITY_ANIM -= 15 * time_step;
+	ptr->scale_x = 10*maxv(ptr->ENTITY_ANIM, 0) * 0.01;
+	ptr->scale_y = 10*maxv(ptr->ENTITY_ANIM, 0) * 0.01;
 
 	/* transitions */
 	if(ptr->ENTITY_ANIM <= 0)

@@ -1,8 +1,7 @@
 #include "global.h"
 #include "framework.h"
 #include "spawner.h"
-#include "enemy_hit.h"
-#include "particle.h"
+//#include "particle.h"
 #include "map_loader.h"
 #include "unit.h"
 #include "fow.h"
@@ -26,7 +25,7 @@
 
 
 #define SPAWNER_ACTIVEANIM "stand"
-#define SPAWNER_PRODUCEANIM "Produce"
+#define SPAWNER_PRODUCEANIM "produce"
 #define SPAWNER_DIEANIM "Die"
 
 
@@ -68,6 +67,11 @@ ENTITY* spawner_spawn(int spawnertype, VECTOR* pos, var owner)
 		case 0:
 			ent = ent_create("the_tower.mdl", pos, Spawner);
             wireframe = ent_create("the_tower_wireframe.mdl", pos, NULL);
+			break;
+
+		case 1:
+			ent = ent_create("lark_farm.mdl", pos, Spawner);
+            wireframe = ent_create("lark_farm_wireframe.mdl", pos, NULL);
 			break;
 	}
 
@@ -140,7 +144,6 @@ void Spawner()
    framework_setup(my, SUBSYSTEM_SPAWNER);
 	my->HEALTH = 50;//TODO HOOK TO UNIT SYSTEM
 	my->MAXHEALTH = my->HEALTH;
-	ENEMY_HIT_init(my);
 	set(my, SHADOW);
 	c_setminmax(me);
 	my->ENTITY_STATE = SPAWNER_STATE_CONSTRUCT;
@@ -214,9 +217,7 @@ void SPAWNER_Update()
 
 void SPAWNER__hit(ENTITY* ptr)
 {
-	ptr->event = NULL;
-	ptr->SPUTNIK_HITTHRESHOLD = 3;				
-	ptr->push = -100;
+	ptr->ENTITY_HITTHRESHOLD = 3;				
 
 	ptr->HEALTH = maxv(0, ptr->HEALTH - ptr->DAMAGE_HIT);
 	ptr->DAMAGE_HIT = 0;
@@ -231,14 +232,13 @@ void SPAWNER__hit(ENTITY* ptr)
 
 void SPAWNER__hitcheck(ENTITY* ptr)
 {
-	if (ptr->SPUTNIK_HITTHRESHOLD > 0)
+	if (ptr->ENTITY_HITTHRESHOLD > 0)
 	{
-		ptr->SPUTNIK_HITTHRESHOLD -= time_step;
+		ptr->ENTITY_HITTHRESHOLD -= time_step;
 		
-		if (ptr->SPUTNIK_HITTHRESHOLD <= 0)
+		if (ptr->ENTITY_HITTHRESHOLD <= 0)
 		{
-			ptr->SPUTNIK_HITTHRESHOLD = 0;
-			ptr->event = ENEMY_HIT_event;
+			ptr->ENTITY_HITTHRESHOLD = 0;
 		}
 	}
 }
