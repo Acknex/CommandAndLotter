@@ -35,6 +35,7 @@ typedef int bool;
 #define ENTITY_DAMAGE skill58
 #define ENTITY_HITTHRESHOLD skill59
 #define ENTITY_UNITTYPE skill60
+#define ENTITY_VICTIMTYPE skill61
 
 #define SELCTED_SKILL skill[39]
 #define UNIT_DEST_SKILL skill[40]

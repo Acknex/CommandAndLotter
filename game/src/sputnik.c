@@ -81,9 +81,19 @@ void SPUTNIK__wait_or_walk(ENTITY * ptr)
 		ent_animate(ptr, SPUTNIK_WAITANIM, ptr->SPUTNIK_ANIMSTATE, ANM_CYCLE);
 	}
 	
-	if (SCAN_IsEntityNear(ptr, unit_getVictim(ptr), ptr->SPUTNIK_ATTACKRANGE))
+	if (ptr->DAMAGE_HIT > 0)
 	{
-		ptr->ENTITY_STATE = ENTITY_STATE_ATTACK;
+		if (ptr->ENTITY_STATE != ENTITY_STATE_HIT)
+		{
+			ptr->HEALTH = maxv(0, ptr->HEALTH - ptr->DAMAGE_HIT);
+			ptr->ENTITY_STATE = ENTITY_STATE_HIT;
+			ptr->ENTITY_HITTHRESHOLD = 5;				
+		}
+		ptr->DAMAGE_HIT = 0;
+	}
+	else if (SCAN_IsEntityNear(ptr, unit_getVictim(ptr), ptr->SPUTNIK_ATTACKRANGE))
+	{
+		ptr->ENTITY_STATE = ENTITY_STATE_ATTACK;		
 	}
 }
 
@@ -95,39 +105,6 @@ void SPUTNIK_Update()
 	{
 		jpsAllowMovementForEntity(ptr, false);
 	
-		ENTITY* victim = unit_getVictim(ptr);
-		if (victim != NULL)
-		{
-			if (victim->ENTITY_STATE == ENTITY_STATE_DIE || victim->ENTITY_STATE == ENTITY_STATE_DEAD) 
-			{
-				//meh.
-				var owner;
-				if (ptr->group == GROUP_ENEMY_UNIT)	
-					owner = UNIT_ENEMY;
-				else
-					owner = UNIT_PLAYER;
-				
-				int count = mapGetNearbyUnitsOfTypeForPos(ptr->x, victim->ENTITY_UNITTYPE, owner, 1000, 1);
-				if (count > 0)
-				{
-					ENTITY* ent = jpsGetEntityFromUnitArray(0);
-					unit_setTarget(ptr, ent->x);
-					unit_setVictim(ptr, ent);
-				}
-			}
-		}	
-		
-		if (ptr->DAMAGE_HIT > 0)
-		{
-			if (ptr->ENTITY_STATE != ENTITY_STATE_HIT)
-			{
-				ptr->HEALTH = maxv(0, ptr->HEALTH - ptr->DAMAGE_HIT);
-				ptr->ENTITY_STATE = ENTITY_STATE_HIT;
-				ptr->ENTITY_HITTHRESHOLD = 5;				
-			}
-			ptr->DAMAGE_HIT = 0;
-		}
-
 		switch(ptr->ENTITY_STATE)    	
 		{
 			case ENTITY_STATE_WAIT_OR_WALK:
@@ -165,6 +142,31 @@ void SPUTNIK_Update()
 			ptr->z = maploader_get_height(ptr->x) - ptr->min_z + SPUTNIK_FEET;			
 		}
 	}	
+}
+
+void SPUTNIK__findNextVictim(ENTITY* ptr)
+{
+	if (unit_getVictim(ptr) == NULL)
+	{
+		//meh.
+		var owner;
+		if (ptr->group == GROUP_ENEMY_UNIT)	
+			owner = UNIT_ENEMY;
+		else
+			owner = UNIT_PLAYER;
+		
+		error("TRYFIND");
+		int count = mapGetNearbyUnitsOfTypeForPos(ptr->x, ptr->ENTITY_VICTIMTYPE, owner, 1000, 1);
+		if (count > 0)
+		{
+			error("FOUND");
+			ENTITY* ent = jpsGetEntityFromUnitArray(0);
+			
+			//set new target and victim
+			unit_setTarget(ptr, ent->x);
+			unit_setVictim(ptr, ent);
+		}
+	}
 }
 
 void SPUTNIK__hit(ENTITY* ptr)
@@ -227,6 +229,7 @@ void SPUTNIK__attack(ENTITY* ptr)
 	if (ptr->SPUTNIK_ANIMSTATEATK >= 100)
 	{
 		ptr->SPUTNIK_ANIMSTATEATK = 0;
+		SPUTNIK__findNextVictim(ptr);
 		ptr->ENTITY_STATE = ENTITY_STATE_WAIT_OR_WALK;
 	}
 

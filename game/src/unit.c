@@ -37,6 +37,7 @@ var unit_setVictim(ENTITY* ent, ENTITY* victim)
 				//if (victim->group == GROUP_UNIT)
 				{
 					ent->ENTITY_VICTIM = handle(victim);
+					ent->ENTITY_VICTIMTYPE = victim->ENTITY_UNITTYPE;
 					return 1;
 				}
 			}
