@@ -38,10 +38,4 @@ function main()
 #include "stub.c"
 #include "unit.c"
 #include "ang.c"
-<<<<<<< .mine
-#include "unit.c"
-#include "ang.c"
-=======
-
-
->>>>>>> .theirs
+#include "scan.c"

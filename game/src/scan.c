@@ -17,8 +17,10 @@ var SCAN_IsTargetNear(ENTITY* ent, VECTOR* pos, var distance)
 {
 	if (ent == NULL)
 		return 0;
-		
-	if (vec_dist(&pos->x, ent->x) < distance)
+	
+	VECTOR* vec1 = vector(ent->x, ent->y, 0);
+	VECTOR* vec2 = vector(pos->x, pos->y, 0);
+	if (vec_dist(vec1, vec2) < distance)
 		return 1;
 	else
 		return 0;

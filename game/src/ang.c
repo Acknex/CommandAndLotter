@@ -20,6 +20,7 @@ var ANG_turnToAngle(ENTITY* ptr, var angle, var speed, var hysteresis)
 	if (absv(diffAngle.pan) > hysteresis)
 	{
 		ANGLE* angle;
+		DEBUG_VAR(diffAngle.pan, 40);
 		if (diffAngle.pan > 0)
 		{
 			ptr->pan += minv(diffAngle.pan, speed * time_step);
@@ -34,3 +35,27 @@ var ANG_turnToAngle(ENTITY* ptr, var angle, var speed, var hysteresis)
 	}
 	return 1;
 }
+
+/*
+var ANG_turnToAngle(ENTITY* ptr, var angle, var speed, var hysteresis)
+{
+	var diff = ang(ptr->pan-angle);
+	if (absv(diff) > hysteresis)
+	{
+		ANGLE* angle;
+		DEBUG_VAR(diff, 40);
+		if (diff > 0)
+		{
+			//ptr->pan += minv(diff, speed * time_step);
+			
+		}
+		else
+		{
+			//ptr->pan += maxv(diff, -speed * time_step);
+		}
+		ptr->pan = ang(ptr->pan);
+		return 0;
+	}
+	return 1;
+}
+*/
