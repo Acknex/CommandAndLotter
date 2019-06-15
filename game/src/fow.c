@@ -70,10 +70,9 @@ void fow_update()
 		{
 			TILE *tile = mapTileGet(map, x,y);
 			if(tile->visibility == FOW_HIDDEN){
-				//if(mapIsAnyFriendlyUnitNearby(map, tile, FOW_SIGHT_RANGE, UNIT_PLAYER)) 
-				if(mapIsAnyUnitNearby(map, tile, FOW_SIGHT_RANGE)) 
+				if(mapIsAnyFriendlyUnitNearby(map, tile, FOW_SIGHT_RANGE, PLAYER_ID_PLAYER)) 
+				//if(mapIsAnyUnitNearby(map, tile, FOW_SIGHT_RANGE)) 
 				{
-				//	printf("friendly");
 					tile->visibility = FOW_SCOUTED;	
 				}
 			}
