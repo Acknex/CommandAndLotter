@@ -44,11 +44,11 @@ void Sputnik()
 	my->HEALTH = 23;//HEALTH_SPUTNIK; TODO HOOK TO UNIT SYSTEM
 	my->MAXHEALTH = 23;//HEALTH_SPUTNIK; TODO HOOK TO UNIT SYSTEM
 	ENEMY_HIT_init(my);
-	vec_scale(&my->scale_x, 1.2);
 	set(my, SHADOW);
 	c_setminmax(me);
 	my->min_z += SPUTNIK_FEET;
 	my->ENTITY_STATE = ENTITY_STATE_WAIT;
+	my->ENTITY_DAMAGE = 5;
 }
 
 void SPUTNIK_Init()
@@ -215,6 +215,7 @@ void SPUTNIK__attack(ENTITY* ptr)
 				c_ignore(GROUP_PLAYER_UNIT, GROUP_PLAYER_SPAWNER,0);
 			else
 				c_ignore(GROUP_ENEMY_UNIT, GROUP_ENEMY_SPAWNER,0);
+			//ENEMY_HIT_setAttack()
 			c_trace(ptr->x, unit_getTarget(ptr), mode);			
 		}
 		ptr->SPUTNIK_DIDATTACK = 1;
