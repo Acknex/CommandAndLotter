@@ -647,6 +647,7 @@ TILE* mapGetTileFromVector(MAP* map, VECTOR* v)
 
 void mapUpdateUnits(MAP* map)
 {
+	int currentPlayer;
 	int i,j;
 	for(i = 1; i < map->size[0]-1; i++)
 	{
@@ -658,11 +659,11 @@ void mapUpdateUnits(MAP* map)
 				listDestroy(tile->unitList, 0);
 				tile->unitList = NULL;
 			}*/
-			tile->numUnits = 0;
+			for(currentPlayer = 0; currentPlayer < MAX_PLAYERS; currentPlayer++)
+				tile->numUnits[currentPlayer] = 0;
 		}
 	}
 	
-	int currentPlayer;
 	for(currentPlayer = 0; currentPlayer < MAX_PLAYERS; currentPlayer++)
 	{
 		UNIT *unit = map->unitFirst[currentPlayer];
@@ -676,10 +677,10 @@ void mapUpdateUnits(MAP* map)
 			}*/
 			if(tile)
 			{
-				if(tile->numUnits < MAX_UNITS_PER_TILE)
+				if(tile->numUnits[currentPlayer] < MAX_UNITS_PER_TILE)
 				{
 					tile->unitArray[tile->numUnits] = unit;
-					tile->numUnits++;
+					tile->numUnits[currentPlayer]++;
 				}
 			}
 			if(unit->tile) unit->prevTile = unit->tile;
@@ -726,11 +727,13 @@ int mapGetNearbyUnits(MAP* map, TILE* sourceTile, int range)
 			if(tile)
 			{
 				int k;
-				for(k = 0; k < tile->numUnits; k++)
-				{
-					pointerArray[pointerArrayNum++] = tile->unitArray[k];
-					if(pointerArrayNum >= POINTER_ARRAY_MAX) return pointerArrayNum;
-				}
+				int currentPlayer;
+				for(currentPlayer = 0; currentPlayer<MAX_PLAYERS; ++currentPlayer)				
+					for(k = 0; k < tile->numUnits[currentPlayer]; k++)
+					{
+						pointerArray[pointerArrayNum++] = tile->unitArray[k];
+						if(pointerArrayNum >= POINTER_ARRAY_MAX) return pointerArrayNum;
+					}
 			}
 		}
 	}
@@ -746,8 +749,28 @@ int mapIsAnyUnitNearby(MAP* map, TILE* sourceTile, int range)
 		for(j = sourceTile->pos[1]-range; j <= sourceTile->pos[1]+range; j++)
 		{
 			TILE* tile = mapTileGet(map, i, j);
+			int currentPlayer;
 			if(tile)
-				if(tile->numUnits) return 1;
+				for(currentPlayer = 0; currentPlayer<MAX_PLAYERS; ++currentPlayer)	
+					if(tile->numUnits[currentPlayer]) return 1;
+		}
+	}
+	return 0;
+}
+
+
+int mapIsAnyFriendlyUnitNearby(MAP* map, TILE* sourceTile, int range, int playerNumber)
+{
+	if(!sourceTile) return NULL;
+	int i,j;
+	for(i = sourceTile->pos[0]-range; i <= sourceTile->pos[0]+range; i++)
+	{
+		for(j = sourceTile->pos[1]-range; j <= sourceTile->pos[1]+range; j++)
+		{
+			TILE* tile = mapTileGet(map, i, j);
+			int currentPlayer;
+			if(tile)
+				if(tile->numUnits[playerNumber]) return 1;
 		}
 	}
 	return 0;
