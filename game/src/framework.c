@@ -6,6 +6,7 @@
 #include "credits.h"
 #include "music_player.h"
 #include "jps.h"
+#include "ui_game.h"
 
 #include <acknex.h>
 #include <windows.h>
@@ -283,6 +284,10 @@ void framework_update()
 
     // Do music update
     music_update();
+
+    // unfuck bmap_process abfuck
+    if(framework.state == FRAMEWORK_STATE_GAME)
+        ui_game_after_all();
 
     if(framework.state == FRAMEWORK_STATE_SHUTDOWN)
     {
