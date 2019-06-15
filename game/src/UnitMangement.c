@@ -11,6 +11,7 @@ var CamFPS;
 #include "framework.h"
 #include "map_loader.h"
 #include "camera.h"
+#include "global.h"
 
 #ifdef DebugMode
     var test1; //für debugzwecke
@@ -138,11 +139,8 @@ void UnitMangement_open(){
         for(y = -1500; y < 1500; y+=300){
 
             var z = maploader_get_height(vector(x,y,0));
-            you = ent_create("sputnik.mdl",vector(x,y,z),NULL);
+            you = ent_create("sputnik.mdl",vector(x,y,z+90),NULL);
             you.ambient = 0;
-            if(you.y == 0){
-                you.ambient = 200;
-            }
             framework_setup(you, SUBSYSTEM_UNIT_MANAGEMENT);
         }
     }
@@ -167,7 +165,6 @@ function PosToMap(VECTOR * vec, var x, var y)
         if(p == 0){
             error("p ist null");
         }
-        draw_point3d(p, vector(0,0,255), 100, 50);
         vec_set(vec,p);
     }
 }
@@ -177,10 +174,10 @@ function CheckIsLeftFrom(VECTOR* Base, VECTOR* V1, VECTOR * V2)
     VECTOR Line1;
     VECTOR Line2;
     VECTOR Cross;
-
-    Base.z = V1.z = V2.z = 250;
     vec_diff(Line1,Base, V1);
     vec_diff(Line2,Base, V2);
+
+
 
     vec_normalize (Line1, 1);
     vec_normalize (Line2, 1);
@@ -225,9 +222,6 @@ function MarkUnits()
 
     var i;
     ENTITY * ent;
-
-    draw_point3d(vector(0,0,250), vector(0,255,255), 100, 50);
-
 
     SUBSYSTEM_LOOP(ent, SUBSYSTEM_UNIT_MANAGEMENT){
 
@@ -292,7 +286,13 @@ function DebugDrawDests()
     }
 }
 
-
+function DeselectAll()
+{
+    ENTITY * ent;
+    SUBSYSTEM_LOOP(ent, SUBSYSTEM_UNIT_MANAGEMENT){
+        DeselectUnit(ent);
+    }
+}
 
 function NumberKeyPressed(int nr)
 {
@@ -305,6 +305,10 @@ function NumberKeyPressed(int nr)
         if(key_ctrl){
             if(ent.SELCTED_SKILL){
                 ent.UNIT_GROUP_SKILL = nr;
+            }else{
+                if(ent.UNIT_GROUP_SKILL == nr){
+                    ent.UNIT_GROUP_SKILL = 0;
+                }
             }
         }else{
             SetUnitSelcted(ent, ent.UNIT_GROUP_SKILL == nr);
@@ -325,12 +329,23 @@ function NumberKeyPressed(int nr)
 
 var NuberKeyPressedLast = 0;
 
-function RealUnitControl()
+function UnitControl()
 {
     VECTOR temp;
     mouse_mode = 4;
     if(mouse_left){
         if(MouseLeftLast == 0){
+            if(!key_shiftl){
+                DeselectAll();
+            }
+            vec_set(temp, vector(mouse_pos.x,mouse_pos.y, camera.clip_far));
+            vec_for_screen(temp,camera);
+            c_trace(camera.x, temp,USE_POLYGON);
+            if(you != 0){
+                if(you.SK_SUBSYSTEM == SUBSYSTEM_UNIT_MANAGEMENT){
+                    SelectUnit(you);
+                }
+            }
 
             ClickPoint2D_A[0]=mouse_pos.x;
             ClickPoint2D_A[1]=mouse_pos.y;
@@ -343,7 +358,10 @@ function RealUnitControl()
             ClickPoint2D_B[1]=mouse_pos.y;
             DrawQuadDemo();
         }
-        MarkUnits();
+        if(abs(ClickPoint2D_A[0]-ClickPoint2D_B[0])+abs(ClickPoint2D_A[1]-ClickPoint2D_B[1])  >5){
+            MarkUnits();
+        }
+
 
     }else{
        if(MouseLeftLast){
@@ -374,9 +392,8 @@ function RealUnitControl()
 
 void UnitMangement_update()
 {
-    RealUnitControl();
-    DebugDrawDests();
-
+    UnitControl();
+   // DebugDrawDests();
 }
 
 bool UnitMangement_is_done(){
