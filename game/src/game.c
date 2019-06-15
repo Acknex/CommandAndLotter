@@ -13,6 +13,7 @@
 #include "fow.h"
 #include "z.h"
 #include "materials.h"
+#include "effects2d.h"
 
 void game_init(void)
 {
@@ -21,6 +22,7 @@ void game_init(void)
     grid_init();
 	buildingPlacement_init();
 	presetsInit();
+    effects2d_init();
 
     effect_load(mtl_model, "units.fx");
 }
@@ -65,6 +67,8 @@ void game_open(void)
 	#ifdef GAME_OPEN_DEBUG
 		cprintf1("\n game_open: END at frame %d", (int)total_frames);
 	#endif
+
+    effects2d_open();
 }
 
 void game_update(void)
@@ -79,12 +83,15 @@ void game_update(void)
     UnitMangement_update();
     fow_update();
 	buildingPlacement_update();
+
+    effects2d_update();
 }
 
 void game_close(void)
 {
 	ui_game_close();
 	grid_close();
+    effects2d_close();
 }
 
 bool game_is_done(void)

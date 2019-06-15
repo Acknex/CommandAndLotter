@@ -33,10 +33,10 @@ void effects2d_init()
     effects2d.animations[0].frame_count = 5;
     effects2d.animations[0].speed = 1;
     effects2d.animations[0].frames[0] = bmap_create("Cursor1.png");
-    effects2d.animations[0].frames[0] = bmap_create("Cursor2.png");
-    effects2d.animations[0].frames[0] = bmap_create("Cursor3.png");
-    effects2d.animations[0].frames[0] = bmap_create("Cursor4.png");
-    effects2d.animations[0].frames[0] = bmap_create("Cursor5.png");
+    effects2d.animations[0].frames[1] = bmap_create("Cursor2.png");
+    effects2d.animations[0].frames[2] = bmap_create("Cursor3.png");
+    effects2d.animations[0].frames[3] = bmap_create("Cursor4.png");
+    effects2d.animations[0].frames[4] = bmap_create("Cursor5.png");
 
     effects2d.particle_count = 0;
 }
