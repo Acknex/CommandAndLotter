@@ -2,7 +2,7 @@
 #include "framework.h"
 #include "spawner.h"
 #include "enemy_hit.h"
-#include "particle.h"
+//#include "particle.h"
 #include "map_loader.h"
 
 #define SPAWNER_QUEUE skill21
@@ -10,6 +10,13 @@
 #define SPAWNER_BUILDTIMER skill23
 #define SPAWNER_DIETIMER skill24
 #define SPAWNER_HITTHRESHOLD skill27
+#define SPAWNER_FIREPARTICLES skill28
+#define SPAWNER_DEBRISPARTICLES skill29
+#define SPAWNER_SMOKEPARTICLES skill30
+
+#define SPAWNER_BASEX skill40			// Position nach dem erstellen
+#define SPAWNER_BASEY skill41
+#define SPAWNER_BASEZ skill42
 
 
 #define SPAWNER_ACTIVEANIM "stand"
@@ -26,6 +33,10 @@
 
 #define SPAWNER_BUILDTIME 20
 #define SPAWNER_DIETIME 30
+
+#define SPAWNER_MAXFIRE 40
+#define SPAWNER_MAXDEBRIS 5
+#define SPAWNER_MAXSMOKE 90
 
 ENTITY* spawner_spawn(int spawnertype, VECTOR* pos, var owner)
 {
@@ -79,7 +90,8 @@ var spawner_getProgress(ENTITY* ent)
 	{
 		if (ent->group = GROUP_ENEMY_SPAWNER || ent->group == GROUP_PLAYER_SPAWNER)
 		{
-			return 1 - (ent->SPAWNER_BUILDTIMER / SPAWNER_BUILDTIME);
+			if (ent->ENTITY_STATE == SPAWNER_STATE_CONSTRUCT)
+				return 1 - (ent->SPAWNER_BUILDTIMER / SPAWNER_BUILDTIME);
 		}
 	}
 	return 0;
@@ -90,17 +102,19 @@ void Spawner()
    framework_setup(my, SUBSYSTEM_SPAWNER);
 	my->HEALTH = 23;//TODO HOOK TO UNIT SYSTEM
 	ENEMY_HIT_init(my);
-	vec_scale(&my->scale_x, 1.2);
 	set(my, SHADOW);
 	c_setminmax(me);
 	my->ENTITY_STATE = SPAWNER_STATE_CONSTRUCT;
+	//my->ENTITY_STATE = SPAWNER_STATE_DIE;
 
 	my->SPAWNER_QUEUE = 0;
 	my->SPAWNER_BUILDTIMER = SPAWNER_BUILDTIME;
 	my->SPAWNER_DIETIMER = SPAWNER_DIETIME;
 
 	my->z = maploader_get_height(my->x) - my->min_z;			
-	
+	my->SPAWNER_BASEX = my->x;
+	my->SPAWNER_BASEY = my->y;
+	my->SPAWNER_BASEZ = my->z;
 }
 
 void SPAWNER_Init()
@@ -235,13 +249,108 @@ void SPAWNER__produce(ENTITY* ptr)
 	}
 }
 
+void SPAWNER_smoke_fade_p(PARTICLE* p)
+{
+	p->skill_a-=time_step;
+	p->alpha = maxv(0, minv(100, p->skill_a));
+	if (p->alpha <= 0) p->lifespan = 0;
+
+	p->size = minv(p->skill_b, p->size+time_step*3);
+}
+
+BMAP* bmp_smoke = "rauch2.tga";
+
+void SPAWNER_smoke(PARTICLE* p)
+{
+	p->skill_a = random(20) + 10;
+	p->bmap = bmp_smoke;
+	p->lifespan = 9000;
+	p->skill_b = 1000 + random(50);
+	p->size = 200;
+	p->alpha = 80;
+	//vec_scale(p->vel_x, 0.4);
+	p->vel_x = 20-random(40);
+	p->vel_y = 20-random(40);
+	p->vel_z = 20 - random(30);
+	set(p, TRANSLUCENT | MOVE);
+	p.event = SPAWNER_smoke_fade_p;
+}
+
+void SPAWNER_debris(PARTICLE* p)
+{
+	p->lifespan = 50;
+	p->size = 100 + random(200);
+	p->alpha = 80;
+	p->gravity = 4;
+	p->red = 0;
+	p->green = 0;
+	p->blue = 0;
+	p->vel_x = 80-random(160);
+	p->vel_y = 80-random(160);
+	p->vel_z = 20 + random(30);
+	set(p, TRANSLUCENT | MOVE);
+	p->event = NULL;
+}
+
+
+void SPAWNER_fire_fade_p(PARTICLE* p)
+{
+	p->skill_a-=time_step * 3;
+	p->alpha = maxv(0, minv(100, p->skill_a));
+	p->size -= time_step * p->skill_b;
+	p->green = minv(255, p->green + time_step * p->skill_b * 2);
+}
+
+BMAP* bmp_fire = "rauch2.tga";
+
+void SPAWNER_fire(PARTICLE* p)
+{
+	p->skill_a = random(30) + 60;
+	p->lifespan = 90;
+	p->skill_b = random(4) + 2;
+	p->size = 200;
+	p->alpha = 80;
+	p->red = 255;
+	p->green = 80;
+	p->vel_x = 20-random(40);
+	p->vel_y = 20-random(40);
+	p->vel_z = 20 - random(30);
+	set(p, TRANSLUCENT | MOVE);
+	p.event = SPAWNER_fire_fade_p;
+}
+
+
 void SPAWNER__die(ENTITY* ptr)
 {
 	ptr->SPAWNER_DIETIMER -= time_step;
 
-	VECTOR* pos = vector(ptr->x+random(10)-5, ptr->y+random(10)-5, ptr->z+random(10)-5);
-	VECTOR* vel = vector(-5-random(10), -2-random(4), 2+random(4));
-	effect(PARTICLE_smoke, 6*time_step, pos, vel);
+	var deathfactor = 1.0 - (ptr->SPAWNER_DIETIMER / SPAWNER_DIETIME);
+
+	ptr->z = ptr->SPAWNER_BASEZ - deathfactor * 700.0;
+	ptr->roll = deathfactor * 15.0;
+
+	if (deathfactor < 0.1)
+	{ // DEBRIS
+		VECTOR* pos = vector(ptr->SPAWNER_BASEX+random(100)-50, ptr->SPAWNER_BASEY+random(100)-50, ptr->SPAWNER_BASEZ+random(100)-50);
+		effect(SPAWNER_debris, 12*time_step, pos, nullvector);
+	}
+
+	if (deathfactor < 0.3)
+	{ // FIRE
+		VECTOR* pos = vector(ptr->SPAWNER_BASEX+random(100)-50, ptr->SPAWNER_BASEY+random(100)-50, ptr->SPAWNER_BASEZ+random(100)-50);
+		effect(SPAWNER_fire, 30*time_step, pos, nullvector);
+	}
+
+	if (deathfactor < 0.7)
+	{ //SMOKE
+		VECTOR* pos = vector(ptr->SPAWNER_BASEX+random(100)-50, ptr->SPAWNER_BASEY+random(100)-50, ptr->SPAWNER_BASEZ+random(100)-50);
+		effect(SPAWNER_smoke, 60*time_step, pos, nullvector);
+	}
+
+
+	//VECTOR* pos = vector(ptr->x+random(10)-5, ptr->y+random(10)-5, ptr->z+random(10)-5);
+	//VECTOR* vel = vector(-5-random(10), -2-random(4), 2+random(4));
+	//effect(PARTICLE_smoke, 6*time_step, pos, vel);
 
 	/* transitions */
 	if(ptr->SPAWNER_DIETIMER <= 0)

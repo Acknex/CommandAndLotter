@@ -61,19 +61,6 @@
 	};
 	typedef struct _JPSPATH JPSPATH; // PATH might be an acknex keyword
 
-	struct _MAP
-	{
-		int size[2];
-		TILE* tiles;
-		BMAP* bmp;
-		LIST* JPSTileList;
-		JPSPATH *jpsPath;
-		// quant and 3d stuff
-		VECTOR vMin, vMax, vSize;
-		var tileSize;
-	};
-	typedef struct _MAP MAP;
-	MAP* mapCurrent = NULL;
 
 	#define MAX_PRESETS 2
 	struct _UNIT_PRESET
@@ -125,16 +112,23 @@
 		struct _PROJECTILE *next;
 	};
 	typedef struct _PROJECTILE PROJECTILE;
-
+	
 	#define MAX_PLAYERS 2
-	struct _GAME_STATE
+	struct _MAP
 	{
-		// buildings, similar to units
+		int size[2];
+		TILE* tiles;
+		BMAP* bmp;
+		LIST* JPSTileList;
+		JPSPATH *jpsPath;
+		// quant and 3d stuff
+		VECTOR vMin, vMax, vSize;
+		var tileSize;
 		UNIT *unitFirst[MAX_PLAYERS];
 		PROJECTILE *projectileFirst[MAX_PLAYERS];
 	};
-	typedef struct _GAME_STATE GAME_STATE;
-	GAME_STATE gameState;
+	typedef struct _MAP MAP;
+	MAP* mapCurrent = NULL;
 
 	/////////////////////////////////////////////////
 
@@ -147,16 +141,31 @@
 	int offset2D[16] = { -1,0, 1,0, 0,-1, 0,1,   -1,-1, -1,1, 1,1, 1,-1 }; // cross first, then diagonals
 
 	/////////////////////////////////////////////////
-	// available functions
+	// ackCon relevant functions
+
+	MAP* mapGetCurrent();
+
+	//MAP *mapCreate(int sizeX, int sizeY);
+
+	MAP* jpsMapLoadFromFile(char* filename);
+
+	TILE* mapTileGet(MAP* map, int x, int y);
+
+	VECTOR* mapGetVectorFromTile(MAP* map, VECTOR* v, TILE* tile);
+
+	VECTOR* mapGetVector2DFromVector3D(MAP* map, VECTOR* v, VECTOR* v2d);
+
+	TILE* mapGetTileFromVector(MAP* map, VECTOR* v);
+
+	BMAP* mapGetBitmap(MAP* map);
+
+	/////////////////////////////////////////////////
+	// more available functions
 
 	JPSPATH *jpsPathCreate(int maxLength);
 
-	MAP *mapCreate(int sizeX, int sizeY);
-
 	// randomly generate a dummy map
 	void mapFillTest(MAP* map);
-
-	TILE* mapTileGet(MAP* map, int x, int y);
 
 	int mapTraceDo(MAP* map, int *posFrom, int *posTo, int mode);
 
@@ -191,11 +200,6 @@
 
 	void presetsInit();
 
-	VECTOR* mapGetVectorFromTile(MAP* map, VECTOR* v, TILE* tile);
-
-	VECTOR* mapGetVector2DFromVector3D(MAP* map, VECTOR* v, VECTOR* v2d);
-
-	TILE* mapGetTileFromVector(MAP* map, VECTOR* v);
 
 	void mapUpdateUnits(MAP* map);
 
@@ -221,7 +225,9 @@
 
 	void unitInitializeFromPreset(UNIT *unit, int presetID);
 
-	UNIT* unitCreate(int playerID, int presetID, VECTOR* pos2d);
+	UNIT* jpsUnitCreate(int playerID, int unitType, ENTITY* ent);
+	
+	void jpsUnitDestroy(UNIT* unit);
 
 	void unitSetTargetFromTile(MAP* map, UNIT* unit, TILE* targetTile);
 
@@ -229,7 +235,6 @@
 
 	void mapSaveToFile(MAP* map, char* filename);
 
-	MAP* mapLoadFromFile(char* filename);
 
 	///////////////////////////////
 	// jps.h
