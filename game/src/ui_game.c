@@ -239,23 +239,26 @@ void ui_game_update()
 	scale_factor_x = screen_size.x / 1920;
 	scale_factor_y = screen_size.y / 1080;
 
-	BMAP* bmp = mapGetBitmap(NULL);
-	if(bmp)
+	if(key_m)
 	{
-		int size = 4;
-		draw_quad(bmp,vector(000,0,0),NULL,NULL,vector(size,size,0),NULL,100,0);
-		int unitDrawSize = 4;
-		int currentPlayer;
-		for(currentPlayer = 0; currentPlayer < MAX_PLAYERS; currentPlayer++)
+		BMAP* bmp = mapGetBitmap(NULL);
+		if(bmp)
 		{
-			UNIT *unit = mapCurrent.unitFirst[currentPlayer];
-			while(unit)
+			int size = 4;
+			draw_quad(bmp,vector(000,0,0),NULL,NULL,vector(size,size,0),NULL,100,0);
+			int unitDrawSize = 4;
+			int currentPlayer;
+			for(currentPlayer = 0; currentPlayer < MAX_PLAYERS; currentPlayer++)
 			{
-				if(unit->isActive)
+				UNIT *unit = mapCurrent.unitFirst[currentPlayer];
+				while(unit)
 				{
-					draw_quad(NULL,vector(unit->pos2d.x*size-unitDrawSize/2,unit->pos2d.y*size-unitDrawSize/2,0),NULL,vector(4,4,0),NULL,COLOR_RED,50,0);
+					if(unit->isActive)
+					{
+						draw_quad(NULL,vector(unit->pos2d.x*size-unitDrawSize/2,unit->pos2d.y*size-unitDrawSize/2,0),NULL,vector(4,4,0),NULL,COLOR_RED,50,0);
+					}
+					unit = unit->next;
 				}
-				unit = unit->next;
 			}
 		}
 	}
@@ -346,11 +349,11 @@ void ui_game_update()
 				ui_radial_counter->skill_y = ent;
 				a_dummy_var = spawner_getQueue(ent);
 				
-//				var sp = spawner_getProgress(ent);
-//				
-//				ui_radial_counter->red = 128 + 128 * sp;
-//				ui_radial_counter->green = 128 + 128 * sp;
-//				ui_radial_counter->blue = 128 + 128 * sp;
+				//				var sp = spawner_getProgress(ent);
+				//				
+				//				ui_radial_counter->red = 128 + 128 * sp;
+				//				ui_radial_counter->green = 128 + 128 * sp;
+				//				ui_radial_counter->blue = 128 + 128 * sp;
 			}
 		}
 	}
@@ -563,7 +566,7 @@ void ui_game_after_all()
 {
 	ENTITY * ent = ui_radial_counter->skill_y;
 	if(ent)
-		progressbar_radial_render(ui_radial_progress, 100 - 100 * spawner_getProgress(ent), vector(0, 1, 0), 80);
+	progressbar_radial_render(ui_radial_progress, 100 - 100 * spawner_getProgress(ent), vector(0, 1, 0), 80);
 	
 	DEBUG_BMAP(ui_radial_progress, 16, 1);
 }

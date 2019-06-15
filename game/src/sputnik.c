@@ -60,7 +60,7 @@ void SPUTNIK__wait_or_walk(ENTITY * ptr)
 	UNIT* unit = jpsUnitGetFromEntity(ptr);
 	if(!unit) return;
 	
-	MAP* map = mapGetCurrent();
+	/*MAP* map = mapGetCurrent();
 	JPSPATH *jpsPath = unit->jpsPath;
 	if(jpsPath && unit->tile)
 	{
@@ -78,7 +78,7 @@ void SPUTNIK__wait_or_walk(ENTITY * ptr)
 				draw_line3D2(vPrev, vNext, COLOR_GREEN, 75);
 			}
 		}
-	}
+	}*/
 	
 	
 	vec_set(ptr->x, unit->pos3d);
