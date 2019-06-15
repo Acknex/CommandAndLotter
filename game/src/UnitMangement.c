@@ -13,7 +13,7 @@ var CamFPS;
 #include "effects2d.h"
 
 #ifdef DebugMode
-    var test1; //für debugzwecke
+    var test1; //f?r debugzwecke
     var test2;
     var test3;
     var test4;
@@ -175,7 +175,7 @@ function CheckIsLeftFrom(VECTOR* Base, VECTOR* V1, VECTOR * V2)
     }
 }
 
-#define SEL_AMBIENT 255
+#define SEL_AMBIENT 40
 
 function DeselectUnit(ENTITY * ent)
 {
@@ -256,7 +256,7 @@ var MouseRightLast = 0;
 
 
 function SetDestForSelectd(VECTOR * Dest)
-{ 
+{
     int Count = 0;
     ENTITY * ent;
     for(ent = ent_next(NULL); ent != NULL; ent = ent_next(ent)){
@@ -339,7 +339,7 @@ function NumberKeyPressed(int nr)
             }
         }
     }
-    if(!key_ctrl && key_alt && count){//Gruppe mit Alt-Ausgewählt die auch Units enthält
+    if(!key_ctrl && key_alt && count){//Gruppe mit Alt-Ausgew?hlt die auch Units enth?lt
         x /= count;
         y /= count;
         topdown_camera_set_pos(vector(x,y,0));
@@ -417,7 +417,7 @@ function UnitControl()
             }
         }
         VECTOR Dest;
-        PosToMap(Dest,mouse_pos.x,mouse_pos.y);                            
+        PosToMap(Dest,mouse_pos.x,mouse_pos.y);
         if(SetDestForSelectd(Dest) > 0){
             effects2d_spawn(Dest, CmdType);
         }

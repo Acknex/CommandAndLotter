@@ -13,6 +13,7 @@
 #include <color>
 
 Texture entSkin1;
+float fAmbient;
 sampler sColorTex = sampler_state { Texture = <entSkin1>; MipFilter = Linear; };
 
 //////////////////////////////////////////////////////////////////////
@@ -37,7 +38,7 @@ out_vertex_main vs_building_main(
 
 float4 ps_building_main(out_vertex_main In) : COLOR
 {
-    float4 color = tex2D(sColorTex, In.TexCoord);
+    float4 color = tex2D(sColorTex, In.TexCoord) * (fAmbient + 1.0f) * vecColor * 2.0f;
     return color;
 }
 
