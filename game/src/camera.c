@@ -1,19 +1,31 @@
 
 #include "camera.h"
 
+var topdown_camera_height;
+VECTOR topdown_camera_center;
+var topdown_camera_rotation;
+
+
+
+
 void topdown_camera_open() 
 {
 	camera.z = 3000;
 	camera.tilt = -70;
 	topdown_camera_height = 4;
+	topdown_camera_rotation = 0;
 	
 	vec_set(&topdown_camera_center, nullvector);
 }
 
 void topdown_camera_update() 
 {
-	if(key_p)
-		topdown_camera_set_pos(nullvector);
+	//if(key_p)
+	//	topdown_camera_set_pos(nullvector);
+		
+	if(mouse_middle)
+		topdown_camera_rotation += CAMERA_ROTATIONSPEED * mickey.x / screen_size.x;
+	camera.pan = topdown_camera_rotation;
 	
 #ifdef DEBUG
 	if(def_camera == 0)
