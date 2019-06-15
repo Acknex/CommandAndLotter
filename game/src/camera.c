@@ -21,17 +21,17 @@ void topdown_camera_open()
 
 void topdown_camera_update() 
 {
-	//if(key_p)
-	//	topdown_camera_set_pos(nullvector);
-		
-	if(mouse_middle)
-		topdown_camera_rotation += CAMERA_ROTATIONSPEED * mickey.x / screen_size.x;
-	camera.pan = topdown_camera_rotation;
-	
 #ifdef DEBUG
 	if(def_camera == 0)
 #endif
 	{
+	//if(key_p)
+	//	topdown_camera_set_pos(nullvector);
+		
+		if(mouse_middle)
+			topdown_camera_rotation += CAMERA_ROTATIONSPEED * mickey.x / screen_size.x;
+		camera.pan = topdown_camera_rotation;
+	
 		bool _left = (mouse_pos.y<CAMERA_MOVEBORDER);
 		bool _right = ((screen_size.y-mouse_pos.y)<CAMERA_MOVEBORDER);
 		bool _up = (mouse_pos.x<CAMERA_MOVEBORDER);
