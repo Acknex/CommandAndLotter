@@ -5,6 +5,7 @@
 #include "particle.h"
 #include "map_loader.h"
 #include "unit.h"
+#include "fow.h"
 
 #define SPAWNER_QUEUE skill21
 #define SPAWNER_PROGRESS skill22
@@ -42,6 +43,9 @@
 #define SPAWNER_MAXFIRE 40
 #define SPAWNER_MAXDEBRIS 5
 #define SPAWNER_MAXSMOKE 90
+#define SPAWNER_LOS 2000
+
+#define SPAWNER_LOS 2000
 
 MATERIAL * building_wireframe_material =
 {
@@ -69,6 +73,7 @@ ENTITY* spawner_spawn(int spawnertype, VECTOR* pos, var owner)
 
 	if (ent != NULL)
 	{
+		fov_uncover(pos, SPAWNER_LOS);
 		ent->SPAWNER_UNITTYPE = spawnertype;
 		if (owner == SPAWNER_ENEMY)
 			ent->group = GROUP_ENEMY_SPAWNER;

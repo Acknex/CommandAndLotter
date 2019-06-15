@@ -69,6 +69,7 @@ void framework_init()
     // settings_register_signal(framework_update_settings);
 
     max_entities = 5000;
+    max_particles = 500000;
     particle_mode = 8;
     collision_mode = 2;
     preload_mode = 3; // preload a lot
@@ -136,6 +137,8 @@ void framework_capture_mouse()
     GetWindowRect(hWnd, &rect);
     SetCursorPos((rect.left + rect.right) / 2, (rect.top + rect.bottom) / 2);
 }
+
+var progress = 0;
 
 //! Aktualisiert alles.
 void framework_update()

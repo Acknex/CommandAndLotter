@@ -39,6 +39,7 @@ SOURCES += \
   src/map_loader.c \
   src/UnitMangement.c \
   src/music_player.c \
+  src/progressbars.c \
   src/scan.c \
   src/sputnik.c \
   src/stub.c \
@@ -78,6 +79,7 @@ HEADERS += \
   src/map_loader.h \
   src/UnitMangement.h \
   src/music_player.h \
+  src/progressbars.h \
   src/scan.h \
   src/sputnik.h \
   src/stub.h \
@@ -106,4 +108,5 @@ HEADERS += \
 
 DISTFILES += \
   main.wdl \
+  shaders/progress-radial.fx \
   shaders/water.fx

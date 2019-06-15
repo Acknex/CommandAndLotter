@@ -82,9 +82,10 @@
 		int presetID;
 		int playerID;
 		int isActive;
+		int isMoving;
 		int HP;
 		int speed;
-		VECTOR pos2d, pos3d;
+		VECTOR pos2d, pos3d, prevPos3d;
 		VECTOR target2d, prevTarget2d, currentTarget2d;
 		ENTITY* ent;
 		TILE* tile;
