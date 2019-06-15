@@ -245,7 +245,7 @@ void SPUTNIK__walk(ENTITY* ptr)
 	{
 		ptr->SPUTNIK_DIDATTACK = 0;
 		ptr->SPUTNIK_ANIMSTATEATK = 0;
-		ptr->SPUTNIK_ANIMSTATE += ptr->SPUTNIK_RUNSPEED * time_step;
+		ptr->SPUTNIK_ANIMSTATE += 10 * ptr->SPUTNIK_RUNSPEED * time_step;
 		ent_animate(ptr, SPUTNIK_WALKANIM, ptr->SPUTNIK_ANIMSTATE, ANM_CYCLE);		
 	}
 }
