@@ -1,3 +1,5 @@
+#include "mainmenu.c"
+
 #ifndef MATERIALS_H
 #define MATERIALS_H
 
@@ -151,6 +153,7 @@ void updateRenderTargetsIfNeeded()
     if(AmazingRendertargetCounter == 1)
     {
         materials_reinit();
+        mainmenu_resolution_update();
     }
 
     AmazingRendertargetCounter = 0;
