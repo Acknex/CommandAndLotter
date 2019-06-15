@@ -2,6 +2,7 @@
 #include "unit.h"
 #include "spawner.h"
 #include "progressbars.h"
+#include "building.h"
 
 void ui_spawn_event_sputnik(var num, PANEL *panel)
 {
@@ -17,6 +18,11 @@ void ui_destroy_event_sputnik(var num, PANEL *panel)
 	if (!ent) { return; } // NOOOO
 	ent->HEALTH = 0;
 	ent->ENTITY_STATE = 4;
+}
+
+void ui_place_building(var num, PANEL *panel)
+{
+	buildingPlacement_beginConstruction(num - 2);
 }
 
 void ui_show_commando_groups()
@@ -166,6 +172,10 @@ void ui_game_init()
 	pan_setdigits(ui_radial_counter, 0, bmap_width(ui_radial_n) / 2, bmap_height(ui_radial_n) / 2 , "%.0f", ui_hud_font, 1, &a_dummy_var);
 	
 	pan_setbutton(ui_game_menu, 0, 0, 1, 151, ui_hide_button_p, ui_hide_button_n, ui_hide_button_o, ui_hide_button_n, ui_show_commando_groups, NULL, NULL);
+	pan_setbutton(ui_game_menu, 0, 0, 15, 134, ui_icon_blank, ui_icon_blank, ui_icon_blank, ui_icon_blank, ui_place_building, NULL, NULL);
+	pan_setbutton(ui_game_menu, 0, 0, 15, 242, ui_icon_blank, ui_icon_blank, ui_icon_blank, ui_icon_blank, ui_place_building, NULL, NULL);
+	pan_setbutton(ui_game_menu, 0, 0, 15, 350, ui_icon_blank, ui_icon_blank, ui_icon_blank, ui_icon_blank, ui_place_building, NULL, NULL);
+	pan_setbutton(ui_game_menu, 0, 0, 15, 458, ui_icon_blank, ui_icon_blank, ui_icon_blank, ui_icon_blank, ui_place_building, NULL, NULL);
 	
 	ui_bmap_cbabe[0] = bmap_create("CbFace1.png");
 	ui_bmap_cbabe[1] = bmap_create("CbFace2.png");
@@ -235,26 +245,26 @@ void ui_game_update()
 	scale_factor_x = screen_size.x / 1920;
 	scale_factor_y = screen_size.y / 1080;
 
-	BMAP* bmp = mapGetBitmap(NULL);
-	if(bmp)
-	{
-		int size = 4;
-		draw_quad(bmp,vector(000,0,0),NULL,NULL,vector(size,size,0),NULL,100,0);
-		int unitDrawSize = 4;
-		int currentPlayer;
-		for(currentPlayer = 0; currentPlayer < MAX_PLAYERS; currentPlayer++)
-		{
-			UNIT *unit = mapCurrent.unitFirst[currentPlayer];
-			while(unit)
-			{
-				if(unit->isActive)
-				{
-					draw_quad(NULL,vector(unit->pos2d.x*size-unitDrawSize/2,unit->pos2d.y*size-unitDrawSize/2,0),NULL,vector(4,4,0),NULL,COLOR_RED,50,0);
-				}
-				unit = unit->next;
-			}
-		}
-	}
+//	BMAP* bmp = mapGetBitmap(NULL);
+//	if(bmp)
+//	{
+//		int size = 4;
+//		draw_quad(bmp,vector(000,0,0),NULL,NULL,vector(size,size,0),NULL,100,0);
+//		int unitDrawSize = 4;
+//		int currentPlayer;
+//		for(currentPlayer = 0; currentPlayer < MAX_PLAYERS; currentPlayer++)
+//		{
+//			UNIT *unit = mapCurrent.unitFirst[currentPlayer];
+//			while(unit)
+//			{
+//				if(unit->isActive)
+//				{
+//					draw_quad(NULL,vector(unit->pos2d.x*size-unitDrawSize/2,unit->pos2d.y*size-unitDrawSize/2,0),NULL,vector(4,4,0),NULL,COLOR_RED,50,0);
+//				}
+//				unit = unit->next;
+//			}
+//		}
+//	}
 	
 	var scale_factor_x = screen_size.x / 1920;
 	var scale_factor_y = screen_size.y / 1080;
@@ -299,6 +309,9 @@ void ui_game_update()
 	}
 	
 	ui_unit_meta->pos_y = screen_size.y - bmap_height(ui_bmap_units) * scale_factor_x - 3;
+	
+	
+	
 	
 	int ui_max_type = 0;
 	
@@ -377,8 +390,7 @@ void ui_game_update()
 	
 	VECTOR screen;
 	
-	a_stupid_var += 1;
-	a_stupid_var %= 40000;
+	a_stupid_var = z_get();
 	
 	if( last_building != ui_active_building)
 	{

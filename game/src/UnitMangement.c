@@ -8,6 +8,7 @@ var CamFPS;
 #include "map_loader.h"
 #include "camera.h"
 #include "global.h"
+#include "unit.h"
 
 #ifdef DebugMode
     var test1; //für debugzwecke
@@ -262,8 +263,16 @@ function SetDestForSelectd(VECTOR * Dest)
     }
 }
 
-VECTOR UnitTempVec;
 
+function SetVictimForSelectd(ENTITY * Victim)
+{
+    ENTITY * ent;
+    for(ent = ent_next(NULL); ent != NULL; ent = ent_next(ent)){
+        if(ent->group==GROUP_PLAYER_UNIT && ent.SELCTED_SKILL){
+            unit_setVictim(ent, Victim);
+        }
+    }
+}
 
 
 function DebugDrawDests()
@@ -339,15 +348,19 @@ function UnitControl()
         if(MouseLeftLast == 0){
             if(!key_shiftl){
                 DeselectAllOfGroup(GROUP_PLAYER_UNIT);
+               // DeselectAllOfGroup(GROUP_PLAYER_SPAWNER);
+
+                //DeselectAllOfGroup(GROUP_ENEMY_SPAWNER);
             }
+            DeselectAllOfGroup(GROUP_ENEMY_UNIT);
             DeselectAllOfSubsystem(SUBSYSTEM_SPAWNER);
 
             if(mouse_panel == 0){
                 vec_set(temp, vector(mouse_pos.x,mouse_pos.y, camera.clip_far));
                 vec_for_screen(temp,camera);
-                c_trace(camera.x, temp,USE_POLYGON | IGNORE_PASSENTS);
+                c_trace(camera.x, temp,USE_POLYGON | IGNORE_PASSENTS | IGNORE_SPRITES);
                 if(you != 0){
-                     if(you->group==GROUP_PLAYER_UNIT || you->group==GROUP_PLAYER_SPAWNER){
+                     if(you->group==GROUP_PLAYER_UNIT || you->group==GROUP_PLAYER_SPAWNER || you->group==GROUP_ENEMY_UNIT || you->group==GROUP_ENEMY_SPAWNER){
                         SelectUnit(you);
                     }
                 }
@@ -371,8 +384,19 @@ function UnitControl()
     }
     if(mouse_right && !MouseRightLast){
 
+        if(mouse_panel == 0){
+            vec_set(temp, vector(mouse_pos.x,mouse_pos.y, camera.clip_far));
+            vec_for_screen(temp,camera);
+            c_trace(camera.x, temp,USE_POLYGON | IGNORE_PASSENTS);
+            if(you != 0){
+                 if(you->group==GROUP_ENEMY_UNIT  || you->group == GROUP_ENEMY_SPAWNER){
+                    SetVictimForSelectd(you);
+                }
+            }
+        }
+
         VECTOR Dest;
-        PosToMap(Dest,mouse_pos.x,mouse_pos.y);
+        PosToMap(Dest,mouse_pos.x,mouse_pos.y);                            
         SetDestForSelectd(Dest);
     }
 

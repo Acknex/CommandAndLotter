@@ -102,6 +102,14 @@ void draw_line3D2(VECTOR* vFrom, VECTOR* vTo, COLOR* color, var alpha)
 
 ///////////////////////////////
 
+
+UNIT* jpsAllowMovementForEntity(ENTITY* ptr, int allow)
+{
+	UNIT* unit = jpsUnitGetFromEntity(ptr);
+	unit->allowMovement = allow;
+	return unit;
+}
+
 JPSPATH *jpsPathCreate(int maxLength)
 {
 	JPSPATH *jpsPath = (JPSPATH*)sys_malloc(sizeof(JPSPATH));
@@ -1045,9 +1053,9 @@ void mapMoveUnits(MAP* map)
 		{
 			UNIT* next = unit->next;
 			UNIT_PRESET* unitPreset = &unitPresets[unit->presetID];
-			if(unit->isActive)
-			{
 				vec_set(unit->prevPos3d, unit->pos3d);
+			if(unit->allowMovement) //unit->isActive)
+			{
 				unitMove(map, unit);
 				mapGetVector3DFromVector2D(map, unit->pos3d, unit->pos2d);
 				unit->isMoving = (abs(unit->pos3d.x-unit->prevPos3d.x) > 0.025 || abs(unit->pos3d.y-unit->prevPos3d.y) > 0.025);
@@ -1056,10 +1064,14 @@ void mapMoveUnits(MAP* map)
 			}
 			else
 			{
+				unit->isMoving = 0;
+			}
+			/*else
+			{
 				if(prev) prev->next = next;
 				else map->unitFirst[currentPlayer] = next;
 				sys_free(unit);
-			}
+			}*/
 			unit = next;
 		}
 	}
@@ -1192,11 +1204,15 @@ MAP* jpsMapLoadFromFile(char* filename)
 	mapJPSUpdate(map);
 	mapUpdateBmap(map);
 	
-	entJPSDummyPlane = ent_create("jpsPlane.mdl", vector(0,0,500), NULL);
-	set(entJPSDummyPlane, PASSABLE | TRANSLUCENT);
-	ent_setskin(entJPSDummyPlane, map->bmp, 1);
-	vec_set(entJPSDummyPlane->scale_x, vector(sizeX/64.0*tileSize, sizeY/64.0*tileSize, 0));
-	entJPSDummyPlane->material = jpsDummyNoFilter_mat;
+	if(0)
+	{
+		entJPSDummyPlane = ent_create("jpsPlane.mdl", vector(0,0,500), NULL);
+		set(entJPSDummyPlane, PASSABLE | TRANSLUCENT);
+		entJPSDummyPlane.flags2 |= UNTOUCHABLE;
+		ent_setskin(entJPSDummyPlane, map->bmp, 1);
+		vec_set(entJPSDummyPlane->scale_x, vector(sizeX/64.0*tileSize, sizeY/64.0*tileSize, 0));
+		entJPSDummyPlane->material = jpsDummyNoFilter_mat;
+	}
 	
 	return map;
 }
