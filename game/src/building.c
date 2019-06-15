@@ -3,7 +3,6 @@
 #include "global.h"
 #include "framework.h"
 #include "spawner.h"
-#include "enemy_hit.h"
 #include "jps.h"
 
 ENTITY *buildingPlacement_previewModel;

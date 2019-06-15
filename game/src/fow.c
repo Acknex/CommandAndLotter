@@ -15,8 +15,13 @@ void FogEvent(PARTICLE *p)
 	MAP *map = mapGetCurrent();
 	TILE *tile = mapGetTileFromVector(map, vector(p->skill_a, p->skill_b, 0));
 	
-    if(tile->visibility == FOW_SCOUTED)
-        p.lifespan = 0;
+    if(tile->visibility == FOW_SCOUTED) 
+    {
+    	p->alpha -= 10*time_step;
+    	if(p->alpha <= 0)
+    		p.lifespan = 0;
+	}
+        
 }
 
 void Fog(PARTICLE *p)
@@ -56,7 +61,7 @@ void fow_open()
 			
 			VECTOR pos;
 			mapGetVectorFromTile(map, &pos, tile);
-			pos.z = 1000;
+			pos.z = 550;
 			
 			
 			tile->visibility = FOW_HIDDEN;
@@ -109,6 +114,7 @@ void fow_update()
 		}
 	}
 	fow_calcoffset++;
+	fow_calcoffset = fow_calcoffset%fow_calcoffsetMAX;
 	
 	/*
 	fow_updatedelay += time_step;
