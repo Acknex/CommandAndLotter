@@ -40,8 +40,9 @@ void Sputnik()
 	my->SPUTNIK_TURNSPEED = 50;
 	my->SPUTNIK_ATTACKSPEED = 5;
 	my->SPUTNIK_ATTACKRANGE = 300;
-	my->SPUTNIK_ANIMSTATEATK = 100;
+	my->SPUTNIK_ANIMSTATEATK = 0;
 	my->HEALTH = 23;//HEALTH_SPUTNIK; TODO HOOK TO UNIT SYSTEM
+	my->MAXHEALTH = 23;//HEALTH_SPUTNIK; TODO HOOK TO UNIT SYSTEM
 	ENEMY_HIT_init(my);
 	vec_scale(&my->scale_x, 1.2);
 	set(my, SHADOW);
@@ -189,6 +190,7 @@ void SPUTNIK__walk(ENTITY* ptr)
 
 void SPUTNIK__attack(ENTITY* ptr)
 {
+	ANG_turnToPos(ptr, unit_getTarget(ptr), ptr->SPUTNIK_TURNSPEED, 5);
 	if (ptr->SPUTNIK_ANIMSTATEATK == 0)
 	{
 		switch(integer(random(2)))
