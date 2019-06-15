@@ -138,6 +138,8 @@ void framework_capture_mouse()
     SetCursorPos((rect.left + rect.right) / 2, (rect.top + rect.bottom) / 2);
 }
 
+var progress = 0;
+
 //! Aktualisiert alles.
 void framework_update()
 {

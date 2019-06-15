@@ -52,3 +52,4 @@ function main()
 #include "building.c"
 #include "jps.c"
 #include "fow.c"
+#include "progressbars.c"
