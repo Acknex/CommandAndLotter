@@ -179,10 +179,11 @@ void maploader_load(char const * fileName)
     effect_load(maploader_material, "terrain.fx");
     maploader.terrain.material = maploader_material;
 
+    random_seed(1337);
     for(x = 0; x < maploader.w; x++)
-	{
-		for(y = 0; y < maploader.h; y++)
-		{
+    {
+        for(y = 0; y < maploader.h; y++)
+        {
             if(random(100) < 50)
                 continue;
             float v = maploader_tile_vegetation(x, y);
