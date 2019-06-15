@@ -1,6 +1,14 @@
 #include "ui_game.h"
 #include "unit.h"
 
+void ui_spawn_event_cbabe(var num, PANEL *panel)
+{
+	ENTITY *ent = panel->skill_y;
+	if (!ent) { return; } // NOOOO
+	spawner_produce(ent);
+	ent->skill[39] = 1;
+}
+
 void ui_show_commando_groups()
 {
 	ui_command_group_status = !ui_command_group_status;
@@ -32,7 +40,6 @@ void ui_scale_radial(PANEL *rad, var scale)
 
 void ui_orbit_radial(PANEL *rad, int x, int y, var angle, var dist)
 {
-	
 	VECTOR res;
 	rad->pos_x = x + sinv(angle) * dist;
 	rad->pos_y = y + cosv(angle) * dist;
@@ -74,10 +81,10 @@ PANEL* ui_create_radial_button(BMAP *initial_icon)
 	rad->size_x = bmap_width(ui_radial_n);
 	rad->size_y = bmap_height(ui_radial_n);
 	
+	pan_setbutton(rad, 0, 0, 0, 0, ui_radial_o, ui_radial_n, ui_radial_o, ui_radial_n, ui_spawn_event_cbabe, NULL, NULL);
+	
 	rad->scale_x = scale_factor_x;
 	rad->scale_y = scale_factor_x;
-	
-	pan_setbutton(rad, 0, 0, 0, 0, ui_radial_o, ui_radial_n, ui_radial_o, ui_radial_n, NULL, NULL, NULL);
 	
 	PANEL *icon = pan_create("", 3);
 	icon->bmap = initial_icon;
@@ -87,10 +94,8 @@ PANEL* ui_create_radial_button(BMAP *initial_icon)
 	
 	
 	rad->skill_x = handle(icon);
-	ui_repos_radial(rad, 500, 500);
 	return rad;
 }
-
 
 void update_or_create_lifebar(ENTITY *ent)
 {
@@ -101,7 +106,6 @@ void update_or_create_lifebar(ENTITY *ent)
 	vec_set(sc, ent.x);
 	vec_to_screen(sc, camera);
 	vec_sub(sc, vector(15, 35, 0));
-	
 	
 	var p1 = 30 * (1 - fac);
 	var p2 = 30 * fac;
@@ -121,7 +125,8 @@ void update_or_create_lifebar(ENTITY *ent)
 	ui_life_indicator[ui_lifebar_counter]->skill_x = handle(ent);
 	ui_life_indicator[ui_lifebar_counter]->pos_x = sc.x;
 	ui_life_indicator[ui_lifebar_counter]->pos_y = sc.y;
-	ui_life_indicator[ui_lifebar_counter]->flags |= (SHOW | UNTOUCHABLE);
+	ui_life_indicator[ui_lifebar_counter]->alpha = 60;
+	ui_life_indicator[ui_lifebar_counter]->flags |= (SHOW | UNTOUCHABLE | TRANSLUCENT);
 	
 	ui_lifebar_counter++;
 }
@@ -146,6 +151,11 @@ void ui_game_init()
 	ui_minimap = pan_create("", 99);
 	
 	ui_radial_counter->bmap = ui_radial_n;
+	ui_radial_counter->flags = CENTER_X | CENTER_Y | UNTOUCHABLE | LIGHT;
+	ui_radial_counter->red = 128;
+	ui_radial_counter->green = 128;
+	ui_radial_counter->blue = 128;
+	pan_setdigits(ui_radial_counter, 0, bmap_width(ui_radial_n) / 2, bmap_height(ui_radial_n) / 2 , "%.0f", ui_hud_font, 1, &a_dummy_var);
 	
 	pan_setbutton(ui_game_menu, 0, 0, 1, 151, ui_hide_button_p, ui_hide_button_n, ui_hide_button_o, ui_hide_button_n, ui_show_commando_groups, NULL, NULL);
 	
@@ -284,11 +294,6 @@ void ui_game_update()
 				ui_count_sputniks++;
 			}
 			update_or_create_lifebar(ent);
-			
-			int i; for(i = 0; i < ui_lifebar_counter; i++)
-			{
-				
-			}
 		}
 	}
 	
@@ -300,6 +305,26 @@ void ui_game_update()
 			{
 				ui_has_building = 1;
 				ui_active_building = ent;
+				
+				if(!ent->MAXHEALTH || !ent->HEALTH)
+				{
+					ent->MAXHEALTH = 100;
+					ent->HEALTH = integer(random(100));
+				}
+				
+				update_or_create_lifebar(ent);
+				
+				ui_radial_cbabe->skill_y = ent;
+				ui_radial_delete->skill_y = ent;
+				a_dummy_var = spawner_getQueue(ent);
+				
+				var sp = spawner_getProgress(ent);
+				
+				ui_radial_counter->red = 128 + 128 * sp;
+				ui_radial_counter->green = 128 + 128 * sp;
+				ui_radial_counter->blue = 128 + 128 * sp;
+				
+				draw_text(str_for_num(NULL, sp), 0, 0, COLOR_GREEN);
 			}
 		}
 	}
@@ -412,6 +437,8 @@ void ui_game_update()
 		ui_orbit_radial(ui_radial_cbabe,screen.x, screen.y, 270, 200);
 		ui_orbit_radial(ui_radial_delete,screen.x, screen.y, 230, 200);
 		ui_orbit_radial(ui_radial_counter,screen.x, screen.y, 190, 200);
+		
+		
 		
 		ui_show_radial(ui_radial_cbabe);
 		ui_scale_radial(ui_radial_cbabe, 0.1);
