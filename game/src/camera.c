@@ -10,7 +10,7 @@ void topdown_camera_open() {
 }
 
 void topdown_camera_update() {
-
+#ifndef DEBUG
 	bool _left = (mouse_pos.y<CAMERA_MOVEBORDER);
 	bool _right = ((screen_size.y-mouse_pos.y)<CAMERA_MOVEBORDER);
 	bool _up = (mouse_pos.x<CAMERA_MOVEBORDER);
@@ -32,4 +32,5 @@ void topdown_camera_update() {
 	offset.x = -cosv(camera.tilt)*CAMERA_HEIGHT*topdown_camera_height;
 	
 	vec_set(&camera.x, vec_add(offset, topdown_camera_center));
+#endif
 }
