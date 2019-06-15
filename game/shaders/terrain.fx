@@ -3,8 +3,8 @@ Texture entSkin1;
 
 sampler sMaskTex = sampler_state {
     Texture = <entSkin1>;
-    MipFilter = Linear;
-    MinFilter = Linear;
+    MipFilter = Anisotropic;
+    MinFilter = Anisotropic;
     MagFilter = Linear;
 };
 
@@ -16,14 +16,13 @@ Texture maploader_terrain_street_analogue_bmap;
 Texture maploader_terrain_digital_fancy_bmap;
 Texture shader_noise_bmap;
 
-sampler sDigital = sampler_state { Texture = <maploader_terrain_digital_bmap>; MipFilter = Linear; };
-sampler sAnalog = sampler_state { Texture = <maploader_terrain_analogue_bmap>; MipFilter = Linear; };
-sampler sSplatter = sampler_state { Texture = <maploader_terrain_splatter_bmap>; MipFilter = Linear; };
-sampler sNoise = sampler_state { Texture = <shader_noise_bmap>; MipFilter = Linear; };
-sampler sStreetDigital = sampler_state { Texture = <maploader_terrain_street_digital_bmap>; MipFilter = Linear; };
-sampler sStreetAnalog = sampler_state { Texture = <maploader_terrain_street_analogue_bmap>; MipFilter = Linear; };
-sampler sDigitalFancy = sampler_state { Texture = <maploader_terrain_digital_fancy_bmap>; MipFilter = Linear; };
-
+sampler sDigital = sampler_state { Texture = <maploader_terrain_digital_bmap>; MipFilter = Anisotropic; MinFilter = Anisotropic; MagFilter = Linear; };
+sampler sAnalog = sampler_state { Texture = <maploader_terrain_analogue_bmap>; MipFilter = Anisotropic; MinFilter = Anisotropic; MagFilter = Linear; };
+sampler sSplatter = sampler_state { Texture = <maploader_terrain_splatter_bmap>; MipFilter = Anisotropic; MinFilter = Anisotropic; MagFilter = Linear; };
+sampler sNoise = sampler_state { Texture = <shader_noise_bmap>; MipFilter = Anisotropic; MinFilter = Anisotropic; MagFilter = Linear; };
+sampler sStreetDigital = sampler_state { Texture = <maploader_terrain_street_digital_bmap>; MipFilter = Anisotropic; MinFilter = Anisotropic; MagFilter = Linear; };
+sampler sStreetAnalog = sampler_state { Texture = <maploader_terrain_street_analogue_bmap>; MipFilter = Anisotropic; MinFilter = Anisotropic; MagFilter = Linear; };
+sampler sDigitalFancy = sampler_state { Texture = <maploader_terrain_digital_fancy_bmap>; MipFilter = Anisotropic; MinFilter = Anisotropic; MagFilter = Linear; };
 
 float4x4 matWorld;
 float4x4 matWorldViewProj;
