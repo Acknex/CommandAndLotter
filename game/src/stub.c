@@ -1,8 +1,10 @@
 #include "unit.h"
+#include "spawner.h"
 
 VECTOR mousevec;
 int mouseupdate = 0;
 ENTITY* fancysputnik;
+ENTITY* fancytower;
 ENTITY* fancytarget;
 int stubtoggle = 0;
 
@@ -26,6 +28,7 @@ void stub_init()
 	on_mouse_left = setmousepos;
 	fancysputnik = unit_spawn(0, vector(0,0,500), UNIT_PLAYER);
 	fancytarget = ent_create(SPHERE_MDL, vector(100,100,500), NULL);
+	fancytower = spawner_spawn(0, vector(100,1000,500), SPAWNER_PLAYER);
 	vec_scale (&fancytarget->scale_x, 5);	
 }
 

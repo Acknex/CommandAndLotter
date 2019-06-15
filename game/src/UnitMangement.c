@@ -1,8 +1,4 @@
 
-#define SELCTED_SKILL skill[39]
-#define UNIT_DEST_SKILL skill[40]
-#define UNIT_GROUP_SKILL skill[43]
-
 #define DebugMode
 
 var CamFPS;
@@ -224,7 +220,6 @@ function MarkUnits()
     ENTITY * ent;
 
     SUBSYSTEM_LOOP(ent, SUBSYSTEM_UNIT_MANAGEMENT){
-
         var isInside = 1;
         for(i = 0; i < 4 && isInside; i++){
             isInside = CheckIsLeftFrom(Posis[i],Posis[(i+1)%4],ent.x);
@@ -286,13 +281,15 @@ function DebugDrawDests()
     }
 }
 
-function DeselectAll()
+function DeselectAllOfSubsystem(int Subsys)
 {
     ENTITY * ent;
-    SUBSYSTEM_LOOP(ent, SUBSYSTEM_UNIT_MANAGEMENT){
+    SUBSYSTEM_LOOP(ent, Subsys){
         DeselectUnit(ent);
     }
 }
+
+
 
 function NumberKeyPressed(int nr)
 {
@@ -320,7 +317,7 @@ function NumberKeyPressed(int nr)
 
         }
     }
-    if(!key_ctrl && key_alt && count){
+    if(!key_ctrl && key_alt && count){//Gruppe mit Alt-Ausgewählt die auch Units enthält
         x /= count;
         y /= count;
         topdown_camera_set_pos(vector(x,y,0));
@@ -336,29 +333,28 @@ function UnitControl()
     if(mouse_left){
         if(MouseLeftLast == 0){
             if(!key_shiftl){
-                DeselectAll();
+                DeselectAllOfSubsystem(SUBSYSTEM_UNIT_MANAGEMENT);
             }
+             DeselectAllOfSubsystem(SUBSYSTEM_SPAWNER);
+
             vec_set(temp, vector(mouse_pos.x,mouse_pos.y, camera.clip_far));
             vec_for_screen(temp,camera);
             c_trace(camera.x, temp,USE_POLYGON);
             if(you != 0){
-                if(you.SK_SUBSYSTEM == SUBSYSTEM_UNIT_MANAGEMENT){
+                if(you.SK_SUBSYSTEM == SUBSYSTEM_UNIT_MANAGEMENT || you.SK_SUBSYSTEM == SUBSYSTEM_SPAWNER){
                     SelectUnit(you);
                 }
             }
 
-            ClickPoint2D_A[0]=mouse_pos.x;
-            ClickPoint2D_A[1]=mouse_pos.y;
-
-            ClickPoint2D_B[0]=mouse_pos.x;
-            ClickPoint2D_B[1]=mouse_pos.y;
+            ClickPoint2D_A[0]= ClickPoint2D_B[0] = mouse_pos.x;
+            ClickPoint2D_A[1]= ClickPoint2D_B[1] = mouse_pos.y;
 
         }else{
             ClickPoint2D_B[0]=mouse_pos.x;
             ClickPoint2D_B[1]=mouse_pos.y;
-            DrawQuadDemo();
         }
-        if(abs(ClickPoint2D_A[0]-ClickPoint2D_B[0])+abs(ClickPoint2D_A[1]-ClickPoint2D_B[1])  >5){
+        if(abs(ClickPoint2D_A[0]-ClickPoint2D_B[0]) > 2 && abs(ClickPoint2D_A[1]-ClickPoint2D_B[1])> 2){
+            DrawQuadDemo();
             MarkUnits();
         }
 

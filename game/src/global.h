@@ -29,6 +29,12 @@ typedef int bool;
 #define ENTITY_ANIM skill56
 #define ENTITY_VICTIM skill57
 
+
+#define SELCTED_SKILL skill[39]
+#define UNIT_DEST_SKILL skill[40]
+#define UNIT_GROUP_SKILL skill[43]
+
+
 //! Markiert die Entity als "TOT" und sorgt dafür, dass sie zu Ende des Frames gelöscht wird.
 #define SK_ENTITY_DEAD skill98
 
@@ -53,9 +59,12 @@ typedef int bool;
 #define SUBSYSTEM_LOOP(ptr,system) for(ptr = ent_next(NULL); ptr != NULL; ptr = ent_next(ptr)) if(ptr->SK_SUBSYSTEM == (system))
 
 /* do not modify unless you really know what you do! */
+#define GROUP_DEFAULT        1
 #define GROUP_PLAYER_UNIT    10
 #define GROUP_PLAYER_SPAWNER 11
 #define GROUP_ENEMY_UNIT     12
 #define GROUP_ENEMY_SPAWNER  13
+
+
 
 #endif // GLOBAL_H

@@ -27,6 +27,64 @@
 #define SPAWNER_BUILDTIME 20
 #define SPAWNER_DIETIME 30
 
+ENTITY* spawner_spawn(int spawnertype, VECTOR* pos, var owner)
+{
+	ENTITY* ent;
+	switch (spawnertype)
+	{
+		case 0:
+			ent = ent_create("the_tower.mdl", pos, Spawner);
+			break;
+	}
+
+	if (ent != NULL)
+	{
+		if (owner == SPAWNER_ENEMY)
+			ent->group = GROUP_ENEMY_SPAWNER;
+		else
+			ent->group = GROUP_PLAYER_SPAWNER;		
+	}
+	
+	return ent;
+}
+
+var spawner_produce(ENTITY* ent)
+{
+	if (ent != NULL)
+	{
+		if (ent->group = GROUP_ENEMY_SPAWNER || ent->group == GROUP_PLAYER_SPAWNER)
+		{
+			ent->SPAWNER_QUEUE++;
+			return ent->SPAWNER_QUEUE;
+		}
+	}
+	return 0;
+}
+
+var spawner_getQueue(ENTITY* ent)
+{
+	if (ent != NULL)
+	{
+		if (ent->group = GROUP_ENEMY_SPAWNER || ent->group == GROUP_PLAYER_SPAWNER)
+		{
+			return ent->SPAWNER_QUEUE;
+		}
+	}
+	return 0;
+}
+
+var spawner_getProgress(ENTITY* ent)
+{
+	if (ent != NULL)
+	{
+		if (ent->group = GROUP_ENEMY_SPAWNER || ent->group == GROUP_PLAYER_SPAWNER)
+		{
+			return 1 - (ent->SPAWNER_BUILDTIMER / SPAWNER_BUILDTIME);
+		}
+	}
+	return 0;
+}
+
 void Spawner()
 {
    framework_setup(my, SUBSYSTEM_SPAWNER);
@@ -65,7 +123,6 @@ void SPAWNER_Update()
       	SPAWNER__hit(ptr);
 		}
 	
-
 		switch(ptr->ENTITY_STATE)    	
 		{
 
@@ -162,6 +219,8 @@ void SPAWNER__active(ENTITY* ptr)
 void SPAWNER__produce(ENTITY* ptr)
 {
 	ptr->SPAWNER_BUILDTIMER -= time_step;
+	var progress = 100 * (1 - (ptr->SPAWNER_BUILDTIMER / SPAWNER_BUILDTIME));
+	ent_animate(ptr, SPAWNER_PRODUCEANIM, progress, 0);
 	
 	if (ptr->SPAWNER_BUILDTIMER <= 0)
 	{
