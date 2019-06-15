@@ -24,6 +24,7 @@
 	};
 	typedef struct _LIST LIST;
 
+	#define MAX_PLAYERS 2
 	#define MAX_UNITS_PER_TILE 16
 	#define MAX_COST 9999 // keep this somewhat low in case var calculations need to be/ are done with it
 	#define TILE_FLAG_JPS (1<<0)
@@ -34,6 +35,7 @@
 		int value;
 		int value2;
 		int flags;
+		int visibility;
 		//int jpsDist[8];
 		int jpsType;
 		int numNeighbors;
@@ -44,7 +46,7 @@
 		int currentCost;
 		int totalCost;
 		LIST *unitList;
-		int numUnits;
+		int numUnits[MAX_PLAYERS];
 		void *unitArray[MAX_UNITS_PER_TILE];
 		struct _TILE *prev;
 	};
@@ -113,7 +115,6 @@
 	};
 	typedef struct _PROJECTILE PROJECTILE;
 	
-	#define MAX_PLAYERS 2
 	struct _MAP
 	{
 		int size[2];
@@ -130,7 +131,7 @@
 	typedef struct _MAP MAP;
 	MAP* mapCurrent = NULL;
 
-ENTITY* entJPSDummyPlane = NULL;
+	ENTITY* entJPSDummyPlane = NULL;
 	/////////////////////////////////////////////////
 
 	#include "console.h"
@@ -211,6 +212,8 @@ ENTITY* entJPSDummyPlane = NULL;
 	LIST* mapGetNearbyUnits_listbased(MAP* map, TILE* sourceTile, int range);
 
 	int mapGetNearbyUnits(MAP* map, TILE* sourceTile, int range);
+	int mapIsAnyUnitNearby(MAP* map, TILE* sourceTile, int range);
+	int mapIsAnyFriendlyUnitNearby(MAP* map, TILE* sourceTile, int range, int playerNumber);
 
 	VECTOR* unitFlockingSpeedGet(MAP* map, UNIT* unit, VECTOR* v);
 
