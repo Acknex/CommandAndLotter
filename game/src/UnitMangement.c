@@ -135,7 +135,7 @@ void UnitMangement_open(){
         for(y = -1500; y < 1500; y+=300){
 
             var z = maploader_get_height(vector(x,y,0));
-            you = ent_create("sputnik.mdl",vector(x,y,z+90),NULL);
+			you = unit_spawn(0, vector(x,y,z+90), !UNIT_ENEMY);
             you.ambient = 0;
             framework_setup(you, SUBSYSTEM_UNIT_MANAGEMENT);
         }

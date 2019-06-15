@@ -1057,7 +1057,7 @@ void mapMoveUnits(MAP* map)
 			if(unit->isActive)
 			{
 				unitMove(map, unit);
-				if(unit->ent) mapGetVector3DFromVector2D(map, unit->ent.x, unit->pos2d);
+				//if(unit->ent) mapGetVector3DFromVector2D(map, unit->ent.x, unit->pos2d);
 				
 				if(unit->HP <= 0 || 1)
 				{

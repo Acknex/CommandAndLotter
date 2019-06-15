@@ -6,6 +6,8 @@ var unit_setTarget(ENTITY* ent, VECTOR* pos)
 	MAP* map = mapGetCurrent();
 	mapGetVector2DFromVector3D(map, target2D, pos);
 	
+	cprintf2("\n unit_setTarget(%p): group(%d)", ent, ent->group);
+	
 	if (ent != NULL)
 	{
 		if (ent->group == GROUP_PLAYER_UNIT || ent->group == GROUP_ENEMY_UNIT)
@@ -60,7 +62,7 @@ ENTITY* unit_spawn(int unittype, VECTOR* pos, var owner)
 	switch (unittype)
 	{
 		case 0:
-			ent = ent_create("sputnik.mdl", vector(0,0,500), Sputnik);
+			ent = ent_create("sputnik.mdl", pos, Sputnik);
 			break;
 		
 		/*case 1:
@@ -83,6 +85,7 @@ ENTITY* unit_spawn(int unittype, VECTOR* pos, var owner)
 			ent->group = GROUP_ENEMY_UNIT;
 		else
 			ent->group = GROUP_PLAYER_UNIT;		
+		cprintf1("\n unit_spawn: ent(%p)", ent);
 	}
 	
 	return ent;
