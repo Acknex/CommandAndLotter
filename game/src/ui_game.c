@@ -230,7 +230,7 @@ void ui_game_update()
 	BMAP* bmp = mapGetBitmap(NULL);
 	if(bmp)
 	{
-		int size = 12;
+		int size = 4;
 		draw_quad(bmp,vector(000,0,0),NULL,NULL,vector(size,size,0),NULL,100,0);
 		int unitDrawSize = 4;
 		int currentPlayer;
