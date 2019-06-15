@@ -65,4 +65,5 @@ HEADERS += \
   src/unit.h
 
 DISTFILES += \
-  main.wdl
+  main.wdl \
+  shaders/water.fx
