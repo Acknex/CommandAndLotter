@@ -5,9 +5,6 @@
 #include "spawner.h"
 #include "enemy_hit.h"
 
-#define BUILDING_TYPE skill[20]
-#define BUILDING_WORK_LEFT skill[21]
-
 char* buildingPlacement_assets[BUILDING_NUMBER];
 char* buildingPlacement_constructionAssets[BUILDING_NUMBER];
 var buildingPlacement_buildtimes[BUILDING_NUMBER];
@@ -38,22 +35,12 @@ void buildingPlacement_movePreview()
 }
 
 
-
-void ConstructionSite()
-{
-   framework_setup(my, SUBSYSTEM_CONSTRUCTION);
-//	ENEMY_HIT_init(my);
-	set(my, SHADOW);
-	c_setminmax(me);
-}
-
-
 void buildingPlacement_beginConstruction(int selection)
 {
 	buildingPlacement_selection = selection;
 	buildingPlacement_previewModel = ent_create(buildingPlacement_constructionAssets[selection], nullvector, NULL);
 	buildingPlacement_previewModel->flags |= TRANSLUCENT;
-	buildingPlacement_previewModel->alpha = 50;
+	buildingPlacement_previewModel->alpha = 70;
 }
 
 void buildingPlacement_endConstruction()
@@ -65,18 +52,9 @@ void buildingPlacement_endConstruction()
 
 void buildingPlacement_placeConstruction()
 {
-	char* asset = buildingPlacement_constructionAssets[buildingPlacement_selection];
-	ENTITY *constructionSite = ent_create(asset, buildingPlacement_previewModel->x, ConstructionSite);
-	constructionSite->BUILDING_TYPE = buildingPlacement_selection;
-	constructionSite->BUILDING_WORK_LEFT = buildingPlacement_buildtimes[buildingPlacement_selection];
+	spawner_spawn(buildingPlacement_selection, &buildingPlacement_previewModel->x, SPAWNER_PLAYER);
 	
 	buildingPlacement_endConstruction();
-}
-
-
-void buildingPlacement_constructionFinished(ENTITY *construction)
-{
-	spawner_spawn(construction->BUILDING_TYPE, &construction->x, SPAWNER_PLAYER);
 }
 
 void buildingPlacement_update()
@@ -94,17 +72,5 @@ void buildingPlacement_update()
 			buildingPlacement_placeConstruction();
 		if(mouse_right) 
 			buildingPlacement_endConstruction();
-	}
-	
-	
-	ENTITY *ptr;
-	SUBSYSTEM_LOOP(ptr, SUBSYSTEM_CONSTRUCTION)
-	{
-		ptr->BUILDING_WORK_LEFT -= time_step;
-		if(ptr->BUILDING_WORK_LEFT <= 0)
-		{
-			buildingPlacement_constructionFinished(ptr);
-			framework_remove(ptr);
-		}
 	}
 }
