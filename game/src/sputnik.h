@@ -1,14 +1,13 @@
 #ifndef SPUTNIK_H
 #define SPUTNIK_H
 
-void SPUTNIK_GlobalInit();
 void SPUTNIK_Init();
 void SPUTNIK_Update();
 
 // local
 void SPUTNIK__inactive(ENTITY* ptr);
 void SPUTNIK__wait(ENTITY* ptr);
-void SPUTNIK__follow(ENTITY* ptr);
+void SPUTNIK__walk(ENTITY* ptr);
 void SPUTNIK__die(ENTITY* ptr);
 void SPUTNIK__hitcheck(ENTITY* ptr);
 

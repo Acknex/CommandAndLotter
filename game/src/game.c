@@ -2,6 +2,8 @@
 #include "map_loader.h"
 #include "ui_game.h"
 #include "framework.h"
+#include "sputnik.h"
+#include "stub.h"
 #include <acknex.h>
 
 void game_init(void)
@@ -16,11 +18,15 @@ void game_open(void)
 	maploader_load("the-core.png");
 
 	ui_game_open();
+	SPUTNIK_Init();
+	stub_init(); //hook debug shit here
 }
 
 void game_update(void)
 {
 	ui_game_update();
+	SPUTNIK_Update();
+	stub_update(); //hook debug shit here
 }
 
 void game_close(void)

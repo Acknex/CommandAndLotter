@@ -66,6 +66,7 @@ action Sputnik()
 	c_setminmax(me);
 	my->min_z += SPUTNIK_FEET;
 	my->group = GROUP_UNIT;
+	vec_set(my->UNIT_TARGET, my->x);
 }
 
 void SPUTNIK_Init()
@@ -122,7 +123,7 @@ void SPUTNIK_Update()
 
 			case SPUTNIK_STATE_WALK:
 			{
-				SPUTNIK__follow(ptr);
+				SPUTNIK__walk(ptr);
 				break;
 			}
 

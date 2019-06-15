@@ -6,4 +6,6 @@
 #define UNIT_TARGETY skill31
 #define UNIT_TARGETZ skill32
 
+void unit_setTarget(ENTITY* ent, VECTOR* pos);
+
 #endif

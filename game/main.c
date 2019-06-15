@@ -34,3 +34,7 @@ function main()
 #include "map_loader.c"
 #include "sputnik.c"
 #include "enemy_hit.c"
+#include "scan.c"
+#include "stub.c"
+#include "unit.c"
+#include "ang.c"
