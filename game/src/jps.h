@@ -34,6 +34,7 @@
 		int value;
 		int value2;
 		int flags;
+		int visibility;
 		//int jpsDist[8];
 		int jpsType;
 		int numNeighbors;
@@ -211,6 +212,7 @@
 	LIST* mapGetNearbyUnits_listbased(MAP* map, TILE* sourceTile, int range);
 
 	int mapGetNearbyUnits(MAP* map, TILE* sourceTile, int range);
+	int mapIsAnyUnitNearby(MAP* map, TILE* sourceTile, int range);
 
 	VECTOR* unitFlockingSpeedGet(MAP* map, UNIT* unit, VECTOR* v);
 
