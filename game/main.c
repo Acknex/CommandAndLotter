@@ -51,3 +51,4 @@ function main()
 #include "spawner.c"
 #include "building.c"
 #include "jps.c"
+#include "fow.c"

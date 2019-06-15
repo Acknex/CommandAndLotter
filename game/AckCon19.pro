@@ -62,6 +62,7 @@ SOURCES += \
     src/ui_game.c \
     src/unit.c \
     src/UnitMangement.c \
+    src/fow.c\
     main.c
 
 HEADERS += \
@@ -100,7 +101,8 @@ HEADERS += \
     src/stub.h \
     src/ui_game.h \
     src/unit.h \
-    src/UnitMangement.h
+    src/UnitMangement.h \
+    src/fow.h\
 
 DISTFILES += \
   main.wdl \
