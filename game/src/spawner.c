@@ -13,10 +13,11 @@
 #define SPAWNER_FIREPARTICLES skill28
 #define SPAWNER_DEBRISPARTICLES skill29
 #define SPAWNER_SMOKEPARTICLES skill30
+#define SPAWNER_WIREFRAME skill31
 
-#define SPAWNER_BASEX skill40			// Position nach dem erstellen
-#define SPAWNER_BASEY skill41
-#define SPAWNER_BASEZ skill42
+#define SPAWNER_BASEX skill70			// Position nach dem erstellen
+#define SPAWNER_BASEY skill71
+#define SPAWNER_BASEZ skill72
 
 
 #define SPAWNER_ACTIVEANIM "stand"
@@ -38,13 +39,27 @@
 #define SPAWNER_MAXDEBRIS 5
 #define SPAWNER_MAXSMOKE 90
 
+MATERIAL * building_wireframe_material =
+{
+  flags = AUTORELOAD | TRANSLUCENT;
+  effect = "building_wireframe.fx";
+}
+
+MATERIAL * building_material =
+{
+  flags = AUTORELOAD;
+  effect = "building.fx";
+}
+
 ENTITY* spawner_spawn(int spawnertype, VECTOR* pos, var owner)
 {
 	ENTITY* ent;
+    ENTITY *wireframe;
 	switch (spawnertype)
 	{
 		case 0:
 			ent = ent_create("the_tower.mdl", pos, Spawner);
+            wireframe = ent_create("the_tower_wireframe.mdl", pos, NULL);
 			break;
 	}
 
@@ -53,7 +68,15 @@ ENTITY* spawner_spawn(int spawnertype, VECTOR* pos, var owner)
 		if (owner == SPAWNER_ENEMY)
 			ent->group = GROUP_ENEMY_SPAWNER;
 		else
-			ent->group = GROUP_PLAYER_SPAWNER;		
+            ent->group = GROUP_PLAYER_SPAWNER;
+
+        ent->material = building_material;
+
+        if(wireframe != NULL)
+        {
+            wireframe->material = building_wireframe_material;
+            ent->SPAWNER_WIREFRAME = wireframe;
+        }
 	}
 	
 	return ent;
@@ -90,7 +113,8 @@ var spawner_getProgress(ENTITY* ent)
 	{
 		if (ent->group = GROUP_ENEMY_SPAWNER || ent->group == GROUP_PLAYER_SPAWNER)
 		{
-			return 1 - (ent->SPAWNER_BUILDTIMER / SPAWNER_BUILDTIME);
+			if (ent->ENTITY_STATE == SPAWNER_STATE_CONSTRUCT)
+				return 1 - (ent->SPAWNER_BUILDTIMER / SPAWNER_BUILDTIME);
 		}
 	}
 	return 0;
@@ -101,11 +125,10 @@ void Spawner()
    framework_setup(my, SUBSYSTEM_SPAWNER);
 	my->HEALTH = 23;//TODO HOOK TO UNIT SYSTEM
 	ENEMY_HIT_init(my);
-	vec_scale(&my->scale_x, 1.2);
 	set(my, SHADOW);
 	c_setminmax(me);
-	//my->ENTITY_STATE = SPAWNER_STATE_CONSTRUCT;
-	my->ENTITY_STATE = SPAWNER_STATE_DIE;
+	my->ENTITY_STATE = SPAWNER_STATE_CONSTRUCT;
+	//my->ENTITY_STATE = SPAWNER_STATE_DIE;
 
 	my->SPAWNER_QUEUE = 0;
 	my->SPAWNER_BUILDTIMER = SPAWNER_BUILDTIME;
@@ -216,6 +239,24 @@ void SPAWNER__construct(ENTITY* ptr)
 		ptr->ENTITY_STATE = SPAWNER_STATE_ACTIVE;
 	}
 
+
+    var percentage = ptr->SPAWNER_PROGRESS * (ptr.max_z + 200) / 100;
+    ptr->skill41 = floatv(percentage);
+    ptr->skill42 = floatv(ptr->max_x * 0.5);
+
+    ptr->skill45 = floatv(ptr->x);
+    ptr->skill46 = floatv(ptr->z);
+    ptr->skill47 = floatv(ptr->y);
+
+    ENTITY *wireframe = ptr->SPAWNER_WIREFRAME;
+    if(wireframe != NULL)
+    {
+        wireframe->skill41 = floatv(percentage);
+
+        wireframe->skill45 = floatv(wireframe->x);
+        wireframe->skill46 = floatv(wireframe->z);
+        wireframe->skill47 = floatv(wireframe->y);
+    }
 }
 
 void SPAWNER__active(ENTITY* ptr)
@@ -262,12 +303,12 @@ BMAP* bmp_smoke = "rauch2.tga";
 
 void SPAWNER_smoke(PARTICLE* p)
 {
-	p.skill_a = random(30) + 10;
-	p.bmap = bmp_smoke;
-	p.lifespan = 9000;
-	p.skill_b = 1000 + random(50);
-	p.size = 200;
-	p.alpha = 80;
+	p->skill_a = random(20) + 10;
+	p->bmap = bmp_smoke;
+	p->lifespan = 9000;
+	p->skill_b = 1000 + random(50);
+	p->size = 200;
+	p->alpha = 80;
 	//vec_scale(p->vel_x, 0.4);
 	p->vel_x = 20-random(40);
 	p->vel_y = 20-random(40);
@@ -278,9 +319,9 @@ void SPAWNER_smoke(PARTICLE* p)
 
 void SPAWNER_debris(PARTICLE* p)
 {
-	p.lifespan = 50;
-	p.size = 100 + random(200);
-	p.alpha = 80;
+	p->lifespan = 50;
+	p->size = 100 + random(200);
+	p->alpha = 80;
 	p->gravity = 4;
 	p->red = 0;
 	p->green = 0;
@@ -295,24 +336,23 @@ void SPAWNER_debris(PARTICLE* p)
 
 void SPAWNER_fire_fade_p(PARTICLE* p)
 {
-	p->skill_a-=time_step;
+	p->skill_a-=time_step * 3;
 	p->alpha = maxv(0, minv(100, p->skill_a));
-	if (p->alpha <= 0) p->lifespan = 0;
-
-	p->size = minv(p->skill_b, p->size+time_step*3);
+	p->size -= time_step * p->skill_b;
+	p->green = minv(255, p->green + time_step * p->skill_b * 2);
 }
 
 BMAP* bmp_fire = "rauch2.tga";
 
 void SPAWNER_fire(PARTICLE* p)
 {
-	p.skill_a = random(30) + 10;
-	p.bmap = bmp_smoke;
-	p.lifespan = 9000;
-	p.skill_b = 1000 + random(50);
-	p.size = 200;
-	p.alpha = 80;
-	//vec_scale(p->vel_x, 0.4);
+	p->skill_a = random(30) + 60;
+	p->lifespan = 90;
+	p->skill_b = random(4) + 2;
+	p->size = 200;
+	p->alpha = 80;
+	p->red = 255;
+	p->green = 80;
 	p->vel_x = 20-random(40);
 	p->vel_y = 20-random(40);
 	p->vel_z = 20 - random(30);
@@ -330,21 +370,23 @@ void SPAWNER__die(ENTITY* ptr)
 	ptr->z = ptr->SPAWNER_BASEZ - deathfactor * 700.0;
 	ptr->roll = deathfactor * 15.0;
 
-	if (deathfactor < 0.2)
+	if (deathfactor < 0.1)
 	{ // DEBRIS
 		VECTOR* pos = vector(ptr->SPAWNER_BASEX+random(100)-50, ptr->SPAWNER_BASEY+random(100)-50, ptr->SPAWNER_BASEZ+random(100)-50);
 		effect(SPAWNER_debris, 12*time_step, pos, nullvector);
 	}
 
-	if (deathfactor < 0.4)
+	if (deathfactor < 0.3)
 	{ // FIRE
 		VECTOR* pos = vector(ptr->SPAWNER_BASEX+random(100)-50, ptr->SPAWNER_BASEY+random(100)-50, ptr->SPAWNER_BASEZ+random(100)-50);
-
+		effect(SPAWNER_fire, 30*time_step, pos, nullvector);
 	}
 
-	//SMOKE
-	VECTOR* pos = vector(ptr->SPAWNER_BASEX+random(100)-50, ptr->SPAWNER_BASEY+random(100)-50, ptr->SPAWNER_BASEZ+random(100)-50);
-	effect(SPAWNER_smoke, 60*time_step, pos, nullvector);
+	if (deathfactor < 0.7)
+	{ //SMOKE
+		VECTOR* pos = vector(ptr->SPAWNER_BASEX+random(100)-50, ptr->SPAWNER_BASEY+random(100)-50, ptr->SPAWNER_BASEZ+random(100)-50);
+		effect(SPAWNER_smoke, 60*time_step, pos, nullvector);
+	}
 
 
 	//VECTOR* pos = vector(ptr->x+random(10)-5, ptr->y+random(10)-5, ptr->z+random(10)-5);
