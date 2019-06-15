@@ -28,6 +28,7 @@ typedef int bool;
 #define ENTITY_STATE skill55
 #define ENTITY_ANIM skill56
 #define ENTITY_VICTIM skill57
+#define ENTITY_DAMAGE skill58
 
 //! Markiert die Entity als "TOT" und sorgt dafür, dass sie zu Ende des Frames gelöscht wird.
 #define SK_ENTITY_DEAD skill98

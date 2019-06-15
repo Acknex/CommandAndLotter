@@ -79,7 +79,8 @@ var spawner_getProgress(ENTITY* ent)
 	{
 		if (ent->group = GROUP_ENEMY_SPAWNER || ent->group == GROUP_PLAYER_SPAWNER)
 		{
-			return 1 - (ent->SPAWNER_BUILDTIMER / SPAWNER_BUILDTIME);
+			if (ent->ENTITY_STATE == SPAWNER_STATE_CONSTRUCT)
+				return 1 - (ent->SPAWNER_BUILDTIMER / SPAWNER_BUILDTIME);
 		}
 	}
 	return 0;
@@ -90,7 +91,6 @@ void Spawner()
    framework_setup(my, SUBSYSTEM_SPAWNER);
 	my->HEALTH = 23;//TODO HOOK TO UNIT SYSTEM
 	ENEMY_HIT_init(my);
-	vec_scale(&my->scale_x, 1.2);
 	set(my, SHADOW);
 	c_setminmax(me);
 	my->ENTITY_STATE = SPAWNER_STATE_CONSTRUCT;
