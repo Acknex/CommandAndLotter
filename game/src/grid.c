@@ -53,6 +53,11 @@ void grid_setState(int x, int y, int state)
 	grid_setState_byID(grid_CoordToID(x,y), state);
 }
 
+void grid_resetState(int x, int y, int state)
+{
+	grid_resetState_byID(grid_CoordToID(x,y), state);
+}
+
 void grid_getState(int x, int y)
 {
 	return grid_getState_byID(grid_CoordToID(x,y));
@@ -61,9 +66,15 @@ void grid_getState(int x, int y)
 
 void grid_setState_byID(int id, state)
 {
-	grid_state[id] = state;
+	grid_state[id] |= state;
 	
 }
+
+void grid_resetState_byID(int id, state)
+{
+	grid_state[id] &= ~state;
+}
+
 int grid_getState_byID(int id)
 {
 	return grid_state[id];
