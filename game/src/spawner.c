@@ -90,7 +90,8 @@ var spawner_getProgress(ENTITY* ent)
 	{
 		if (ent->group = GROUP_ENEMY_SPAWNER || ent->group == GROUP_PLAYER_SPAWNER)
 		{
-			return 1 - (ent->SPAWNER_BUILDTIMER / SPAWNER_BUILDTIME);
+			if (ent->ENTITY_STATE == SPAWNER_STATE_CONSTRUCT)
+				return 1 - (ent->SPAWNER_BUILDTIMER / SPAWNER_BUILDTIME);
 		}
 	}
 	return 0;
@@ -261,12 +262,12 @@ BMAP* bmp_smoke = "rauch2.tga";
 
 void SPAWNER_smoke(PARTICLE* p)
 {
-	p.skill_a = random(30) + 10;
-	p.bmap = bmp_smoke;
-	p.lifespan = 9000;
-	p.skill_b = 1000 + random(50);
-	p.size = 200;
-	p.alpha = 80;
+	p->skill_a = random(20) + 10;
+	p->bmap = bmp_smoke;
+	p->lifespan = 9000;
+	p->skill_b = 1000 + random(50);
+	p->size = 200;
+	p->alpha = 80;
 	//vec_scale(p->vel_x, 0.4);
 	p->vel_x = 20-random(40);
 	p->vel_y = 20-random(40);
@@ -277,9 +278,9 @@ void SPAWNER_smoke(PARTICLE* p)
 
 void SPAWNER_debris(PARTICLE* p)
 {
-	p.lifespan = 50;
-	p.size = 100 + random(200);
-	p.alpha = 80;
+	p->lifespan = 50;
+	p->size = 100 + random(200);
+	p->alpha = 80;
 	p->gravity = 4;
 	p->red = 0;
 	p->green = 0;
@@ -294,24 +295,23 @@ void SPAWNER_debris(PARTICLE* p)
 
 void SPAWNER_fire_fade_p(PARTICLE* p)
 {
-	p->skill_a-=time_step;
+	p->skill_a-=time_step * 3;
 	p->alpha = maxv(0, minv(100, p->skill_a));
-	if (p->alpha <= 0) p->lifespan = 0;
-
-	p->size = minv(p->skill_b, p->size+time_step*3);
+	p->size -= time_step * p->skill_b;
+	p->green = minv(255, p->green + time_step * p->skill_b * 2);
 }
 
 BMAP* bmp_fire = "rauch2.tga";
 
 void SPAWNER_fire(PARTICLE* p)
 {
-	p.skill_a = random(30) + 10;
-	p.bmap = bmp_smoke;
-	p.lifespan = 9000;
-	p.skill_b = 1000 + random(50);
-	p.size = 200;
-	p.alpha = 80;
-	//vec_scale(p->vel_x, 0.4);
+	p->skill_a = random(30) + 60;
+	p->lifespan = 90;
+	p->skill_b = random(4) + 2;
+	p->size = 200;
+	p->alpha = 80;
+	p->red = 255;
+	p->green = 80;
 	p->vel_x = 20-random(40);
 	p->vel_y = 20-random(40);
 	p->vel_z = 20 - random(30);
@@ -329,21 +329,23 @@ void SPAWNER__die(ENTITY* ptr)
 	ptr->z = ptr->SPAWNER_BASEZ - deathfactor * 700.0;
 	ptr->roll = deathfactor * 15.0;
 
-	if (deathfactor < 0.2)
+	if (deathfactor < 0.1)
 	{ // DEBRIS
 		VECTOR* pos = vector(ptr->SPAWNER_BASEX+random(100)-50, ptr->SPAWNER_BASEY+random(100)-50, ptr->SPAWNER_BASEZ+random(100)-50);
 		effect(SPAWNER_debris, 12*time_step, pos, nullvector);
 	}
 
-	if (deathfactor < 0.4)
+	if (deathfactor < 0.3)
 	{ // FIRE
 		VECTOR* pos = vector(ptr->SPAWNER_BASEX+random(100)-50, ptr->SPAWNER_BASEY+random(100)-50, ptr->SPAWNER_BASEZ+random(100)-50);
-
+		effect(SPAWNER_fire, 30*time_step, pos, nullvector);
 	}
 
-	//SMOKE
-	VECTOR* pos = vector(ptr->SPAWNER_BASEX+random(100)-50, ptr->SPAWNER_BASEY+random(100)-50, ptr->SPAWNER_BASEZ+random(100)-50);
-	effect(SPAWNER_smoke, 60*time_step, pos, nullvector);
+	if (deathfactor < 0.7)
+	{ //SMOKE
+		VECTOR* pos = vector(ptr->SPAWNER_BASEX+random(100)-50, ptr->SPAWNER_BASEY+random(100)-50, ptr->SPAWNER_BASEZ+random(100)-50);
+		effect(SPAWNER_smoke, 60*time_step, pos, nullvector);
+	}
 
 
 	//VECTOR* pos = vector(ptr->x+random(10)-5, ptr->y+random(10)-5, ptr->z+random(10)-5);
