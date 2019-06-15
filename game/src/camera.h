@@ -10,5 +10,7 @@ VECTOR topdown_camera_center;
 
 void topdown_camera_open();
 void topdown_camera_update();
+
+void topdown_camera_set_pos(VECTOR*);
  
 #endif CAMERA_H
