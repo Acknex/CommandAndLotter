@@ -2,13 +2,15 @@
 #include "framework.h"
 #include "spawner.h"
 #include "enemy_hit.h"
-//#include "particle.h"
+#include "particle.h"
 #include "map_loader.h"
+#include "unit.h"
 
 #define SPAWNER_QUEUE skill21
 #define SPAWNER_PROGRESS skill22
 #define SPAWNER_BUILDTIMER skill23
 #define SPAWNER_DIETIMER skill24
+#define SPAWNER_UNITTYPE skill25
 #define SPAWNER_HITTHRESHOLD skill27
 #define SPAWNER_FIREPARTICLES skill28
 #define SPAWNER_DEBRISPARTICLES skill29
@@ -65,6 +67,7 @@ ENTITY* spawner_spawn(int spawnertype, VECTOR* pos, var owner)
 
 	if (ent != NULL)
 	{
+		ent->SPAWNER_UNITTYPE = spawnertype;
 		if (owner == SPAWNER_ENEMY)
 			ent->group = GROUP_ENEMY_SPAWNER;
 		else
@@ -86,7 +89,7 @@ var spawner_produce(ENTITY* ent)
 {
 	if (ent != NULL)
 	{
-		if (ent->group = GROUP_ENEMY_SPAWNER || ent->group == GROUP_PLAYER_SPAWNER)
+		if (ent->group == GROUP_ENEMY_SPAWNER || ent->group == GROUP_PLAYER_SPAWNER)
 		{
 			ent->SPAWNER_QUEUE++;
 			return ent->SPAWNER_QUEUE;
@@ -99,7 +102,7 @@ var spawner_getQueue(ENTITY* ent)
 {
 	if (ent != NULL)
 	{
-		if (ent->group = GROUP_ENEMY_SPAWNER || ent->group == GROUP_PLAYER_SPAWNER)
+		if (ent->group == GROUP_ENEMY_SPAWNER || ent->group == GROUP_PLAYER_SPAWNER)
 		{
 			return ent->SPAWNER_QUEUE;
 		}
@@ -111,7 +114,7 @@ var spawner_getProgress(ENTITY* ent)
 {
 	if (ent != NULL)
 	{
-		if (ent->group = GROUP_ENEMY_SPAWNER || ent->group == GROUP_PLAYER_SPAWNER)
+		if (ent->group == GROUP_ENEMY_SPAWNER || ent->group == GROUP_PLAYER_SPAWNER)
 		{
 			if (ent->ENTITY_STATE == SPAWNER_STATE_CONSTRUCT)
 				return 1 - (ent->SPAWNER_BUILDTIMER / SPAWNER_BUILDTIME);
@@ -120,10 +123,16 @@ var spawner_getProgress(ENTITY* ent)
 	return 0;
 }
 
+var spawner_getHealth(ENTITY* ent)
+{
+	return ent->HEALTH / ent->MAXHEALTH;
+}
+
 void Spawner()
 {
    framework_setup(my, SUBSYSTEM_SPAWNER);
-	my->HEALTH = 23;//TODO HOOK TO UNIT SYSTEM
+	my->HEALTH = 50;//TODO HOOK TO UNIT SYSTEM
+	my->MAXHEALTH = my->HEALTH;
 	ENEMY_HIT_init(my);
 	set(my, SHADOW);
 	c_setminmax(me);
@@ -223,7 +232,6 @@ void SPAWNER__hitcheck(ENTITY* ptr)
 		{
 			ptr->SPUTNIK_HITTHRESHOLD = 0;
 			ptr->event = ENEMY_HIT_event;
-			vec_zero(ptr->DAMAGE_VEC);
 		}
 	}
 }
@@ -232,7 +240,6 @@ void SPAWNER__hitcheck(ENTITY* ptr)
 void SPAWNER__construct(ENTITY* ptr)
 {
   	ptr->SPAWNER_PROGRESS += 10 * time_step;
-  	//TODO: update shader
 	if (ptr->SPAWNER_PROGRESS >= 100)
 	{
 		ptr->SPAWNER_PROGRESS = 100;
@@ -281,7 +288,15 @@ void SPAWNER__produce(ENTITY* ptr)
 	{
 		ptr->SPAWNER_BUILDTIMER = SPAWNER_BUILDTIME;
 		ptr->SPAWNER_QUEUE--;
-		//TODO spawn unit
+
+		//meh.
+		var owner;
+		if (ptr->group == GROUP_ENEMY_SPAWNER)	
+			owner = UNIT_ENEMY;
+		else
+			owner = UNIT_PLAYER;
+				
+		unit_spawn(ptr->SPAWNER_UNITTYPE, ptr->x, owner);
 	}
 	if (ptr->SPAWNER_QUEUE == 0)
 	{
