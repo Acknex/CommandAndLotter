@@ -186,9 +186,9 @@ void SPUTNIK__wait(ENTITY* ptr)
 
 void SPUTNIK__walk(ENTITY* ptr)
 {
-	DEBUG_VAR(ptr->pan, 20);
-	DEBUG_VAR(ptr->UNIT_TARGETX, 120);
-	DEBUG_VAR(ptr->UNIT_TARGETY, 140);
+	//DEBUG_VAR(ptr->pan, 20);
+	//DEBUG_VAR(ptr->UNIT_TARGETX, 120);
+	//DEBUG_VAR(ptr->UNIT_TARGETY, 140);
 	ptr->SPUTNIK_RUNSPEEDCUR = ptr->SPUTNIK_RUNSPEED; 
 	ANG_turnToPos(ptr, ptr->UNIT_TARGET, ptr->SPUTNIK_TURNSPEED, 5);
 	VECTOR* to = vector(ptr->SPUTNIK_RUNSPEEDCUR + 20, 0, 0);
