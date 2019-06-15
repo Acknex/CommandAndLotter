@@ -52,6 +52,7 @@ technique building_technique
         CullMode = CCW;
         ZWriteEnable = True;
         ZEnable = True;
+        ShadeMode = Flat;
 
         VertexShader = compile vs_3_0 vs_building_main();
         PixelShader = compile ps_3_0 ps_building_main();

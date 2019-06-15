@@ -60,10 +60,10 @@ void SPUTNIK__wait_or_walk(ENTITY * ptr)
 	if(!unit) return;
 	
 	vec_set(ptr->x, unit->pos3d);
-		VECTOR diff, temp;
-		vec_diff(diff, unit->pos3d, unit->prevPos3d);
-		var len = vec_to_angle(temp, diff)/time_step;
-		if(len > 8) ptr->SPUTNIK_RUNCOUNTER = 4;
+	VECTOR diff, temp;
+	vec_diff(diff, unit->pos3d, unit->prevPos3d);
+	var len = vec_to_angle(temp, diff)/time_step;
+	if(len > 8) ptr->SPUTNIK_RUNCOUNTER = 4;
 	//if(unit->isMoving) ptr->SPUTNIK_RUNCOUNTER = 12;
 	if(ptr->SPUTNIK_RUNCOUNTER > 0)
 	{
@@ -104,7 +104,7 @@ void SPUTNIK_Update()
 	SUBSYSTEM_LOOP(ptr, SUBSYSTEM_UNIT_SPUTNIK)
 	{
 		jpsAllowMovementForEntity(ptr, false);
-	
+		
 		switch(ptr->ENTITY_STATE)    	
 		{
 			case ENTITY_STATE_WAIT_OR_WALK:
@@ -139,7 +139,15 @@ void SPUTNIK_Update()
 		
 		if (ptr->ENTITY_STATE != ENTITY_STATE_DIE && ptr->ENTITY_STATE != ENTITY_STATE_DEAD)
 		{
-			ptr->z = maploader_get_height(ptr->x) - ptr->min_z + SPUTNIK_FEET;			
+			UNIT* unit = jpsUnitGetFromEntity(ptr);
+			if(unit)
+			{
+				TILE* tile = unit->tile;
+				if(tile)
+				{
+					if(!tile->value) ptr->z = maploader_get_height(ptr->x) - ptr->min_z + SPUTNIK_FEET;
+				}	
+			}
 		}
 	}	
 }
@@ -151,9 +159,9 @@ void SPUTNIK__findNextVictim(ENTITY* ptr)
 		//meh.
 		var owner;
 		if (ptr->group == GROUP_ENEMY_UNIT)	
-			owner = UNIT_ENEMY;
+		owner = UNIT_ENEMY;
 		else
-			owner = UNIT_PLAYER;
+		owner = UNIT_PLAYER;
 		
 		cprintf0("\n SPUTNIK__findNextVictim: TRYFIND...");
 		int count = mapGetNearbyUnitsOfTypeForPos(ptr->x, ptr->ENTITY_VICTIMTYPE, owner, 1000, 1);
@@ -172,7 +180,7 @@ void SPUTNIK__findNextVictim(ENTITY* ptr)
 void SPUTNIK__hit(ENTITY* ptr)
 {
 	ptr->ENTITY_HITTHRESHOLD -= time_step;		
- 	if (ptr->HEALTH <= 0)
+	if (ptr->HEALTH <= 0)
 	{
 		ptr->ENTITY_STATE = ENTITY_STATE_DIE;
 		ptr->SPUTNIK_ANIMSTATE = 0;
@@ -187,7 +195,7 @@ void SPUTNIK__hit(ENTITY* ptr)
 	{
 		var percent = (1 - (ptr->ENTITY_HITTHRESHOLD/5)) * 56;
 		if (percent > 28)
-			percent = 56-percent;
+		percent = 56-percent;
 		ent_animate(ptr, SPUTNIK_ATTACKANIM, percent, 0);
 	}
 }

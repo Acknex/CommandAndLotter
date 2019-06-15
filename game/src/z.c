@@ -16,7 +16,7 @@ var z_get()
 ENTITY* z_spawn(VECTOR* pos)
 {
 	ENTITY* ent;
-	ent = ent_create(CUBE_MDL, pos, Z);
+    ent = ent_create("Crystalmeth.mdl", pos, Z);
 	ent->group = GROUP_ENEMY_UNIT; //should be neutral group
 	return ent;
 }
@@ -24,8 +24,10 @@ ENTITY* z_spawn(VECTOR* pos)
 void Z()
 {
 	framework_setup(my, SUBSYSTEM_Z);
-	set(my, SHADOW);
-	vec_scale(my->scale_x, 10); //temp
+    set(my, SHADOW);
+    var size = 2.0 + random(2);
+    my->pan = random(360);
+    vec_set(my->scale_x, vector(size, size, size));
 	c_setminmax(me);
 	my->ENTITY_STATE = ENTITY_STATE_WAIT_OR_WALK;
 	my->ENTITY_UNITTYPE = UNIT_Z;	
@@ -68,7 +70,7 @@ void Z_Update()
 			}
 		}	
 	
-		ptr->z = maploader_get_height(ptr->x) - ptr->min_z+200;			
+        ptr->z = maploader_get_height(ptr->x) - ptr->min_z;
 		
 	}	
 }
@@ -84,7 +86,7 @@ void Z__hit(ENTITY* ptr)
 
 void Z__wait(ENTITY* ptr)
 {
-	ptr->pan += 5*time_step;
+
 }
 
 

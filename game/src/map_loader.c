@@ -1,5 +1,6 @@
 #include "map_loader.h"
 #include "z.h"
+#include "materials.h"
 
 #include <d3d9.h>
 #include <stdio.h>
@@ -240,6 +241,7 @@ void maploader_load(char const * fileName)
                             boom = "tree03.mdl";
 
                         you = ent_create(boom, pos, NULL);
+                        you->material = matTrees;
                         you->red = 100;
                         you->green = 100;
                         you->blue = 100;

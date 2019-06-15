@@ -15,6 +15,7 @@
 #include "materials.h"
 #include "effects2d.h"
 #include "ai.h"
+#include "music_player.h"
 
 void game_init(void)
 {
@@ -71,6 +72,8 @@ void game_open(void)
 	#endif
 
     effects2d_open();
+
+    music_start("media/ingame.mp3", 2.0, 1);
 }
 
 void game_update(void)
