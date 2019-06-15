@@ -8,6 +8,16 @@ typedef int bool;
 #define true  1
 #define false 0
 
+
+#define ENTITY_STATE_INACTIVE 0
+#define ENTITY_STATE_WAIT 1
+#define ENTITY_STATE_WALK 2
+#define ENTITY_STATE_ATTACK 3
+#define ENTITY_STATE_DIE 4
+#define ENTITY_STATE_DEAD 5
+#define ENTITY_STATE_HIT 6
+
+
 #define HEALTH skill50 //remove after attaching unit system to entity code
 // old hit system - to be fiddled together with unit system and maybe remove later on
 #define DAMAGE_HIT skill51
@@ -16,6 +26,7 @@ typedef int bool;
 //#define DAMAGE_VEC skill54
 #define ENTITY_STATE skill55
 #define ENTITY_ANIM skill56
+#define ENTITY_VICTIM skill57
 
 //! Markiert die Entity als "TOT" und sorgt dafür, dass sie zu Ende des Frames gelöscht wird.
 #define SK_ENTITY_DEAD skill98
@@ -35,6 +46,7 @@ typedef int bool;
 #define SUBSYSTEM_UNIT_LERCHE       103
 #define SUBSYSTEM_UNIT_SPHERE       104
 #define SUBSYSTEM_TERRAIN_SYSTEM    105
+#define SUBSYSTEM_UNIT_MANAGEMENT   	106
 // HIER WEITERE SUBSYSTEME DEFINIEREN
 
 #define SUBSYSTEM_LOOP(ptr,system) for(ptr = ent_next(NULL); ptr != NULL; ptr = ent_next(ptr)) if(ptr->SK_SUBSYSTEM == (system))

@@ -6,6 +6,8 @@
 #define UNIT_TARGETY skill31
 #define UNIT_TARGETZ skill32
 
-void unit_setTarget(ENTITY* ent, VECTOR* pos);
+var unit_setTarget(ENTITY* ent, VECTOR* pos);
+var unit_setVictim(ENTITY* ent);
+ENTITY* unit_spawn(int unittype, VECTOR* pos);
 
 #endif
