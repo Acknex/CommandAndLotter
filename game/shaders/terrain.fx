@@ -2,7 +2,7 @@
 //help: Terrain contains a shadow map on the Skin1 blue channel.
 //help: With PS 1.1 (GeForce3), sun & dynamic lights are then disabled.
 //id: 14
-#define SHADOWMAP
+#define SHADOWMAP 1
 
 #include <define>
 #include <transform>

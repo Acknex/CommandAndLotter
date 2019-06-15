@@ -1,5 +1,8 @@
 #include <acknex.h>
 #define PRAGMA_PATH "src"
+#define PRAGMA_PATH "code"
+
+#define PRAGMA_PATH "%EXE_DIR%\\code"; // fx files
 
 #define DEBUG
 
@@ -18,6 +21,7 @@
 
 function main()
 {
+    def_move();
 	framework_init();
 }
 

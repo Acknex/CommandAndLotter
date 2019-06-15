@@ -18,8 +18,22 @@ struct maploader_t maploader;
 
 MATERIAL * maploader_material =
 {
-	effect = "terrain.fx";
   flags = AUTORELOAD;
+  emissive_blue = 255;
+}
+
+void maploader_get_tile_pos(VECTOR * v, int * x, int * y)
+{
+	int size_x = maploader_cellsize * maploader.w + maploader_cellsize - 1;
+	int size_y = maploader_cellsize * maploader.h + maploader_cellsize - 1;
+
+	*x = (v->x + maploader_trisize * size_x / 2) / (maploader_trisize * maploader_cellsize);
+	*y = (v->y + maploader_trisize * size_y / 2) / (maploader_trisize * maploader_cellsize);
+
+	if(*x <= 0) *x = 0;
+	if(*y <= 0) *y = 0;
+	if(*x >= maploader.w) *x = maploader.w - 1;
+	if(*y >= maploader.h) *y = maploader.h - 1;
 }
 
 void maploader_init()
@@ -77,18 +91,15 @@ void maploader_load(char const * fileName)
 	bmap_unlock(bmp);
 	// bmap_remove(bmp);
 
-	int cellsize = 3;
-	var trisize = 32;
-
-	int size_x = cellsize * maploader.w + cellsize - 1;
-	int size_y = cellsize * maploader.h + cellsize - 1;
+	int size_x = maploader_cellsize * maploader.w + maploader_cellsize - 1;
+	int size_y = maploader_cellsize * maploader.h + maploader_cellsize - 1;
 
 	maploader.terrain = ent_createterrain(
 		bmp,
 		vector(0, 0, 0),
 		size_x,
 		size_y,
-		trisize
+		maploader_trisize
 	);
 
 	int i;
@@ -100,8 +111,7 @@ void maploader_load(char const * fileName)
 
 		D3DVERTEX * v = c.v;
 
-		x = (v->x + trisize * size_x / 2) / (trisize * cellsize);
-		y = (v->z + trisize * size_y / 2) / (trisize * cellsize);
+		maploader_get_tile_pos(vector(v->x, v->z, 0), &x, &y);
 
 //		diag("x=");
 //		diag(str_for_int(NULL, x));
@@ -125,6 +135,8 @@ void maploader_load(char const * fileName)
 	c_updatehull(maploader.terrain, 0);
 
 	maploader.terrain = maploader_material;
+
+	effect_load(maploader_material, "terrain.fx");
 }
 
 bool maploader_has_map()
@@ -155,4 +167,25 @@ float maploader_tile_vegetation(int x, int y)
 float maploader_tile_height(int x, int y)
 {
 	return ((maploader.cells)[maploader.w * y + x]).elevation;
+}
+
+int   maploader_get_type(VECTOR * v)
+{
+	int x, y;
+	maploader_get_tile_pos(v, &x, &y);
+	return maploader_tile_type(x, y);
+}
+
+float maploader_get_vegetation(VECTOR * v)
+{
+	int x, y;
+	maploader_get_tile_pos(v, &x, &y);
+	return maploader_tile_vegetation(x, y);
+}
+
+float maploader_get_height(VECTOR * v)
+{
+	int x, y;
+	maploader_get_tile_pos(v, &x, &y);
+	return maploader_tile_height(x, y);
 }

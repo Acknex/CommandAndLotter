@@ -29,19 +29,36 @@ DEPENDPATH += $$pwd/src
 
 SOURCES += \
   main.c \
+  src/UnitMangement.c \
+  src/ang.c \
+  src/camera.c \
   src/credits.c \
+  src/enemy_hit.c \
   src/framework.c \
   src/game.c \
   src/mainmenu.c \
-  src/map_loader.c
+  src/map_loader.c \
+  src/music_player.c \
+  src/scan.c \
+  src/sputnik.c \
+  src/ui_game.c
 
 HEADERS += \
+  src/UnitMangement.h \
+  src/ang.h \
+  src/camera.h \
   src/credits.h \
+  src/enemy_hit.h \
   src/framework.h \
   src/game.h \
   src/global.h \
   src/mainmenu.h \
-  src/map_loader.h
+  src/map_loader.h \
+  src/music_player.h \
+  src/scan.h \
+  src/sputnik.h \
+  src/ui_game.h \
+  src/unit.h
 
 DISTFILES += \
   main.wdl \
