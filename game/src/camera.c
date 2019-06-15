@@ -5,6 +5,7 @@ var topdown_camera_height;
 VECTOR topdown_camera_center;
 var topdown_camera_rotation;
 
+VECTOR topdown_camera_centerTarget;
 
 
 
@@ -39,12 +40,22 @@ void topdown_camera_update()
 		int key_updown = (key_w-key_s) + ((int)_left-(int)_right);
 		int key_leftright = (key_a-key_d) + ((int)_up-(int)_down);
 	
-		topdown_camera_center.x += (key_updown*cosv(camera.pan)- key_leftright*sinv(camera.pan))*time_step*CAMERA_SPEED;
-		topdown_camera_center.y += (key_leftright*cosv(camera.pan)+ key_updown*sinv(camera.pan))*time_step*CAMERA_SPEED;
-		topdown_camera_center.z = 0;
+		topdown_camera_centerTarget.x += (key_updown*cosv(camera.pan)- key_leftright*sinv(camera.pan))*time_step*CAMERA_SPEED;
+		topdown_camera_centerTarget.y += (key_leftright*cosv(camera.pan)+ key_updown*sinv(camera.pan))*time_step*CAMERA_SPEED;
+		topdown_camera_centerTarget.z = 0;
 		
-		topdown_camera_height += -0.1*(topdown_camera_height/10)*mickey.z*time_step;
+		topdown_camera_height += -0.1*(topdown_camera_height/10.)*mickey.z*time_step;
 		topdown_camera_height = clamp(topdown_camera_height, 1, 10.);
+		
+		
+		
+		VECTOR movement;
+		vec_set(&movement, &topdown_camera_centerTarget);
+		vec_sub(&movement, &topdown_camera_center);
+		vec_scale(&movement, time_step);
+		
+		vec_add(&topdown_camera_center, &movement);
+		
 		
 		
 		VECTOR offset;
@@ -61,5 +72,5 @@ void topdown_camera_update()
 
 void topdown_camera_set_pos(VECTOR* target_pos)
 {
-	vec_set(&topdown_camera_center, target_pos);
+	vec_set(&topdown_camera_centerTarget, target_pos);
 }
