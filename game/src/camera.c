@@ -25,7 +25,7 @@ void topdown_camera_update()
 	//if(key_p)
 	//	topdown_camera_set_pos(nullvector);
 		
-		if(mouse_middle)
+		if(mouse_middle || key_q)
 		{
 			camera.pan += CAMERA_ROTATIONSPEED * mickey.x / screen_size.x;
 			camera.tilt += CAMERA_ROTATIONSPEED * mickey.y / screen_size.y;
