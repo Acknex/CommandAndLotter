@@ -54,7 +54,7 @@ void fow_open()
 			for(y = 0; y<map->size[1]; ++y)
 			{
 				TILE *tile = mapTileGet(map, x,y);
-				tile->visibility = FOW_SCOUTED;
+				tile->visibility = FOW_HIDDEN;
 			}
     }
 }
