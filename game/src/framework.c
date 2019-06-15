@@ -5,6 +5,7 @@
 #include "game.h"
 #include "credits.h"
 #include "music_player.h"
+#include "jps.h"
 
 #include <acknex.h>
 #include <windows.h>
@@ -25,7 +26,7 @@ typedef struct
 
 framework_t framework;
 
-// BMAP * framework_mouse_cursor = "cursor3.tga";
+BMAP * framework_mouse_cursor = "cursor.tga";
 
 // BMAP * framework_load_screen_bmap = "game_loadingscreen.png";
 
@@ -67,22 +68,25 @@ void framework_init()
     framework_update_settings();
     // settings_register_signal(framework_update_settings);
 
+    max_entities = 5000;
     particle_mode = 8;
     collision_mode = 2;
     preload_mode = 3; // preload a lot
 
     // vec_set(sky_color, vector(1,1,1));
 
-    // mouse_map = framework_mouse_cursor;
+    mouse_map = framework_mouse_cursor;
 
 #ifndef FRAMEWORK_NO_POSTPROCESS
     // SetupDefaultMaterials();
     // SetupPostprocessing();
 #endif
 
-		mouse_mode = 4;
+    video_set(1280, 720, 0, 2);
 
-		on_frame = framework_update;
+    mouse_mode = 4;
+
+    on_frame = framework_update;
 }
 
 void framework_setup(ENTITY * ent, int subsystem)
@@ -118,7 +122,11 @@ void framework_cleanup()
         you = ent;
         ent = ent_next(ent);
         if(you->SK_ENTITY_DEAD)
+        {
+        		UNIT *unit = jpsUnitGetFromEntity(you);
+        		if(unit) jpsUnitDestroy(unit);
             ptr_remove(you);
+        }
     }
 }
 
@@ -269,6 +277,9 @@ void framework_update()
 
     // Cleanup all dead entities
     framework_cleanup();
+
+    // Do music update
+    music_update();
 
     if(framework.state == FRAMEWORK_STATE_SHUTDOWN)
     {

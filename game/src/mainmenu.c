@@ -48,8 +48,8 @@ void mainmenu_set_exit(void)
 
 void mainmenu_open(void)
 {
-	// music_speedup(100);
-	// music_start("media\\intro.mp3", 0.5, 0);
+	music_speedup(100);
+	music_start("media/mainmenu.mp3", 0.5, 0);
 }
 
 void mainmenu_update(void)

@@ -6,6 +6,14 @@
 #define UNIT_TARGETY skill31
 #define UNIT_TARGETZ skill32
 
-void unit_setTarget(ENTITY* ent, VECTOR* pos);
+#define UNIT_ENEMY 0
+#define UNIT_PLAYER 1
+
+var unit_setTarget(ENTITY* ent, VECTOR* pos);
+var unit_setVictim(ENTITY* ent, ENTITY* victim);
+ENTITY* unit_spawn(int unittype, VECTOR* pos, var owner);
+VECTOR* unit_getTarget(ENTITY* ent);
+ENTITY* unit_getVictim(ENTITY* ent);
+var unit_getHealth(ENTITY* ent);
 
 #endif
