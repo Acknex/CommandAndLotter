@@ -25,15 +25,6 @@
 #define SPUTNIK_ATTACKANIM "AttackA"
 #define SPUTNIK_DIEANIM "Die"
 
-
-#define ENTITY_STATE_INACTIVE 0
-#define ENTITY_STATE_WAIT 1
-#define ENTITY_STATE_WALK 2
-#define ENTITY_STATE_ATTACK 3
-#define ENTITY_STATE_DIE 4
-#define ENTITY_STATE_DEAD 5
-#define ENTITY_STATE_HIT 6
-
 #define SPUTNIK_FEET 30
 #define SPUTNIK_TARGETDIST 100
 
@@ -157,7 +148,7 @@ void SPUTNIK__hitcheck(ENTITY* ptr)
 
 void SPUTNIK__wait(ENTITY* ptr)
 {
-  	ptr->SPUTNIK_ANIMSTATE += 10 * time_step;
+  	ptr->SPUTNIK_ANIMSTATE += 7 * time_step;
 	ent_animate(ptr, SPUTNIK_WAITANIM, ptr->SPUTNIK_ANIMSTATE, ANM_CYCLE);
 		
 	/* transitions */
