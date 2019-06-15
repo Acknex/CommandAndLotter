@@ -1,4 +1,6 @@
 #include "map_loader.h"
+#include "z.h"
+
 #include <d3d9.h>
 #include <stdio.h>
 
@@ -7,6 +9,7 @@ typedef struct
 	int celltype;
 	float vegetation;
 	float elevation;
+    float zettiness;
 } maploader_cell;
 
 struct maploader_t
@@ -127,6 +130,7 @@ void maploader_load(char const * fileName)
 			((maploader.cells)[maploader.w * y + x]).celltype = 0;
 			((maploader.cells)[maploader.w * y + x]).vegetation = col.green / 255.0;
             ((maploader.cells)[maploader.w * y + x]).elevation = col.blue * 3;
+            ((maploader.cells)[maploader.w * y + x]).zettiness = 1.0 - alpha / 100.0;
 		}
 	}
 
@@ -217,38 +221,52 @@ void maploader_load(char const * fileName)
             int type = maploader_tile_type(x, y);
             if(type != MAPLOADER_TILE_DEFAULT)
                 continue;
-            if(random(100) < 50)
-                continue;
-            float v = maploader_tile_vegetation(x, y);
-            if(v < 0.2)
-                continue;
-            if(random(100) < pow(v, 6.0) * 100) {
-                char const * boom = "tree01.mdl";
-                var r = random(1);
-                if(r > 0.66)
-                    boom = "tree02.mdl";
-                else if(r > 0.33)
-                    boom = "tree03.mdl";
+            VECTOR pos;
+            maploader_pos_to_vec(pos, x, y);
 
-                you = ent_create(boom, nullvector, NULL);
-                maploader_pos_to_vec(you->x, x, y);
-                you->pan = random(360);
-                you->tilt = random(30) - 15;
-                // you->emask &= ~DYNAMIC;
+            if(random(100) > 50)
+            {
+                float z = maploader_tile_zettiness(x, y);
+
+                if(random(100) < 100 * z)
+                {
+                   z_spawn(pos);
+                }
+            }
+
+            if(random(100) > 50)
+            {
+                float v = maploader_tile_vegetation(x, y);
+                if(v > 0.2)
+                {
+                    if(random(100) < pow(v, 6.0) * 100) {
+                        char const * boom = "tree01.mdl";
+                        var r = random(1);
+                        if(r > 0.66)
+                            boom = "tree02.mdl";
+                        else if(r > 0.33)
+                            boom = "tree03.mdl";
+
+                        you = ent_create(boom, pos, NULL);
+                        you->pan = random(360);
+                        you->tilt = random(30) - 15;
+                        // you->emask &= ~DYNAMIC;
+                    }
+                }
             }
         }
     }
     maploader.terrain.clipfactor = 2;
 
-    int i; for(i = -15; i <= 15; i++)
-    {
-        you = ent_create(
-            "StrasseGerade.mdl",
-            vector(580 * i, 0, 0),
-            NULL
-        );
-        you.z = maploader_get_height(you.x);
-    }
+//    int i; for(i = -15; i <= 15; i++)
+//    {
+//        you = ent_create(
+//            "StrasseGerade.mdl",
+//            vector(580 * i, 0, 0),
+//            NULL
+//        );
+//        you.z = maploader_get_height(you.x);
+//    }
 
 
 
@@ -289,6 +307,11 @@ float maploader_tile_height(int x, int y)
 	return ((maploader.cells)[maploader.w * y + x]).elevation;
 }
 
+float maploader_tile_zettiness(int x, int y)
+{
+    return ((maploader.cells)[maploader.w * y + x]).zettiness;
+}
+
 int   maploader_get_type(VECTOR * v)
 {
 	int x, y;
@@ -309,6 +332,7 @@ float maploader_get_height(VECTOR * v)
 	maploader_pos_for_vec(v, &x, &y);
 	return maploader_tile_height(x, y);
 }
+
 
 var maploader_dist2d(VECTOR * _a, VECTOR * _b)
 {

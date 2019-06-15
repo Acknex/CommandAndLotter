@@ -629,13 +629,14 @@ void presetsInit()
 	unitPreset->ID = 0;
 	unitPreset->maxSpeed = 10;
 	unitPreset->maxHP = 100;
-	unitPreset->radius = 0.25;
+	unitPreset->radius = 0.175;
 	
 	// 2nd unit
 }
 
 VECTOR* mapGetVectorFromTile(MAP* map, VECTOR* v, TILE* tile)
 {
+	if(!tile) error("you called mapGetVectorFromTile with a NULL tile, probably because of mapGetTile and bad indices!");
 	static VECTOR _vstatic;
 	if(!v) v = &_vstatic;
 	v->x = (tile->pos[0]+0.5)*map->tileSize + map->vMin.x;
@@ -772,14 +773,14 @@ int mapIsAnyFriendlyUnitNearby(MAP* map, TILE* sourceTile, int range, int player
 		for(j = sourceTile->pos[1]-iRange; j <= sourceTile->pos[1]+iRange; j++)
 		{
 			TILE* tile = mapTileGet(map, i, j);
-				
+			
 			int currentPlayer;
 			if(tile) {
 				VECTOR otherPos;
 				mapGetVectorFromTile(map, &otherPos, tile);
 				
 				if(vec_dist(pos, &otherPos) > range)
-					continue;
+				continue;
 				if(tile->numUnits[playerNumber]) return 1;
 			}
 		}
@@ -810,7 +811,7 @@ VECTOR* unitFlockingSpeedGet(MAP* map, UNIT* unit, VECTOR* v)
 		VECTOR vDir;
 		vec_diff(vDir, unit->pos2d, neighbor->pos2d);
 		var length = vec_length(vDir);
-		var range = 2*(unitPreset->radius + neighborPreset->radius);
+		var range = 1.75*(unitPreset->radius + neighborPreset->radius);
 		
 		if(length < range)
 		{
@@ -1053,7 +1054,7 @@ void mapMoveUnits(MAP* map)
 		{
 			UNIT* next = unit->next;
 			UNIT_PRESET* unitPreset = &unitPresets[unit->presetID];
-				vec_set(unit->prevPos3d, unit->pos3d);
+			vec_set(unit->prevPos3d, unit->pos3d);
 			if(unit->allowMovement) //unit->isActive)
 			{
 				unitMove(map, unit);
@@ -1113,7 +1114,26 @@ void jpsUnitDestroy(UNIT* unit)
 {
 	if(!unit) return;
 	if(unit->jpsPath) jpsPathDestroy(unit->jpsPath);
-	sys_free(unit);
+	MAP* map = mapGetCurrent();
+	// maybe get player ID from unit
+	int currentPlayer;
+	for(currentPlayer = 0; currentPlayer < MAX_PLAYERS; currentPlayer++)
+	{
+		UNIT* prev = NULL;
+		UNIT *otherUnit = map->unitFirst[currentPlayer];
+		while(otherUnit)
+		{
+			UNIT* next = otherUnit->next;
+			if(unit == otherUnit)
+			{
+				if(prev) prev->next = next;
+				else map->unitFirst[currentPlayer] = next;
+				sys_free(unit);
+				return;
+			}
+			otherUnit = next;
+		}
+	}
 }
 
 void unitSetTargetFromVector2D(MAP* map, UNIT* unit, VECTOR *vTarget)

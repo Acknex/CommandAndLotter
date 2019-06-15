@@ -25,6 +25,7 @@ int maploader_size_y(void);
 int   maploader_tile_type(int x, int y);
 float maploader_tile_vegetation(int x, int y);
 float maploader_tile_height(int x, int y);
+float maploader_tile_zettiness(int x, int y);
 
 int   maploader_get_type(VECTOR * v);
 float maploader_get_vegetation(VECTOR * v);
