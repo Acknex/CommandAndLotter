@@ -94,7 +94,6 @@ void fow_open()
 		for(y = 0; y<map->size[1]; ++y)
 		{
 			TILE *tile = mapTileGet(map, x,y);
-			
 			VECTOR pos;
 			mapGetVectorFromTile(map, &pos, tile);
 			pos.z = 550;
@@ -119,11 +118,14 @@ void fov_uncover(VECTOR *pos, var range)
 		for(j = tile->pos[1]-iRange; j <= tile->pos[1]+iRange; j++)
 		{
 			TILE *otherTile = mapTileGet(map, i, j);
+			if(otherTile)
+			{
 			VECTOR otherPos;
 			mapGetVectorFromTile(map, &otherPos, otherTile);
 			
 			if(vec_dist(pos, &otherPos) < range)
 				otherTile->visibility = FOW_SCOUTED;
+			}
 		}
 }
 

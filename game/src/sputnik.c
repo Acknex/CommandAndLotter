@@ -59,7 +59,6 @@ void SPUTNIK__wait_or_walk(ENTITY * ptr)
 	UNIT* unit = jpsAllowMovementForEntity(ptr, true);
 	if(!unit) return;
 	
-		
 	vec_set(ptr->x, unit->pos3d);
 		VECTOR diff, temp;
 		vec_diff(diff, unit->pos3d, unit->prevPos3d);
