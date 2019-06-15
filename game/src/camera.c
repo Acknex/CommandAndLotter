@@ -43,7 +43,7 @@ void topdown_camera_update()
 		topdown_camera_centerTarget.y += (key_leftright*cosv(camera.pan)+ key_updown*sinv(camera.pan))*time_step*CAMERA_SPEED;
 		topdown_camera_centerTarget.z = 0;
 		
-		topdown_camera_height += -0.1*(topdown_camera_height/10.)*mickey.z*time_step;
+		topdown_camera_height += -CAMERA_SCALESPEED*(topdown_camera_height/10.)*mickey.z*time_step;
 		topdown_camera_height = clamp(topdown_camera_height, 1, 10.);
 		
 		
