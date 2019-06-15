@@ -214,8 +214,6 @@
 	void* pointerArray[POINTER_ARRAY_MAX]; // yes!
 	int pointerArrayNum = 0;
 
-	LIST* mapGetNearbyUnits_listbased(MAP* map, TILE* sourceTile, int range);
-
 	int mapGetNearbyUnits(MAP* map, TILE* sourceTile, int range);
 	int mapIsAnyUnitNearby(MAP* map, TILE* sourceTile, int range);
 	int mapIsAnyFriendlyUnitNearby(MAP* map, TILE* sourceTile, int range, int playerNumber);

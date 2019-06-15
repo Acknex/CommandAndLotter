@@ -4,7 +4,7 @@
 #include "global.h"
 
 int maploader_cellsize = 3; // cell size in quads
-var maploader_trisize = 32; // triangle size
+var maploader_trisize = 28.75; // triangle size
 
 #define MAPLOADER_TILE_DEFAULT 0
 #define MAPLOADER_TILE_HOLE    1
