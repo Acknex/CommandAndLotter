@@ -1,6 +1,7 @@
 
 #define SELCTED_SKILL skill[39]
 #define UNIT_DEST_SKILL skill[40]
+#define UNIT_GROUP_SKILL skill[43]
 
 #define DebugMode
 
@@ -9,6 +10,7 @@ var CamFPS;
 #include <acknex.h>
 #include "framework.h"
 #include "map_loader.h"
+#include "camera.h"
 
 #ifdef DebugMode
     var test1; //für debugzwecke
@@ -136,7 +138,6 @@ void UnitMangement_open(){
         for(y = -1500; y < -500; y+=100){
 
             var z = maploader_get_height(vector(x,y,0));
-
             you = ent_create("sputnik.mdl",vector(x,y,z),NULL);
             you.ambient = 0;
             if(you.y == 0){
@@ -184,6 +185,29 @@ function CheckIsLeftFrom(VECTOR* Base, VECTOR* V1, VECTOR * V2)
 }
 
 
+function DeselectUnit(ENTITY * ent)
+{
+    ent.SELCTED_SKILL = 0;
+    ent.ambient = 0;
+}
+
+function SelectUnit(ENTITY * ent)
+{
+    ent.SELCTED_SKILL = 1;
+    ent.ambient = 255;
+}
+
+function SetUnitSelcted(ENTITY* ent, var isSelected)
+{
+    if(isSelected){
+        SelectUnit(ent);
+    }else{
+        DeselectUnit(ent);
+    }
+}
+
+
+
 function SelectEntitys()
 {
     VECTOR Posis[4];
@@ -201,12 +225,7 @@ function SelectEntitys()
         for(i = 0; i < 4 && isInside; i++){
             isInside = CheckIsLeftFrom(Posis[i],Posis[(i+1)%4],ent.x);
         }
-        ent.SELCTED_SKILL = isInside;
-        if(isInside){
-            ent.ambient = 200;
-        }else{
-            ent.ambient = 0;
-        }
+        SetUnitSelcted(ent, isInside);
     }
 }
 
@@ -239,39 +258,46 @@ function SetDestForSelectd(VECTOR * Dest)
 
 VECTOR UnitTempVec;
 
-function Deselect(ENTITY * ent)
-{
-    ent.SELCTED_SKILL = 0;
-    ent.ambient = 0;
-}
-
-
-function SetDest(ENTITY * ent)
-{
-    vec_set(ent.UNIT_DEST_SKILL,UnitTempVec);
-}
-
-
-void FuncToCall(ENTITY * e);
-function DoFuncForAllSelected()
-{
-    ENTITY * ent;
-    SUBSYSTEM_LOOP(ent, SUBSYSTEM_UNIT_MANAGEMENT){
-        if(ent.SELCTED_SKILL){
-            FuncToCall(ent);
-        }
-    }
-}
-
 
 
 function DebugDrawDests()
 {
     ENTITY * ent;
     SUBSYSTEM_LOOP(ent, SUBSYSTEM_UNIT_MANAGEMENT){
-            draw_line3d(ent.x, NULL, 100);
-            draw_line3d(ent.x, vector(0,255,0), 100);
-            draw_line3d(ent.UNIT_DEST_SKILL, vector(0,255,0), 100);
+        draw_line3d(ent.x, NULL, 100);
+        draw_line3d(ent.x, vector(0,255,0), 100);
+        draw_line3d(ent.UNIT_DEST_SKILL, vector(0,255,0), 100);
+    }
+}
+
+
+
+function NumberKeyPressed(int nr)
+{
+    var x = 0;
+    var y = 0;
+    var count = 0;
+
+    ENTITY * ent;
+    SUBSYSTEM_LOOP(ent, SUBSYSTEM_UNIT_MANAGEMENT){
+        if(key_ctrl){
+            if(ent.SELCTED_SKILL){
+                ent.UNIT_GROUP_SKILL = nr;
+            }
+        }else{
+            SetUnitSelcted(ent, ent.UNIT_GROUP_SKILL == nr);
+            if(ent.UNIT_GROUP_SKILL == nr){
+                x+=ent.x;
+                y+=ent.y;
+                count++;
+            }
+
+        }
+    }
+    if(!key_ctrl && key_alt && count){
+        x /= count;
+        y /= count;
+        topdown_camera_set_pos(vector(x,y,0));
     }
 }
 
@@ -303,16 +329,17 @@ function RealUnitControl()
     }
     if(mouse_right && !MouseRightLast){
 
-        PosToMap(UnitTempVec,mouse_pos.x,mouse_pos.y);
-        FuncToCall = SetDest;
-        DoFuncForAllSelected();
+        VECTOR Dest;
+        PosToMap(Dest,mouse_pos.x,mouse_pos.y);
+        SetDestForSelectd(Dest);
     }
 
-//    if(key_esc){
-//      //  FuncToCall = Deselect;
-//      //  DoFuncForAllSelected();
-//    }
-
+    int i;
+    for(i = 2; i < 10; i++){
+        if(key_pressed(i)){
+            NumberKeyPressed(i-1);
+        }
+    }
     MouseLeftLast = mouse_left;
     MouseRightLast = mouse_right;
 
@@ -320,11 +347,10 @@ function RealUnitControl()
 
 
 
-void UnitMangement_update(){
-
-
-        RealUnitControl();
-        DebugDrawDests();
+void UnitMangement_update()
+{
+    RealUnitControl();
+    DebugDrawDests();
 
 }
 
