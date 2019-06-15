@@ -136,14 +136,14 @@ void maploader_load(char const * fileName)
 
     collision_mode = 0;
 
-    you = ent_createterrain(
-        bmp,
-        vector(0, 0, 0),
-        2,
-        2,
-        size_x * maploader_trisize
-    );
-    you.material = maploader_water_material;
+//    you = ent_createterrain(
+//        bmp,
+//        vector(0, 0, 0),
+//        2,
+//        2,
+//        size_x * maploader_trisize
+//    );
+//    you.material = maploader_water_material;
 
     maploader.terrain = ent_createterrain(
         bmp,
