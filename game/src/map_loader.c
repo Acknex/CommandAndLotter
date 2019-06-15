@@ -1,5 +1,6 @@
 #include "map_loader.h"
 #include <d3d9.h>
+#include <stdio.h>
 
 typedef struct
 {
@@ -154,12 +155,12 @@ void maploader_load(char const * fileName)
         }
         mesh->UnlockVertexBuffer();
     }
-    
+
     set(maploader.terrain, PASSABLE);
 
     collision_mode = 1;
 
-    if(!key_c)
+    if(key_c)
         c_updatehull(maploader.terrain, 0);
     ent_fixnormals(maploader.terrain, 0);
 
@@ -216,4 +217,50 @@ float maploader_get_height(VECTOR * v)
 	int x, y;
 	maploader_get_tile_pos(v, &x, &y);
 	return maploader_tile_height(x, y);
+}
+
+var maploader_dist2d(VECTOR * _a, VECTOR * _b)
+{
+    VECTOR a,b;
+    vec_set(a, _a);
+    vec_set(b, _b);
+    a.z = 0;
+    b.z = 0;
+    return vec_dist(a, b);
+}
+
+var maploader_lerp(var a, var b, float f)
+{
+    return (1.0 - f) * a + f * b;
+}
+
+VECTOR * maploader_trace(VECTOR *_start, VECTOR *_end)
+{
+    VECTOR start, end;
+    vec_set(start, _start);
+    vec_set(end, _end);
+
+    VECTOR iter;
+    vec_set(iter, start);
+
+    var total = maploader_dist2d(start, end);
+
+    while(maploader_dist2d(iter, end) > maploader_trisize)
+    {
+        var a = maploader_dist2d(iter, end) / total;
+        iter.z = maploader_lerp(end.z, start.z, a);
+        if(iter.z < maploader_get_height(iter))
+            return vector(iter.x, iter.y+1, iter.z);
+
+        VECTOR dir;
+        vec_diff(dir, end, start);
+        dir.z = 0;
+        vec_normalize(dir, maploader_trisize);
+
+        vec_add(iter, dir);
+    }
+    if(iter.z < maploader_get_height(iter))
+        return vector(iter.x, iter.y+1, iter.z);
+
+    return NULL;
 }

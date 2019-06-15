@@ -30,4 +30,7 @@ int   maploader_get_type(VECTOR * v);
 float maploader_get_vegetation(VECTOR * v);
 float maploader_get_height(VECTOR * v);
 
+//! returns temporary vector or NULL when no hit
+VECTOR * maploader_trace(VECTOR * start, VECTOR * end);
+
 #endif // MAP_LOADER_H

@@ -37,7 +37,6 @@ void game_update(void)
 	stub_update(); //hook debug shit here
 	topdown_camera_update();
     //UnitMangement_update();
-
 }
 
 void game_close(void)
