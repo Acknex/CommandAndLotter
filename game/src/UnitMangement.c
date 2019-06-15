@@ -419,7 +419,7 @@ function UnitControl()
         VECTOR Dest;
         PosToMap(Dest,mouse_pos.x,mouse_pos.y);                            
         if(SetDestForSelectd(Dest) > 0){
-            effects2d_spawn(Dest.x, Dest.y, CmdType);
+            effects2d_spawn(Dest, CmdType);
         }
     }
 
