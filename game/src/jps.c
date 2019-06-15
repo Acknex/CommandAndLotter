@@ -755,15 +755,25 @@ int mapIsAnyUnitNearby(MAP* map, TILE* sourceTile, int range)
 int mapIsAnyFriendlyUnitNearby(MAP* map, TILE* sourceTile, int range, int playerNumber)
 {
 	if(!sourceTile) return NULL;
+	VECTOR pos;
+	mapGetVectorFromTile(map, &pos, sourceTile);
+	int iRange = floor(range / map->tileSize + 0.5);
 	int i,j;
-	for(i = sourceTile->pos[0]-range; i <= sourceTile->pos[0]+range; i++)
+	for(i = sourceTile->pos[0]-iRange; i <= sourceTile->pos[0]+iRange; i++)
 	{
-		for(j = sourceTile->pos[1]-range; j <= sourceTile->pos[1]+range; j++)
+		for(j = sourceTile->pos[1]-iRange; j <= sourceTile->pos[1]+iRange; j++)
 		{
 			TILE* tile = mapTileGet(map, i, j);
+				
 			int currentPlayer;
-			if(tile)
-			if(tile->numUnits[playerNumber]) return 1;
+			if(tile) {
+				VECTOR otherPos;
+				mapGetVectorFromTile(map, &otherPos, tile);
+				
+				if(vec_dist(pos, &otherPos) > range)
+					continue;
+				if(tile->numUnits[playerNumber]) return 1;
+			}
 		}
 	}
 	return 0;
@@ -1182,11 +1192,15 @@ MAP* jpsMapLoadFromFile(char* filename)
 	mapJPSUpdate(map);
 	mapUpdateBmap(map);
 	
-	entJPSDummyPlane = ent_create("jpsPlane.mdl", vector(0,0,500), NULL);
-	set(entJPSDummyPlane, PASSABLE | TRANSLUCENT);
-	ent_setskin(entJPSDummyPlane, map->bmp, 1);
-	vec_set(entJPSDummyPlane->scale_x, vector(sizeX/64.0*tileSize, sizeY/64.0*tileSize, 0));
-	entJPSDummyPlane->material = jpsDummyNoFilter_mat;
+	if(0)
+	{
+		entJPSDummyPlane = ent_create("jpsPlane.mdl", vector(0,0,500), NULL);
+		set(entJPSDummyPlane, PASSABLE | TRANSLUCENT);
+		entJPSDummyPlane.flags2 |= UNTOUCHABLE;
+		ent_setskin(entJPSDummyPlane, map->bmp, 1);
+		vec_set(entJPSDummyPlane->scale_x, vector(sizeX/64.0*tileSize, sizeY/64.0*tileSize, 0));
+		entJPSDummyPlane->material = jpsDummyNoFilter_mat;
+	}
 	
 	return map;
 }

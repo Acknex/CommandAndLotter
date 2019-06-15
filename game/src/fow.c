@@ -61,7 +61,7 @@ void fow_open()
 			
 			VECTOR pos;
 			mapGetVectorFromTile(map, &pos, tile);
-			pos.z = 1000;
+			pos.z = 550;
 			
 			
 			tile->visibility = FOW_HIDDEN;

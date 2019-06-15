@@ -5,7 +5,7 @@
 
 #define FOW_HIDDEN 0
 #define FOW_SCOUTED 1
-#define FOW_SIGHT_RANGE 4
+#define FOW_SIGHT_RANGE 1500
 
 
 void fow_open();
