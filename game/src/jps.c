@@ -222,7 +222,8 @@ void mapUpdateBmap(MAP* map)
 	BMAP* bmp = map->bmp;
 	if(!bmp) return;
 	var format = bmap_lock(bmp,0);
-	var pixelOn = pixel_for_vec(vector(255,255,255),100,format);
+	var pixelJPS = pixel_for_vec(vector(255,0,255),100,format);
+	var pixelOn = pixel_for_vec(vector(128,128,128),100,format);
 	var pixelOff = pixel_for_vec(vector(0,0,0),100,format);
 
 	for(i = 0; i < map->size[0]; i++)
@@ -230,8 +231,12 @@ void mapUpdateBmap(MAP* map)
 		for(j = 0; j < map->size[1]; j++)
 		{
 			TILE* tile = mapTileGet(map,i,j);
-			if(tile->value) pixel_to_bmap(bmp,i,j,pixelOn);
-			else pixel_to_bmap(bmp,i,j,pixelOff);
+			if(tile->flags & TILE_FLAG_JPS) pixel_to_bmap(bmp,i,j,pixelJPS);
+			else
+			{
+				if(tile->value) pixel_to_bmap(bmp,i,j,pixelOff);
+				else pixel_to_bmap(bmp,i,j,pixelOn);
+			}
 		}	
 	}
 	bmap_unlock(bmp);
@@ -549,7 +554,7 @@ int mapJPSPathGet(MAP* map, TILE* startTile, TILE *targetTile, JPSPATH *jpsPathO
 		{
 			
 			TILE* tile2 = (TILE*)neighborList->data;
-		
+			
 			int newCost = tile->currentCost+(tile->neighborCost)[i];
 			if(newCost < tile2->currentCost)
 			{
@@ -1102,6 +1107,12 @@ void mapSaveToFile(MAP* map, char* filename)
 	file_close(fhandle);
 }
 
+MATERIAL* jpsDummyNoFilter_mat =
+{
+	effect = "jpsDummyNoFilter.fx";
+	flags = AUTORELOAD;
+}
+
 MAP* jpsMapLoadFromFile(char* filename)
 {
 	var fhandle = file_open_read(filename);
@@ -1122,9 +1133,24 @@ MAP* jpsMapLoadFromFile(char* filename)
 	}
 	file_close(fhandle);
 	mapJPSUpdate(map);
+	mapUpdateBmap(map);
+	
+	entJPSDummyPlane = ent_create("jpsPlane.mdl", vector(0,0,-640), NULL);
+	set(entJPSDummyPlane, PASSABLE | TRANSLUCENT);
+	ent_setskin(entJPSDummyPlane, map->bmp, 1);
+	vec_set(entJPSDummyPlane->scale_x, vector(sizeX/64.0*tileSize*4, sizeY/64.0*tileSize*4, 0));
+	entJPSDummyPlane->material = jpsDummyNoFilter_mat;
 	
 	return map;
 }
+
+BMAP* mapGetBitmap(MAP* map)
+{
+	if(!map) map = mapGetCurrent();
+	if(!map) return NULL;
+	return map->bmp;
+}
+
 
 ///////////////////////////////
 // jps.c
