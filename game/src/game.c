@@ -2,6 +2,7 @@
 #include "map_loader.h"
 #include "ui_game.h"
 #include "framework.h"
+#include "map.h"
 #include "camera.h"
 #include "sputnik.h"
 #include "stub.h"
@@ -12,6 +13,7 @@ void game_init(void)
 {
 	ui_game_init();
     UnitMangement_init();
+    grid_init();
 }
 
 void game_open(void)
@@ -28,6 +30,8 @@ void game_open(void)
     UnitMangement_open();
 	SPUTNIK_Init();
 	stub_init(); //hook debug shit here
+	
+	grid_open(50,50);
 }
 
 void game_update(void)
@@ -42,6 +46,7 @@ void game_update(void)
 void game_close(void)
 {
 	ui_game_close();
+	grid_close();
 }
 
 bool game_is_done(void)
