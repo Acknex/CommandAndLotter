@@ -10,6 +10,6 @@ void effects2d_open(void);
 void effects2d_update(void);
 void effects2d_close(void);
 
-void effects2d_spawn(int x, int y, int type);
+void effects2d_spawn(VECTOR * worldpos, int type);
 
 #endif // EFFECTS2D_H
