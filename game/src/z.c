@@ -26,7 +26,7 @@ void Z()
    framework_setup(my, SUBSYSTEM_Z);
 	ENEMY_HIT_init(my);
 	set(my, SHADOW);
-	vec_scale(my->scale_x, 10);
+	vec_scale(my->scale_x, 10); //temp
 	c_setminmax(me);
 	my->ENTITY_STATE = ENTITY_STATE_WAIT;
 }
@@ -41,15 +41,11 @@ void Z_Update()
 	ENTITY * ptr;
 	SUBSYSTEM_LOOP(ptr, SUBSYSTEM_Z)
 	{
-	DEBUG_VAR(ptr->x, 200);
-	DEBUG_VAR(ptr->y, 220);
-	DEBUG_VAR(ptr->z, 240);
 			
 		if (ptr->DAMAGE_HIT > 0)
       {
       	Z__hit(ptr);
 		}
-DEBUG_VAR(ptr->ENTITY_STATE, 123);
 		switch(ptr->ENTITY_STATE)    	
 		{
 
@@ -83,6 +79,7 @@ void Z__hit(ENTITY* ptr)
 	ptr->ENTITY_ANIM = 100;
 	snd_play(z_collect_snd, 100, 0);
 	z_amount += Z_VALUE;
+	ptr->DAMAGE_HIT = 0;
 }
 
 void Z__wait(ENTITY* ptr)
@@ -94,11 +91,11 @@ void Z__wait(ENTITY* ptr)
 void Z__die(ENTITY* ptr)
 {
 	ptr->ENTITY_ANIM -= 5 * time_step;
-	ptr->scale_x = maxv(ptr->scale_x - ptr->ENTITY_ANIM, 0);
-	ptr->scale_y = maxv(ptr->scale_y - ptr->ENTITY_ANIM, 0);
+	ptr->scale_x = maxv(ptr->scale_x - ptr->ENTITY_ANIM*0.01, 0);
+	ptr->scale_y = maxv(ptr->scale_y - ptr->ENTITY_ANIM*0.01, 0);
 
 	/* transitions */
-	if(ptr->ENTITY_ANIM >= 90)
+	if(ptr->ENTITY_ANIM <= 0)
 	{
 		ptr->ENTITY_STATE = ENTITY_STATE_DEAD;
 		set(ptr, PASSABLE);
