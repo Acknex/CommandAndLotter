@@ -1,7 +1,6 @@
 #include "global.h"
 #include "framework.h"
 #include "spawner.h"
-//#include "particle.h"
 #include "map_loader.h"
 #include "unit.h"
 #include "fow.h"
@@ -10,7 +9,6 @@
 #define SPAWNER_PROGRESS skill22
 #define SPAWNER_BUILDTIMER skill23
 #define SPAWNER_DIETIMER skill24
-#define SPAWNER_UNITTYPE skill25
 #define SPAWNER_HITTHRESHOLD skill27
 #define SPAWNER_FIREPARTICLES skill28
 #define SPAWNER_DEBRISPARTICLES skill29
@@ -58,25 +56,25 @@ MATERIAL * building_material =
   effect = "building.fx";
 }
 
-ENTITY* spawner_spawn(int spawnertype, VECTOR* pos, var owner)
+ENTITY* spawner_spawn(int unittype, VECTOR* pos, var owner)
 {
 	ENTITY* ent;
     ENTITY *wireframe;
-	switch (spawnertype)
+	switch (unittype)
 	{
-        case 0:
+        case UNIT_SPUTNIK:
             ent = ent_create("the_tower.mdl", pos, Spawner);
             wireframe = ent_create("the_tower_wireframe.mdl", pos, NULL);
             break;
-        case 1:
+        case UNIT_LERCHE:
             ent = ent_create("lark_farm.mdl", pos, Spawner);
             wireframe = ent_create("lark_farm_wireframe.mdl", pos, NULL);
             break;
-        case 2:
+        case UNIT_EYE:
             ent = ent_create("eye_tree_you.mdl", pos, Spawner);
             wireframe = ent_create("eye_tree_you_wireframe.mdl", pos, NULL);
             break;
-        case 3:
+        case UNIT_BABE:
             ent = ent_create("bank_of_zorro.mdl", pos, Spawner);
             wireframe = ent_create("bank_of_zorro_wireframe.mdl", pos, NULL);
             break;
@@ -84,8 +82,10 @@ ENTITY* spawner_spawn(int spawnertype, VECTOR* pos, var owner)
 
 	if (ent != NULL)
 	{
+		mapSetTileValueAtPos3D(mapGetCurrent(), pos, 1); // 1 == solid, non-traversable
+		mapJPSUpdate(mapGetCurrent());
 		fov_uncover(pos, SPAWNER_LOS);
-		ent->SPAWNER_UNITTYPE = spawnertype;
+		ent->ENTITY_UNITTYPE = unittype;
 		if (owner == SPAWNER_ENEMY)
 			ent->group = GROUP_ENEMY_SPAWNER;
 		else
@@ -316,7 +316,7 @@ void SPAWNER__produce(ENTITY* ptr)
 		VECTOR* angle = vector(ang(ptr->SPAWNER_SPAWNANGLE), 0, 0);
 		vec_rotate(targetPos, angle);
 		vec_add(targetPos, ptr->x);
-		unit_spawn(ptr->SPAWNER_UNITTYPE, ptr->x, targetPos, owner);
+		unit_spawn(ptr->ENTITY_UNITTYPE, ptr->x, targetPos, owner);
 	}
 	if (ptr->SPAWNER_QUEUE == 0)
 	{
@@ -431,6 +431,8 @@ void SPAWNER__die(ENTITY* ptr)
 	/* transitions */
 	if(ptr->SPAWNER_DIETIMER <= 0)
 	{
+		mapSetTileValueAtPos3D(mapGetCurrent(), ptr->x, 0); // 1 == solid, non-traversable
+		mapJPSUpdate(mapGetCurrent());
 		reset(ptr, SHADOW);
 		ptr->SPAWNER_DIETIMER  = 0;
 		ptr->ENTITY_STATE = SPAWNER_STATE_DEAD;

@@ -10,6 +10,7 @@ var CamFPS;
 #include "global.h"
 #include "unit.h"
 #include "jps.h"
+#include "effects2d.h"
 
 #ifdef DebugMode
     var test1; //für debugzwecke
@@ -256,23 +257,29 @@ var MouseRightLast = 0;
 
 function SetDestForSelectd(VECTOR * Dest)
 { 
+    int Count = 0;
     ENTITY * ent;
     for(ent = ent_next(NULL); ent != NULL; ent = ent_next(ent)){
         if(ent->group==GROUP_PLAYER_UNIT && ent.SELCTED_SKILL){
             unit_setTarget(ent, Dest);
+            Count++;
         }
     }
+    return Count;
 }
 
 
 function SetVictimForSelectd(ENTITY * Victim)
 {
+    int Count = 0;
     ENTITY * ent;
     for(ent = ent_next(NULL); ent != NULL; ent = ent_next(ent)){
         if(ent->group==GROUP_PLAYER_UNIT && ent.SELCTED_SKILL){
             unit_setVictim(ent, Victim);
+            Count++;
         }
     }
+    return Count;
 }
 
 
@@ -391,6 +398,7 @@ function UnitControl()
        }
     }
     if(mouse_right && !MouseRightLast){
+        var CmdType = EFFECTS2D_TYPE_GOTO;
 
         if(mouse_panel == 0){
             vec_set(temp, vector(mouse_pos.x,mouse_pos.y, camera.clip_far));
@@ -399,13 +407,20 @@ function UnitControl()
             if(you != 0){
                  if(you->group==GROUP_ENEMY_UNIT  || you->group == GROUP_ENEMY_SPAWNER){
                     SetVictimForSelectd(you);
+                    CmdType = EFFECTS2D_TYPE_ATTACK;
+                    if(unit_getType(you) == UNIT_Z){
+                       CmdType = EFFECTS2D_TYPE_MINE;
+                    }
+
+
                 }
             }
         }
-
         VECTOR Dest;
         PosToMap(Dest,mouse_pos.x,mouse_pos.y);                            
-        SetDestForSelectd(Dest);
+        if(SetDestForSelectd(Dest) > 0){
+            effects2d_spawn(Dest.x, Dest.y, CmdType);
+        }
     }
 
     int i;

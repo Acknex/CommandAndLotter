@@ -86,7 +86,7 @@ void buildingPlacement_placeConstruction()
 
 void buildingPlacement_update()
 {
-	if(buildingPlacement_selection == BUILDING_NONE) 
+	if(buildingPlacement_selection == BUILDING_NONE && !mouse_left) 
 	{
         if(key_1)
 			buildingPlacement_beginConstruction(BUILDING_TOWER);

@@ -1244,6 +1244,18 @@ BMAP* mapGetBitmap(MAP* map)
 	return map->bmp;
 }
 
+void mapSetTileValueAtPos3D(MAP* map, VECTOR* pos3d, int value)
+{
+	TILE* tile = mapGetTileFromVector(map, pos3d);
+	if(tile) tile->value = value;
+}
+
+int mapGetTileValueAtPos3D(MAP* map, VECTOR* pos3d)
+{
+	TILE* tile = mapGetTileFromVector(map, pos3d);
+	if(tile) return tile->value;
+	return -1;
+}
 
 ///////////////////////////////
 // jps.c

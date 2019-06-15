@@ -33,6 +33,7 @@ SOURCES += \
   src/building.c \
   src/camera.c \
   src/credits.c \
+  src/effects2d.c \
   src/enemy_hit.c \
   src/framework.c \
   src/game.c \
@@ -77,6 +78,7 @@ HEADERS += \
   src/camera.h \
   src/console.h \
   src/credits.h \
+  src/effects2d.h \
   src/enemy_hit.h \
   src/framework.h \
   src/game.h \
