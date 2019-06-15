@@ -102,6 +102,14 @@ void draw_line3D2(VECTOR* vFrom, VECTOR* vTo, COLOR* color, var alpha)
 
 ///////////////////////////////
 
+
+UNIT* jpsAllowMovementForEntity(ENTITY* ptr, int allow)
+{
+	UNIT* unit = jpsUnitGetFromEntity(ptr);
+	unit->allowMovement = allow;
+	return unit;
+}
+
 JPSPATH *jpsPathCreate(int maxLength)
 {
 	JPSPATH *jpsPath = (JPSPATH*)sys_malloc(sizeof(JPSPATH));
@@ -429,7 +437,7 @@ void mapTileCalculateVisibility(MAP* map)
 	}
 }
 
-#define JPS_DEBUG
+//#define JPS_DEBUG
 
 int mapJPSPathGet(MAP* map, TILE* startTile, TILE *targetTile, JPSPATH *jpsPathOut)
 {
@@ -621,13 +629,14 @@ void presetsInit()
 	unitPreset->ID = 0;
 	unitPreset->maxSpeed = 10;
 	unitPreset->maxHP = 100;
-	unitPreset->radius = 0.25;
+	unitPreset->radius = 0.175;
 	
 	// 2nd unit
 }
 
 VECTOR* mapGetVectorFromTile(MAP* map, VECTOR* v, TILE* tile)
 {
+	if(!tile) error("you called mapGetVectorFromTile with a NULL tile, probably because of mapGetTile and bad indices!");
 	static VECTOR _vstatic;
 	if(!v) v = &_vstatic;
 	v->x = (tile->pos[0]+0.5)*map->tileSize + map->vMin.x;
@@ -733,6 +742,54 @@ int mapGetNearbyUnits(MAP* map, TILE* sourceTile, int range)
 	return pointerArrayNum;
 }
 
+int unit_getType(ENTITY* ent);
+
+// set typeID to -1 to get all objects
+// owner to -1 for both player and enemy units
+int mapGetNearbyUnitsOfTypeForPos(VECTOR *vpos, int typeID, int owner, var maxDistance, int maxNumEntities)
+{
+	MAP* map = mapGetCurrent();
+	TILE* sourceTile = mapGetTileFromVector(map, vpos);
+	pointerArrayNum = 0;
+	if(!sourceTile) return 0;
+	int range = 1+maxDistance/map->tileSize;
+	int ownerMin = 0;
+	int ownerMax = 1;
+	if(owner == 0) ownerMax = 0;
+	if(owner == 1) ownerMin = 1;
+	int i,j;
+	for(i = sourceTile->pos[0]-range; i <= sourceTile->pos[0]+range; i++)
+	{
+		for(j = sourceTile->pos[1]-range; j <= sourceTile->pos[1]+range; j++)
+		{
+			TILE* tile = mapTileGet(map, i, j);
+			if(tile)
+			{
+				int k;
+				int currentPlayer;
+				for(currentPlayer = ownerMin; currentPlayer < ownerMax; ++currentPlayer)
+				{		
+					for(k = 0; k < tile->numUnits[currentPlayer]; k++)
+					{
+						UNIT* unit = tile->unitArray[k];
+						ENTITY* ent = unit->ent;
+						if(ent)
+						{
+							if(owner < 0 || owner == unit_getType(ent))
+							{
+								pointerArray[pointerArrayNum++] = tile->unitArray[k];
+								if(pointerArrayNum >= POINTER_ARRAY_MAX || pointerArrayNum >= maxNumEntities) return pointerArrayNum;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return pointerArrayNum;
+}
+
+
 int mapIsAnyUnitNearby(MAP* map, TILE* sourceTile, int range)
 {
 	if(!sourceTile) return NULL;
@@ -755,15 +812,25 @@ int mapIsAnyUnitNearby(MAP* map, TILE* sourceTile, int range)
 int mapIsAnyFriendlyUnitNearby(MAP* map, TILE* sourceTile, int range, int playerNumber)
 {
 	if(!sourceTile) return NULL;
+	VECTOR pos;
+	mapGetVectorFromTile(map, &pos, sourceTile);
+	int iRange = floor(range / map->tileSize + 0.5);
 	int i,j;
-	for(i = sourceTile->pos[0]-range; i <= sourceTile->pos[0]+range; i++)
+	for(i = sourceTile->pos[0]-iRange; i <= sourceTile->pos[0]+iRange; i++)
 	{
-		for(j = sourceTile->pos[1]-range; j <= sourceTile->pos[1]+range; j++)
+		for(j = sourceTile->pos[1]-iRange; j <= sourceTile->pos[1]+iRange; j++)
 		{
 			TILE* tile = mapTileGet(map, i, j);
+			
 			int currentPlayer;
-			if(tile)
-			if(tile->numUnits[playerNumber]) return 1;
+			if(tile) {
+				VECTOR otherPos;
+				mapGetVectorFromTile(map, &otherPos, tile);
+				
+				if(vec_dist(pos, &otherPos) > range)
+				continue;
+				if(tile->numUnits[playerNumber]) return 1;
+			}
 		}
 	}
 	return 0;
@@ -792,7 +859,7 @@ VECTOR* unitFlockingSpeedGet(MAP* map, UNIT* unit, VECTOR* v)
 		VECTOR vDir;
 		vec_diff(vDir, unit->pos2d, neighbor->pos2d);
 		var length = vec_length(vDir);
-		var range = 2*(unitPreset->radius + neighborPreset->radius);
+		var range = 1.75*(unitPreset->radius + neighborPreset->radius);
 		
 		if(length < range)
 		{
@@ -984,7 +1051,7 @@ void unitMove(MAP* map, UNIT* unit)
 			TILE* nextTile = (jpsPath->tiles)[jpsPath->currentNode];
 			if(!nextTile) error("ERROR");
 			//if(!mapTraceDo(map,unitTile->pos,nextTile->pos,0))
-			if(vec_length( vector(unitTile->pos[0]-nextTile->pos[0], unitTile->pos[1]-nextTile->pos[1], 0) ) < 0.5 )
+			if(vec_length( vector(unitTile->pos[0]-nextTile->pos[0], unitTile->pos[1]-nextTile->pos[1], 0) ) < 0.25 )
 			{
 				jpsPath->currentNode--;
 				if(jpsPath->currentNode >= 0) nextTile = (jpsPath->tiles)[jpsPath->currentNode];
@@ -1035,9 +1102,9 @@ void mapMoveUnits(MAP* map)
 		{
 			UNIT* next = unit->next;
 			UNIT_PRESET* unitPreset = &unitPresets[unit->presetID];
-			if(unit->isActive)
+			vec_set(unit->prevPos3d, unit->pos3d);
+			if(unit->allowMovement) //unit->isActive)
 			{
-				vec_set(unit->prevPos3d, unit->pos3d);
 				unitMove(map, unit);
 				mapGetVector3DFromVector2D(map, unit->pos3d, unit->pos2d);
 				unit->isMoving = (abs(unit->pos3d.x-unit->prevPos3d.x) > 0.025 || abs(unit->pos3d.y-unit->prevPos3d.y) > 0.025);
@@ -1046,10 +1113,14 @@ void mapMoveUnits(MAP* map)
 			}
 			else
 			{
+				unit->isMoving = 0;
+			}
+			/*else
+			{
 				if(prev) prev->next = next;
 				else map->unitFirst[currentPlayer] = next;
 				sys_free(unit);
-			}
+			}*/
 			unit = next;
 		}
 	}
@@ -1091,21 +1162,41 @@ void jpsUnitDestroy(UNIT* unit)
 {
 	if(!unit) return;
 	if(unit->jpsPath) jpsPathDestroy(unit->jpsPath);
-	sys_free(unit);
+	MAP* map = mapGetCurrent();
+	// maybe get player ID from unit
+	int currentPlayer;
+	for(currentPlayer = 0; currentPlayer < MAX_PLAYERS; currentPlayer++)
+	{
+		UNIT* prev = NULL;
+		UNIT *otherUnit = map->unitFirst[currentPlayer];
+		while(otherUnit)
+		{
+			UNIT* next = otherUnit->next;
+			if(unit == otherUnit)
+			{
+				if(prev) prev->next = next;
+				else map->unitFirst[currentPlayer] = next;
+				sys_free(unit);
+				return;
+			}
+			otherUnit = next;
+		}
+	}
 }
 
 void unitSetTargetFromVector2D(MAP* map, UNIT* unit, VECTOR *vTarget)
 {
-	cprintf3("\n unitSetTargetFromVector2D(%p, (%.1f,%.1f))", unit, (double)vTarget->x, (double)vTarget->y);
+	//cprintf3("\n unitSetTargetFromVector2D(%p, (%.1f,%.1f))", unit, (double)vTarget->x, (double)vTarget->y);
 	if(!unit) return;
 	vec_set(unit->target2d, vTarget);
 	if(vec_dist(unit->target2d, unit->prevTarget2d) > 0.2)
 	{
 		vec_set(unit->prevTarget2d, unit->target2d);
 		unit->targetTile = mapTileGet(map, vTarget.x, vTarget.y);
+		//cprintf1(" - unit->targetTile(%p)", unit->targetTile);
 		//if(targetTile && unit->tile)
 		if(!unit->jpsPath) unit->jpsPath = jpsPathCreate(16);
-		mapJPSPathGet(map, unit->tile, targetTile, unit->jpsPath);
+		mapJPSPathGet(map, unit->tile, unit->targetTile, unit->jpsPath);
 	}
 }
 
@@ -1181,11 +1272,15 @@ MAP* jpsMapLoadFromFile(char* filename)
 	mapJPSUpdate(map);
 	mapUpdateBmap(map);
 	
-	entJPSDummyPlane = ent_create("jpsPlane.mdl", vector(0,0,580), NULL);
-	set(entJPSDummyPlane, PASSABLE | TRANSLUCENT);
-	ent_setskin(entJPSDummyPlane, map->bmp, 1);
-	vec_set(entJPSDummyPlane->scale_x, vector(sizeX/64.0*tileSize, sizeY/64.0*tileSize, 0));
-	entJPSDummyPlane->material = jpsDummyNoFilter_mat;
+	if(0)
+	{
+		entJPSDummyPlane = ent_create("jpsPlane.mdl", vector(0,0,800), NULL);
+		set(entJPSDummyPlane, PASSABLE | TRANSLUCENT);
+		entJPSDummyPlane.flags2 |= UNTOUCHABLE;
+		ent_setskin(entJPSDummyPlane, map->bmp, 1);
+		vec_set(entJPSDummyPlane->scale_x, vector(sizeX/64.0*tileSize, sizeY/64.0*tileSize, 0));
+		entJPSDummyPlane->material = jpsDummyNoFilter_mat;
+	}
 	
 	return map;
 }
@@ -1197,6 +1292,66 @@ BMAP* mapGetBitmap(MAP* map)
 	return map->bmp;
 }
 
+void mapSetTileValueAtPos3D(MAP* map, VECTOR* pos3d, int value)
+{
+	TILE* tile = mapGetTileFromVector(map, pos3d);
+	if(tile) tile->value = value;
+}
+
+int mapGetTileValueAtPos3D(MAP* map, VECTOR* pos3d)
+{
+	TILE* tile = mapGetTileFromVector(map, pos3d);
+	if(tile) return tile->value;
+	return -1;
+}
+
+TILE* mapGetEmptyTileForAI(MAP* map, int freeBorder)
+{
+	int ishift = random(map->size[0]);
+	//int jshift = random(map->size[0]);
+	int jstart = 2+random(4);
+	int i,j;
+	for(j = jstart; j < map->size[1]; j++)
+	{
+		for(i = 0; i < map->size[0]; i++)
+		{
+			int i2 = (i+ishift)%map->size[0];
+			//int j2 = (j+jshift)%map->size[1];
+			int j2 = j;
+			if(i2 >= 3 && i2 < map->size[0]-3 && j2 >= 3 && j2 < map->size[1]-3)
+			{
+				TILE* tile = mapTileGet(map,i2,j2);
+				if(!tile->value)
+				{
+					int tileOkay = 8;
+					if(freeBorder)
+					{
+						tileOkay = 0;
+						int i3,j3;
+						for(i3 = -1; i3 <= 1; i3++)
+						{
+							for(j3 = -1; j3 <= 1; j3++)
+							{
+								if(i3 || j3)
+								{
+									int i4 = i3+i2;
+									int j4 = j3+j2;
+									TILE* tile2 = mapTileGet(map,i4,j4);
+									if(tile2)
+									{
+										if(!tile2->value) tileOkay++;
+									}
+								}
+							}
+						}
+					}
+					if(tileOkay == 8) return tile;
+				}
+			}
+		}
+	}
+	return NULL;
+}
 
 ///////////////////////////////
 // jps.c

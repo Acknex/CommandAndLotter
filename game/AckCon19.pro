@@ -29,12 +29,16 @@ DEPENDPATH += $$pwd/src
 
 SOURCES += \
   main.c \
+  src/ai.c \
   src/ang.c \
+  src/building.c \
   src/camera.c \
   src/credits.c \
+  src/effects2d.c \
   src/enemy_hit.c \
   src/framework.c \
   src/game.c \
+  src/jps.c \
   src/mainmenu.c \
   src/map_loader.c \
   src/UnitMangement.c \
@@ -44,6 +48,7 @@ SOURCES += \
   src/sputnik.c \
   src/stub.c \
   src/ui_game.c \
+  src/ui_menu.c \
   src/unit.c \
     src/ang.c \
     src/camera.c \
@@ -64,26 +69,34 @@ SOURCES += \
     src/unit.c \
     src/UnitMangement.c \
     src/fow.c\
-    main.c
+    main.c \
+  src/z.c
 
 HEADERS += \
   shaders/terrain.fx \
   src/ang.h \
+  src/building.h \
   src/camera.h \
+  src/console.h \
   src/credits.h \
+  src/effects2d.h \
   src/enemy_hit.h \
+  src/fow.h \
   src/framework.h \
   src/game.h \
   src/global.h \
+  src/jps.h \
   src/mainmenu.h \
   src/map_loader.h \
   src/UnitMangement.h \
+  src/materials.h \
   src/music_player.h \
   src/progressbars.h \
   src/scan.h \
   src/sputnik.h \
   src/stub.h \
   src/ui_game.h \
+  src/ui_menu.h \
   src/unit.h \
     src/ang.h \
     src/camera.h \
@@ -104,7 +117,8 @@ HEADERS += \
     src/ui_game.h \
     src/unit.h \
     src/UnitMangement.h \
-    src/fow.h\
+    src/fow.h\ \
+  src/z.h
 
 DISTFILES += \
   main.wdl \

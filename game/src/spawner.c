@@ -1,8 +1,6 @@
 #include "global.h"
 #include "framework.h"
 #include "spawner.h"
-#include "enemy_hit.h"
-#include "particle.h"
 #include "map_loader.h"
 #include "unit.h"
 #include "fow.h"
@@ -11,7 +9,6 @@
 #define SPAWNER_PROGRESS skill22
 #define SPAWNER_BUILDTIMER skill23
 #define SPAWNER_DIETIMER skill24
-#define SPAWNER_UNITTYPE skill25
 #define SPAWNER_HITTHRESHOLD skill27
 #define SPAWNER_FIREPARTICLES skill28
 #define SPAWNER_DEBRISPARTICLES skill29
@@ -26,7 +23,7 @@
 
 
 #define SPAWNER_ACTIVEANIM "stand"
-#define SPAWNER_PRODUCEANIM "Produce"
+#define SPAWNER_PRODUCEANIM "produce"
 #define SPAWNER_DIEANIM "Die"
 
 
@@ -59,22 +56,39 @@ MATERIAL * building_material =
   effect = "building.fx";
 }
 
-ENTITY* spawner_spawn(int spawnertype, VECTOR* pos, var owner)
+ENTITY* spawner_spawn(int unittype, VECTOR* pos, var owner)
 {
 	ENTITY* ent;
     ENTITY *wireframe;
-	switch (spawnertype)
+	switch (unittype)
 	{
-		case 0:
-			ent = ent_create("the_tower.mdl", pos, Spawner);
+        case UNIT_SPUTNIK:
+            ent = ent_create("the_tower.mdl", pos, Spawner);
             wireframe = ent_create("the_tower_wireframe.mdl", pos, NULL);
-			break;
+            break;
+        case UNIT_LERCHE:
+            ent = ent_create("lark_farm.mdl", pos, Spawner);
+            wireframe = ent_create("lark_farm_wireframe.mdl", pos, NULL);
+            break;
+        case UNIT_EYE:
+            ent = ent_create("eye_tree_you.mdl", pos, Spawner);
+            wireframe = ent_create("eye_tree_you_wireframe.mdl", pos, NULL);
+            break;
+        case UNIT_BABE:
+            ent = ent_create("bank_of_zorro.mdl", pos, Spawner);
+            wireframe = ent_create("bank_of_zorro_wireframe.mdl", pos, NULL);
+            break;
 	}
 
 	if (ent != NULL)
 	{
-		fov_uncover(pos, SPAWNER_LOS);
-		ent->SPAWNER_UNITTYPE = spawnertype;
+		mapSetTileValueAtPos3D(mapGetCurrent(), pos, 1); // 1 == solid, non-traversable
+		mapJPSUpdate(mapGetCurrent());
+		
+		if(owner == PLAYER_ID_PLAYER)
+			fov_uncover(pos, SPAWNER_LOS);
+		
+		ent->ENTITY_UNITTYPE = unittype;
 		if (owner == SPAWNER_ENEMY)
 			ent->group = GROUP_ENEMY_SPAWNER;
 		else
@@ -138,13 +152,11 @@ var spawner_getHealth(ENTITY* ent)
 void Spawner()
 {
    framework_setup(my, SUBSYSTEM_SPAWNER);
-	my->HEALTH = 50;//TODO HOOK TO UNIT SYSTEM
+	my->HEALTH = 50;
 	my->MAXHEALTH = my->HEALTH;
-	ENEMY_HIT_init(my);
 	set(my, SHADOW);
 	c_setminmax(me);
 	my->ENTITY_STATE = SPAWNER_STATE_CONSTRUCT;
-	//my->ENTITY_STATE = SPAWNER_STATE_DIE;
 
 	my->SPAWNER_QUEUE = 0;
 	my->SPAWNER_BUILDTIMER = SPAWNER_BUILDTIME;
@@ -214,9 +226,7 @@ void SPAWNER_Update()
 
 void SPAWNER__hit(ENTITY* ptr)
 {
-	ptr->event = NULL;
-	ptr->SPUTNIK_HITTHRESHOLD = 3;				
-	ptr->push = -100;
+	ptr->ENTITY_HITTHRESHOLD = 3;				
 
 	ptr->HEALTH = maxv(0, ptr->HEALTH - ptr->DAMAGE_HIT);
 	ptr->DAMAGE_HIT = 0;
@@ -231,14 +241,13 @@ void SPAWNER__hit(ENTITY* ptr)
 
 void SPAWNER__hitcheck(ENTITY* ptr)
 {
-	if (ptr->SPUTNIK_HITTHRESHOLD > 0)
+	if (ptr->ENTITY_HITTHRESHOLD > 0)
 	{
-		ptr->SPUTNIK_HITTHRESHOLD -= time_step;
+		ptr->ENTITY_HITTHRESHOLD -= time_step;
 		
-		if (ptr->SPUTNIK_HITTHRESHOLD <= 0)
+		if (ptr->ENTITY_HITTHRESHOLD <= 0)
 		{
-			ptr->SPUTNIK_HITTHRESHOLD = 0;
-			ptr->event = ENEMY_HIT_event;
+			ptr->ENTITY_HITTHRESHOLD = 0;
 		}
 	}
 }
@@ -246,7 +255,7 @@ void SPAWNER__hitcheck(ENTITY* ptr)
 
 void SPAWNER__construct(ENTITY* ptr)
 {
-  	ptr->SPAWNER_PROGRESS += 10 * time_step;
+    ptr->SPAWNER_PROGRESS += 5 * time_step;
 	if (ptr->SPAWNER_PROGRESS >= 100)
 	{
 		ptr->SPAWNER_PROGRESS = 100;
@@ -257,6 +266,7 @@ void SPAWNER__construct(ENTITY* ptr)
     var percentage = ptr->SPAWNER_PROGRESS * (ptr.max_z + 200) / 100;
     ptr->skill41 = floatv(percentage);
     ptr->skill42 = floatv(ptr->max_x * 0.5);
+    ptr->skill43 = floatv(clamp((80.0 - ptr->SPAWNER_PROGRESS)/20.0, 0.0, 1.0));
 
     ptr->skill45 = floatv(ptr->x);
     ptr->skill46 = floatv(ptr->z);
@@ -308,7 +318,7 @@ void SPAWNER__produce(ENTITY* ptr)
 		VECTOR* angle = vector(ang(ptr->SPAWNER_SPAWNANGLE), 0, 0);
 		vec_rotate(targetPos, angle);
 		vec_add(targetPos, ptr->x);
-		unit_spawn(ptr->SPAWNER_UNITTYPE, ptr->x, targetPos, owner);
+		unit_spawn(ptr->ENTITY_UNITTYPE, ptr->x, targetPos, owner);
 	}
 	if (ptr->SPAWNER_QUEUE == 0)
 	{
@@ -423,6 +433,8 @@ void SPAWNER__die(ENTITY* ptr)
 	/* transitions */
 	if(ptr->SPAWNER_DIETIMER <= 0)
 	{
+		mapSetTileValueAtPos3D(mapGetCurrent(), ptr->x, 0); // 1 == solid, non-traversable
+		mapJPSUpdate(mapGetCurrent());
 		reset(ptr, SHADOW);
 		ptr->SPAWNER_DIETIMER  = 0;
 		ptr->ENTITY_STATE = SPAWNER_STATE_DEAD;

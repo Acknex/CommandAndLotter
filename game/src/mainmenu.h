@@ -4,17 +4,20 @@
 #include "global.h"
 
 int mainmenu_current_response = 0;
-uimenu_window_t * wndMenuMain;
-uimenu_window_t * wndMenuOptions;
+uimenu_window_t * mainmenu_wndMenuBackground;
+uimenu_window_t * mainmenu_wndMenuMain;
+uimenu_element_t * mainmenu_btnNewGame;
+uimenu_element_t * mainmenu_btnOptions;
+uimenu_element_t * mainmenu_btnCredits;
+uimenu_element_t * mainmenu_btnExit;
+uimenu_window_t * mainmenu_wndMenuOptions;
 
-BMAP * mainmenu_btn_new_game = "btn_menu_new_game.png";
-BMAP * mainmenu_btn_new_game_hi = "btn_menu_new_game_hi.png";
-BMAP * mainmenu_btn_options = "btn_menu_options.png";
-BMAP * mainmenu_btn_options_hi = "btn_menu_options_hi.png";
-BMAP * mainmenu_btn_credits = "btn_menu_credits.png";
-BMAP * mainmenu_btn_credits_hi = "btn_menu_credits_hi.png";
-BMAP * mainmenu_btn_exit = "btn_menu_exit.png";
-BMAP * mainmenu_btn_exit_hi = "btn_menu_exit_hi.png";
+BMAP * mainmenu_btn_new_game = "NewGame.png";
+BMAP * mainmenu_btn_options = "Options.png";
+BMAP * mainmenu_btn_credits = "Credits.png";
+BMAP * mainmenu_btn_exit = "exit.png";
+
+BMAP * mainmenu_background = "MenueBackground_fc.png";
 
 #define MAINMENU_RESPONSE_KEEP      0
 #define MAINMENU_RESPONSE_STARTGAME 1
@@ -24,9 +27,12 @@ BMAP * mainmenu_btn_exit_hi = "btn_menu_exit_hi.png";
 void mainmenu_init(void);
 void mainmenu_open(void);
 void mainmenu_update(void);
+void mainmenu_resolution_update(void);
 void mainmenu_close(void);
 
 void mainmenu_set_start(void);
+void mainmenu_show_options(void);
+void mainmenu_hide_options(void);
 void mainmenu_set_credits(void);
 void mainmenu_set_exit(void);
 

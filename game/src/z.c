@@ -1,7 +1,6 @@
 #include "global.h"
 #include "framework.h"
 #include "z.h"
-#include "enemy_hit.h"
 #include "map_loader.h"
 
 #define Z_VALUE 10
@@ -17,18 +16,21 @@ var z_get()
 ENTITY* z_spawn(VECTOR* pos)
 {
 	ENTITY* ent;
-	ent = ent_create(CUBE_MDL, pos, Z);
+    ent = ent_create("Crystalmeth.mdl", pos, Z);
+	ent->group = GROUP_ENEMY_UNIT; //should be neutral group
 	return ent;
 }
 
 void Z()
 {
-   framework_setup(my, SUBSYSTEM_Z);
-	ENEMY_HIT_init(my);
-	set(my, SHADOW);
-	vec_scale(my->scale_x, 10);
+	framework_setup(my, SUBSYSTEM_Z);
+    set(my, SHADOW);
+    var size = 2.0 + random(2);
+    my->pan = random(360);
+    vec_set(my->scale_x, vector(size, size, size));
 	c_setminmax(me);
 	my->ENTITY_STATE = ENTITY_STATE_WAIT_OR_WALK;
+	my->ENTITY_UNITTYPE = UNIT_Z;	
 }
 
 void Z_Init()
@@ -41,15 +43,12 @@ void Z_Update()
 	ENTITY * ptr;
 	SUBSYSTEM_LOOP(ptr, SUBSYSTEM_Z)
 	{
-	DEBUG_VAR(ptr->x, 200);
-	DEBUG_VAR(ptr->y, 220);
-	DEBUG_VAR(ptr->z, 240);
 			
-		if (ptr->DAMAGE_HIT > 0)
-      {
-      	Z__hit(ptr);
+		if (ptr->DAMAGE_HIT > 0 && ptr->ENTITY_STATE != ENTITY_STATE_DIE && ptr->ENTITY_STATE != ENTITY_STATE_DEAD)
+      	{
+      		Z__hit(ptr);
 		}
-DEBUG_VAR(ptr->ENTITY_STATE, 123);
+		
 		switch(ptr->ENTITY_STATE)    	
 		{
 
@@ -71,34 +70,34 @@ DEBUG_VAR(ptr->ENTITY_STATE, 123);
 			}
 		}	
 	
-		ptr->z = maploader_get_height(ptr->x) - ptr->min_z;			
+        ptr->z = maploader_get_height(ptr->x) - ptr->min_z;
 		
 	}	
 }
 
 void Z__hit(ENTITY* ptr)
 {
-	ptr->event = NULL;
 	ptr->ENTITY_STATE = ENTITY_STATE_DIE;
 	ptr->ENTITY_ANIM = 100;
 	snd_play(z_collect_snd, 100, 0);
 	z_amount += Z_VALUE;
+	ptr->DAMAGE_HIT = 0;
 }
 
 void Z__wait(ENTITY* ptr)
 {
-	ptr->pan += 5*time_step;
+
 }
 
 
 void Z__die(ENTITY* ptr)
 {
-	ptr->ENTITY_ANIM -= 5 * time_step;
-	ptr->scale_x = maxv(ptr->scale_x - ptr->ENTITY_ANIM, 0);
-	ptr->scale_y = maxv(ptr->scale_y - ptr->ENTITY_ANIM, 0);
+	ptr->ENTITY_ANIM -= 15 * time_step;
+	ptr->scale_x = 10*maxv(ptr->ENTITY_ANIM, 0) * 0.01;
+	ptr->scale_y = 10*maxv(ptr->ENTITY_ANIM, 0) * 0.01;
 
 	/* transitions */
-	if(ptr->ENTITY_ANIM >= 90)
+	if(ptr->ENTITY_ANIM <= 0)
 	{
 		ptr->ENTITY_STATE = ENTITY_STATE_DEAD;
 		set(ptr, PASSABLE);

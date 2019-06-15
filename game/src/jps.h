@@ -51,8 +51,6 @@
 		struct _TILE *prev;
 	};
 	typedef struct _TILE TILE;
-	TILE* startTile = NULL;
-	TILE* targetTile = NULL;
 
 	struct _JPSPATH
 	{
@@ -83,6 +81,7 @@
 		int playerID;
 		int isActive;
 		int isMoving;
+		int allowMovement;
 		int HP;
 		int speed;
 		VECTOR pos2d, pos3d, prevPos3d;
@@ -166,6 +165,16 @@
 	BMAP* mapGetBitmap(MAP* map);
 
 	void jpsGameUpdate(MAP* map);
+	
+	UNIT* jpsAllowMovementForEntity(ENTITY* ptr, int allow);
+	
+	void mapSetTileValueAtPos3D(MAP* map, VECTOR* pos3d, int value);
+	int mapGetTileValueAtPos3D(MAP* map, VECTOR* pos3d);
+	
+TILE* mapGetEmptyTileForAI(MAP* map, int freeBorder);
+
+// firo, use this:
+int mapGetNearbyUnitsOfTypeForPos(VECTOR *vpos, int typeID, int owner, var maxDistance, int maxNumEntities);
 
 	/////////////////////////////////////////////////
 	// more available functions

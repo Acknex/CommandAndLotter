@@ -36,7 +36,8 @@ var unit_setVictim(ENTITY* ent, ENTITY* victim)
 			{
 				//if (victim->group == GROUP_UNIT)
 				{
-					ent->ENTITY_VICTIM = victim;
+					ent->ENTITY_VICTIM = handle(victim);
+					ent->ENTITY_VICTIMTYPE = victim->ENTITY_UNITTYPE;
 					return 1;
 				}
 			}
@@ -50,7 +51,12 @@ ENTITY* unit_getVictim(ENTITY* ent)
 {
 	if (ent != NULL)
 	{
-		ENTITY* victim = ent->ENTITY_VICTIM;
+		ENTITY* victim = ptr_for_handle(ent->ENTITY_VICTIM);
+		if (victim != NULL)
+		{
+			if (victim->ENTITY_STATE == ENTITY_STATE_DIE || victim->ENTITY_STATE == ENTITY_STATE_DEAD)
+				return NULL;
+		}
 		return victim;
 	}
 	return NULL;
@@ -66,15 +72,18 @@ ENTITY* unit_spawn(int unittype, VECTOR* pos, VECTOR* targetPos, var owner)
 	ENTITY* ent = NULL;
 	switch (unittype)
 	{
-		case 0:
+		case UNIT_SPUTNIK:
 			ent = ent_create("sputnik.mdl", pos, Sputnik);
 			break;
 		
-		/*case 1:
+		case UNIT_LERCHE:
 			break;
 		
-		case 2:
-			break;*/
+		case UNIT_EYE:
+			break;
+		
+		case UNIT_BABE:
+			break;
 		
 		default:
 			break;
@@ -82,13 +91,19 @@ ENTITY* unit_spawn(int unittype, VECTOR* pos, VECTOR* targetPos, var owner)
 	
 	if (ent != NULL)
 	{
-		ent->SK_ENTITY_JPS_POINTER_TO_UNIT_STRUCT = jpsUnitCreate(PLAYER_ID_PLAYER, unittype, ent);
 		
 		if (owner == UNIT_ENEMY)
+		{
 			ent->group = GROUP_ENEMY_UNIT;
+			ent->SK_ENTITY_JPS_POINTER_TO_UNIT_STRUCT = jpsUnitCreate(PLAYER_ID_AI, unittype, ent);
+		}
 		else
+		{
 			ent->group = GROUP_PLAYER_UNIT;		
+			ent->SK_ENTITY_JPS_POINTER_TO_UNIT_STRUCT = jpsUnitCreate(PLAYER_ID_PLAYER, unittype, ent);
+		}
 
+		ent->ENTITY_UNITTYPE = unittype;
 		unit_setTarget(ent, targetPos);
 		unit_setVictim(ent,NULL);
 	}
@@ -99,4 +114,21 @@ ENTITY* unit_spawn(int unittype, VECTOR* pos, VECTOR* targetPos, var owner)
 var unit_getHealth(ENTITY* ent)
 {
 	return ent->HEALTH / ent->MAXHEALTH;
+}
+
+void unit_setDamage(ENTITY* ent, var damage)
+{
+	if (ent != NULL)
+	{
+		ent->DAMAGE_HIT = damage;
+	}
+}
+
+int unit_getType(ENTITY* ent)
+{
+	if (ent != NULL)
+	{
+		return ent->ENTITY_UNITTYPE;	
+	}
+	return -1;
 }

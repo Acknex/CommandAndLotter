@@ -15,9 +15,13 @@ void FogEvent(PARTICLE *p)
 	MAP *map = mapGetCurrent();
 	TILE *tile = mapGetTileFromVector(map, vector(p->skill_a, p->skill_b, 0));
 	
-    if(tile->visibility == FOW_SCOUTED){
-        p.lifespan = 0;
-    }
+    if(tile->visibility == FOW_SCOUTED) 
+    {
+    	p->alpha -= 10*time_step;
+    	if(p->alpha <= 0)
+    		p.lifespan = 0;
+	}
+        
 }
 
 void Fog(PARTICLE *p)
@@ -27,7 +31,7 @@ void Fog(PARTICLE *p)
     p.gravity = 0;
     p.size = 600;
     
-    var cRand = random(0.4)+0.4;
+    var cRand = random(0.2)+0.6;
     p.red = cRand * 255;
     p.green = cRand * 255;
     p.blue = cRand * 255;
@@ -42,6 +46,52 @@ void Fog(PARTICLE *p)
     p->skill_d = random(0.5)+0.5;
 }
 
+bool fow_hasDirectLOS(MAP *map, VECTOR* t1, VECTOR *t2)
+{
+	VECTOR tp1, tp2;
+	
+	//mapGetVectorFromTile(map, &tp1, t1);
+	//mapGetVectorFromTile(map, &tp2, t2);
+	vec_set(&tp1, t1);
+	vec_set(&tp2, t2);
+	
+	tp1.z += 300;
+	tp2.z += 300;
+	if(maploader_trace(&tp1, &tp2) == NULL)				
+		return 1;
+	return 0;
+}
+
+int fow_isTileInLOS(MAP* map, TILE* sourceTile, int range, int playerNumber)
+{
+	if(!sourceTile) return NULL;
+	VECTOR pos;
+	mapGetVectorFromTile(map, &pos, sourceTile);
+	int iRange = floor(range / map->tileSize + 0.5);
+	int i,j;
+	for(i = sourceTile->pos[0]-iRange; i <= sourceTile->pos[0]+iRange; i++)
+	{
+		for(j = sourceTile->pos[1]-iRange; j <= sourceTile->pos[1]+iRange; j++)
+		{
+			TILE* tile = mapTileGet(map, i, j);
+				
+			int currentPlayer;
+			if(!tile) 
+				continue;
+				
+			VECTOR otherPos;
+			mapGetVectorFromTile(map, &otherPos, tile);
+			if(vec_dist(pos, &otherPos) > range)
+				continue;
+			
+			if(!tile->numUnits[playerNumber]) 
+				continue;
+			if(fow_hasDirectLOS(map, &pos, &otherPos))			
+				return 1;
+		}
+	}
+	return 0;
+}
 
 
 void fow_open()
@@ -54,14 +104,13 @@ void fow_open()
 		for(y = 0; y<map->size[1]; ++y)
 		{
 			TILE *tile = mapTileGet(map, x,y);
-			
 			VECTOR pos;
 			mapGetVectorFromTile(map, &pos, tile);
-			pos.z = 500;
-			
+			pos.z = 550;
 			
 			tile->visibility = FOW_HIDDEN;
-            effect(Fog, 1, pos, nullvector);
+			if(!tile->value)
+            	effect(Fog, 1, pos, nullvector);
 		}
 #endif
 }
@@ -79,31 +128,62 @@ void fov_uncover(VECTOR *pos, var range)
 		for(j = tile->pos[1]-iRange; j <= tile->pos[1]+iRange; j++)
 		{
 			TILE *otherTile = mapTileGet(map, i, j);
+			if(!otherTile)
+				continue;
+			
 			VECTOR otherPos;
 			mapGetVectorFromTile(map, &otherPos, otherTile);
 			
-			if(vec_dist(pos, &otherPos) < range)
+			if(vec_dist(pos, &otherPos) > range)
+				continue;
+				
+			if(fow_hasDirectLOS(map, pos, &otherPos))
 				otherTile->visibility = FOW_SCOUTED;
 		}
 }
 
+
+//var fow_updatedelay = 0;
+int fow_calcoffset = 0;
+int fow_calcoffsetMAX = 16;
 void fow_update()
 {
 #ifdef USE_FOW
 	MAP *map = mapGetCurrent();
-
-	int x, y;
-	for(x = 0; x<map->size[0]; ++x)
-		for(y = 0; y<map->size[1]; ++y)
-		{
-			TILE *tile = mapTileGet(map, x,y);
-			if(tile->visibility == FOW_HIDDEN){
-				if(mapIsAnyFriendlyUnitNearby(map, tile, FOW_SIGHT_RANGE, PLAYER_ID_PLAYER)) 
-				{
-					tile->visibility = FOW_SCOUTED;	
+	
+	int mapSize = map->size[0]*map->size[1];
+	int i;
+	for(i = fow_calcoffset; i< mapSize; i = i+fow_calcoffsetMAX)
+	{
+		TILE *tile = &((map->tiles)[i]);
+		if(tile->visibility == FOW_HIDDEN)
+			if(fow_isTileInLOS(map, tile, FOW_SIGHT_RANGE, PLAYER_ID_PLAYER)) 
+				tile->visibility = FOW_SCOUTED;
+	}
+	fow_calcoffset++;
+	fow_calcoffset = fow_calcoffset%fow_calcoffsetMAX;
+	
+	/*
+	fow_updatedelay += time_step;
+	if(fow_updatedelay > 1) 
+	{
+		fow_updatedelay = 0;
+		
+		int x, y;
+		for(x = 0; x<map->size[0]; ++x)
+			for(y = 0; y<map->size[1]; ++y)
+			{
+				TILE *tile = mapTileGet(map, x,y);
+				if(tile->visibility == FOW_HIDDEN){
+					if(mapIsAnyFriendlyUnitNearby(map, tile, FOW_SIGHT_RANGE, PLAYER_ID_PLAYER)) 
+					{
+						tile->visibility = FOW_SCOUTED;	
+					}
 				}
+					
 			}
-				
-		}
+	}
+	*/
+	
 #endif
 }

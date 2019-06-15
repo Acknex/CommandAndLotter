@@ -2,7 +2,6 @@
 #include "framework.h"
 #include "sputnik.h"
 #include "scan.h"
-#include "enemy_hit.h"
 #include "ang.h"
 #include "unit.h"
 #include "map_loader.h"
@@ -16,7 +15,7 @@
 #define SPUTNIK_ANIMSTATE skill21
 #define SPUTNIK_ANIMSTATEATK skill22
 #define SPUTNIK_DIDATTACK skill26
-#define SPUTNIK_HITTHRESHOLD skill27
+#define SPUTNIK_RUNCOUNTER skill27
 
 
 #define SPUTNIK_WALKANIM "walk"
@@ -25,7 +24,7 @@
 #define SPUTNIK_DIEANIM "Die"
 
 #define SPUTNIK_FEET 30
-#define SPUTNIK_TARGETDIST 100
+#define SPUTNIK_TARGETDIST 70
 
 SOUND* sputnik_snd_death   = "sputnik_death.wav";
 SOUND* sputnik_snd_attack1 = "sputnik_attack1.wav";
@@ -39,11 +38,10 @@ void Sputnik()
 	my->SPUTNIK_RUNSPEED = 30;
 	my->SPUTNIK_TURNSPEED = 50;
 	my->SPUTNIK_ATTACKSPEED = 5;
-	my->SPUTNIK_ATTACKRANGE = 300;
+	my->SPUTNIK_ATTACKRANGE = 170;
 	my->SPUTNIK_ANIMSTATEATK = 0;
 	my->HEALTH = 23;
 	my->MAXHEALTH = my->HEALTH;
-	ENEMY_HIT_init(my);
 	set(my, SHADOW);
 	c_setminmax(me);
 	my->min_z += SPUTNIK_FEET;
@@ -55,42 +53,26 @@ void SPUTNIK_Init()
 {
 }
 
+
 void SPUTNIK__wait_or_walk(ENTITY * ptr)
 {
-	UNIT* unit = jpsUnitGetFromEntity(ptr);
+	UNIT* unit = jpsAllowMovementForEntity(ptr, true);
 	if(!unit) return;
 	
-	MAP* map = mapGetCurrent();
-	JPSPATH *jpsPath = unit->jpsPath;
-	if(jpsPath && unit->tile)
-	{
-		if(jpsPath->length > 0)
-		{
-			DEBUG_VAR(jpsPath->length,400);
-			int i;
-			for(i = 1; i < jpsPath->length; i++)
-			{
-				TILE* prevTile = (jpsPath->tiles)[i-1];
-				TILE* nextTile = (jpsPath->tiles)[i];
-				VECTOR vPrev, vNext;
-				mapGetVector3DFromVector2D(map, vPrev, vector(prevTile->pos[0]+0.5, prevTile->pos[1]+0.5, 0));
-				mapGetVector3DFromVector2D(map, vNext, vector(nextTile->pos[0]+0.5, nextTile->pos[1]+0.5, 0));
-				draw_line3D2(vPrev, vNext, COLOR_GREEN, 75);
-			}
-		}
-	}
-	
-	
 	vec_set(ptr->x, unit->pos3d);
-	if(unit->isMoving)
+	VECTOR diff, temp;
+	vec_diff(diff, unit->pos3d, unit->prevPos3d);
+	var len = vec_to_angle(temp, diff)/time_step;
+	if(len > 8) ptr->SPUTNIK_RUNCOUNTER = 4;
+	//if(unit->isMoving) ptr->SPUTNIK_RUNCOUNTER = 12;
+	if(ptr->SPUTNIK_RUNCOUNTER > 0)
 	{
-		VECTOR diff, temp;
-		vec_diff(diff, unit->pos3d, unit->prevPos3d);
-		if(vec_to_angle(temp, diff) > 0.01) ptr->pan += ang(temp.x-ptr->pan)*0.5*time_step;
+		ptr->SPUTNIK_RUNCOUNTER = maxv(ptr->SPUTNIK_RUNCOUNTER-time_step,0);
+		if(len > 8) ptr->pan += ang(temp.x-ptr->pan)*0.5*time_step;
 
 		ptr->SPUTNIK_DIDATTACK = 0;
 		ptr->SPUTNIK_ANIMSTATEATK = 0;
-		ptr->SPUTNIK_ANIMSTATE += 0.5 * ptr->SPUTNIK_RUNSPEED * time_step;
+		ptr->SPUTNIK_ANIMSTATE += len*0.425*time_step;//0.5 * ptr->SPUTNIK_RUNSPEED * time_step;
 		ent_animate(ptr, SPUTNIK_WALKANIM, ptr->SPUTNIK_ANIMSTATE, ANM_CYCLE);		
 	}
 	else
@@ -99,9 +81,19 @@ void SPUTNIK__wait_or_walk(ENTITY * ptr)
 		ent_animate(ptr, SPUTNIK_WAITANIM, ptr->SPUTNIK_ANIMSTATE, ANM_CYCLE);
 	}
 	
-	if (SCAN_IsEntityNear(ptr, unit_getVictim(ptr), ptr->SPUTNIK_ATTACKRANGE))
+	if (ptr->DAMAGE_HIT > 0)
 	{
-		ptr->ENTITY_STATE = ENTITY_STATE_ATTACK;
+		if (ptr->ENTITY_STATE != ENTITY_STATE_HIT)
+		{
+			ptr->HEALTH = maxv(0, ptr->HEALTH - ptr->DAMAGE_HIT);
+			ptr->ENTITY_STATE = ENTITY_STATE_HIT;
+			ptr->ENTITY_HITTHRESHOLD = 5;				
+		}
+		ptr->DAMAGE_HIT = 0;
+	}
+	else if (SCAN_IsEntityNear(ptr, unit_getVictim(ptr), ptr->SPUTNIK_ATTACKRANGE))
+	{
+		ptr->ENTITY_STATE = ENTITY_STATE_ATTACK;		
 	}
 }
 
@@ -111,16 +103,8 @@ void SPUTNIK_Update()
 	ENTITY * ptr;
 	SUBSYSTEM_LOOP(ptr, SUBSYSTEM_UNIT_SPUTNIK)
 	{
-		if (ptr->HEALTH > 0)
-		{
-			SPUTNIK__hitcheck(ptr);
-		}
+		jpsAllowMovementForEntity(ptr, false);
 		
-		if (ptr->DAMAGE_HIT > 0)
-		{
-			SPUTNIK__hit(ptr);
-		}
-
 		switch(ptr->ENTITY_STATE)    	
 		{
 			case ENTITY_STATE_WAIT_OR_WALK:
@@ -141,6 +125,12 @@ void SPUTNIK_Update()
 				break;
 			}
 			
+			case ENTITY_STATE_HIT:
+			{
+				SPUTNIK__hit(ptr);
+				break;
+			}
+			
 			default:
 			{
 				break;
@@ -149,85 +139,64 @@ void SPUTNIK_Update()
 		
 		if (ptr->ENTITY_STATE != ENTITY_STATE_DIE && ptr->ENTITY_STATE != ENTITY_STATE_DEAD)
 		{
-			ptr->z = maploader_get_height(ptr->x) - ptr->min_z + SPUTNIK_FEET;			
+			UNIT* unit = jpsUnitGetFromEntity(ptr);
+			if(unit)
+			{
+				TILE* tile = unit->tile;
+				if(tile)
+				{
+					if(!tile->value) ptr->z = maploader_get_height(ptr->x) - ptr->min_z + SPUTNIK_FEET;
+				}	
+			}
 		}
 	}	
 }
 
+void SPUTNIK__findNextVictim(ENTITY* ptr)
+{
+	if (unit_getVictim(ptr) == NULL)
+	{
+		//meh.
+		var owner;
+		if (ptr->group == GROUP_ENEMY_UNIT)	
+		owner = UNIT_ENEMY;
+		else
+		owner = UNIT_PLAYER;
+		
+		cprintf0("\n SPUTNIK__findNextVictim: TRYFIND...");
+		int count = mapGetNearbyUnitsOfTypeForPos(ptr->x, ptr->ENTITY_VICTIMTYPE, owner, 1000, 1);
+		if (count > 0)
+		{
+			cprintf1("FOUND!(%d)", count);
+			ENTITY* ent = jpsGetEntityFromUnitArray(0);
+			
+			//set new target and victim
+			unit_setTarget(ptr, ent->x);
+			unit_setVictim(ptr, ent);
+		}
+	}
+}
+
 void SPUTNIK__hit(ENTITY* ptr)
 {
-	ptr->event = NULL;
-	ptr->SPUTNIK_HITTHRESHOLD = 3;				
-
-	ptr->HEALTH = maxv(0, ptr->HEALTH - ptr->DAMAGE_HIT);
-	ptr->DAMAGE_HIT = 0;
-
+	ptr->ENTITY_HITTHRESHOLD -= time_step;		
 	if (ptr->HEALTH <= 0)
 	{
 		ptr->ENTITY_STATE = ENTITY_STATE_DIE;
 		ptr->SPUTNIK_ANIMSTATE = 0;
 		snd_play(sputnik_snd_death, 100, 0);
+		set(ptr, PASSABLE);		
 	}
-}
-
-void SPUTNIK__hitcheck(ENTITY* ptr)
-{
-	if (ptr->SPUTNIK_HITTHRESHOLD > 0)
-	{
-		ptr->SPUTNIK_HITTHRESHOLD -= time_step;
-		
-		if (ptr->SPUTNIK_HITTHRESHOLD <= 0)
-		{
-			ptr->SPUTNIK_HITTHRESHOLD = 0;
-			ptr->event = ENEMY_HIT_event;
-		}
-	}
-}
-
-void SPUTNIK__wait(ENTITY* ptr)
-{
-	ptr->SPUTNIK_ANIMSTATE += 7 * time_step;
-	ent_animate(ptr, SPUTNIK_WAITANIM, ptr->SPUTNIK_ANIMSTATE, ANM_CYCLE);
-	
-	//UNIT* unit = jpsUnitGetFromEntity(ent);
-	
-	/* transitions */
-	// Unit is near enough to attack
-	if (SCAN_IsEntityNear(ptr, unit_getVictim(ptr), ptr->SPUTNIK_ATTACKRANGE))
-	{
-		ptr->ENTITY_STATE = ENTITY_STATE_ATTACK;
-	}
-	else if (SCAN_IsTargetNear(ptr, unit_getTarget(ptr), SPUTNIK_TARGETDIST) == 0)
+	else if (ptr->ENTITY_HITTHRESHOLD <= 0)
 	{
 		ptr->ENTITY_STATE = ENTITY_STATE_WAIT_OR_WALK;
 	}
 	else
 	{
-		//keep waiting
-	}
-}
-
-void SPUTNIK__walk(ENTITY* ptr)
-{
-	ANG_turnToPos(ptr, unit_getTarget(ptr), ptr->SPUTNIK_TURNSPEED, 5);
-	VECTOR moveVec;
-
-	vec_set(&moveVec, vector(ptr->SPUTNIK_RUNSPEED * time_step, 0, 0));
-	vec_rotate(&moveVec, vector(ptr->pan, 0, 0));
-	vec_add(&ptr->x, moveVec);
-	
-	/* transitions */
-	// Unit reached target
-	if (SCAN_IsTargetNear(ptr, unit_getTarget(ptr), SPUTNIK_TARGETDIST))
-	{
-		ptr->ENTITY_STATE = ENTITY_STATE_WAIT_OR_WALK;
-	}
-	else // Still walking
-	{
-		ptr->SPUTNIK_DIDATTACK = 0;
-		ptr->SPUTNIK_ANIMSTATEATK = 0;
-		ptr->SPUTNIK_ANIMSTATE += 0.5 * ptr->SPUTNIK_RUNSPEED * time_step;
-		ent_animate(ptr, SPUTNIK_WALKANIM, ptr->SPUTNIK_ANIMSTATE, ANM_CYCLE);		
+		var percent = (1 - (ptr->ENTITY_HITTHRESHOLD/5)) * 56;
+		if (percent > 28)
+		percent = 56-percent;
+		ent_animate(ptr, SPUTNIK_ATTACKANIM, percent, 0);
 	}
 }
 
@@ -252,14 +221,11 @@ void SPUTNIK__attack(ENTITY* ptr)
 	{
 		if (ptr->SPUTNIK_DIDATTACK == 0)
 		{
-			me = ptr;
-			var mode = IGNORE_ME | IGNORE_WORLD | IGNORE_PUSH | IGNORE_SPRITES | IGNORE_CONTENT | ACTIVATE_SHOOT;
-			if (ptr->group == GROUP_PLAYER_UNIT)
-			c_ignore(GROUP_PLAYER_UNIT, GROUP_PLAYER_SPAWNER,0);
-			else
-			c_ignore(GROUP_ENEMY_UNIT, GROUP_ENEMY_SPAWNER,0);
-			//ENEMY_HIT_setAttack()
-			c_trace(ptr->x, unit_getTarget(ptr), mode);			
+			ENTITY* victim = unit_getVictim(ptr);
+			if (SCAN_IsEntityNear(ptr, victim, ptr->SPUTNIK_ATTACKRANGE))
+			{
+				unit_setDamage(victim, ptr->ENTITY_DAMAGE);
+			}			
 		}
 		ptr->SPUTNIK_DIDATTACK = 1;
 	}
@@ -271,6 +237,7 @@ void SPUTNIK__attack(ENTITY* ptr)
 	if (ptr->SPUTNIK_ANIMSTATEATK >= 100)
 	{
 		ptr->SPUTNIK_ANIMSTATEATK = 0;
+		SPUTNIK__findNextVictim(ptr);
 		ptr->ENTITY_STATE = ENTITY_STATE_WAIT_OR_WALK;
 	}
 
@@ -284,6 +251,5 @@ void SPUTNIK__die(ENTITY* ptr)
 	if(ptr->SPUTNIK_ANIMSTATE >= 90)
 	{
 		ptr->ENTITY_STATE = ENTITY_STATE_DEAD;
-		set(ptr, PASSABLE);
 	}
 }

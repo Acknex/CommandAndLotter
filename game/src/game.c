@@ -12,6 +12,10 @@
 #include "building.h"
 #include "fow.h"
 #include "z.h"
+#include "materials.h"
+#include "effects2d.h"
+#include "ai.h"
+#include "music_player.h"
 
 void game_init(void)
 {
@@ -20,6 +24,10 @@ void game_init(void)
     grid_init();
 	buildingPlacement_init();
 	presetsInit();
+    effects2d_init();
+	ai_init(1); // parameter = difficulty
+
+    effect_load(mtl_model, "units.fx");
 }
 
 void game_open(void)
@@ -50,6 +58,8 @@ void game_open(void)
     UnitMangement_open();
     fow_open();
 
+    //SetupPostprocessing();
+
 	SPUTNIK_Init();
 	SPAWNER_Init();
 	Z_Init();
@@ -60,12 +70,18 @@ void game_open(void)
 	#ifdef GAME_OPEN_DEBUG
 		cprintf1("\n game_open: END at frame %d", (int)total_frames);
 	#endif
+
+    effects2d_open();
+
+    music_start("media/ingame.mp3", 2.0, 1);
 }
 
 void game_update(void)
 {
+    //updateRenderTargetsIfNeeded();
     topdown_camera_update();
     ui_game_update();
+    ai_update();
 	jpsGameUpdate(mapGetCurrent());
 	SPUTNIK_Update();
 	SPAWNER_Update();
@@ -74,12 +90,15 @@ void game_update(void)
     UnitMangement_update();
     fow_update();
 	buildingPlacement_update();
+
+    effects2d_update();
 }
 
 void game_close(void)
 {
 	ui_game_close();
 	grid_close();
+    effects2d_close();
 }
 
 bool game_is_done(void)

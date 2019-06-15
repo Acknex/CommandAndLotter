@@ -8,9 +8,12 @@ var CamFPS;
 #include "map_loader.h"
 #include "camera.h"
 #include "global.h"
+#include "unit.h"
+#include "jps.h"
+#include "effects2d.h"
 
 #ifdef DebugMode
-    var test1; //für debugzwecke
+    var test1; //f?r debugzwecke
     var test2;
     var test3;
     var test4;
@@ -172,7 +175,7 @@ function CheckIsLeftFrom(VECTOR* Base, VECTOR* V1, VECTOR * V2)
     }
 }
 
-#define SEL_AMBIENT 255
+#define SEL_AMBIENT 40
 
 function DeselectUnit(ENTITY * ent)
 {
@@ -253,17 +256,31 @@ var MouseRightLast = 0;
 
 
 function SetDestForSelectd(VECTOR * Dest)
-{ 
+{
+    int Count = 0;
     ENTITY * ent;
     for(ent = ent_next(NULL); ent != NULL; ent = ent_next(ent)){
         if(ent->group==GROUP_PLAYER_UNIT && ent.SELCTED_SKILL){
             unit_setTarget(ent, Dest);
+            Count++;
         }
     }
+    return Count;
 }
 
-VECTOR UnitTempVec;
 
+function SetVictimForSelectd(ENTITY * Victim)
+{
+    int Count = 0;
+    ENTITY * ent;
+    for(ent = ent_next(NULL); ent != NULL; ent = ent_next(ent)){
+        if(ent->group==GROUP_PLAYER_UNIT && ent.SELCTED_SKILL){
+            unit_setVictim(ent, Victim);
+            Count++;
+        }
+    }
+    return Count;
+}
 
 
 function DebugDrawDests()
@@ -322,7 +339,7 @@ function NumberKeyPressed(int nr)
             }
         }
     }
-    if(!key_ctrl && key_alt && count){//Gruppe mit Alt-Ausgewählt die auch Units enthält
+    if(!key_ctrl && key_alt && count){//Gruppe mit Alt-Ausgew?hlt die auch Units enth?lt
         x /= count;
         y /= count;
         topdown_camera_set_pos(vector(x,y,0));
@@ -339,18 +356,29 @@ function UnitControl()
         if(MouseLeftLast == 0){
             if(!key_shiftl){
                 DeselectAllOfGroup(GROUP_PLAYER_UNIT);
+               // DeselectAllOfGroup(GROUP_PLAYER_SPAWNER);
+
+                //DeselectAllOfGroup(GROUP_ENEMY_SPAWNER);
             }
+            DeselectAllOfGroup(GROUP_ENEMY_UNIT);
             DeselectAllOfSubsystem(SUBSYSTEM_SPAWNER);
 
             if(mouse_panel == 0){
                 vec_set(temp, vector(mouse_pos.x,mouse_pos.y, camera.clip_far));
                 vec_for_screen(temp,camera);
-                c_trace(camera.x, temp,USE_POLYGON | IGNORE_PASSENTS);
+                c_trace(camera.x, temp,USE_POLYGON | IGNORE_PASSENTS | IGNORE_SPRITES);
                 if(you != 0){
-                     if(you->group==GROUP_PLAYER_UNIT || you->group==GROUP_PLAYER_SPAWNER){
-                        SelectUnit(you);
-                    }
-                }
+                         if(you->group==GROUP_PLAYER_UNIT || you->group==GROUP_PLAYER_SPAWNER || you->group==GROUP_ENEMY_UNIT || you->group==GROUP_ENEMY_SPAWNER){
+
+                            MAP* map = mapGetCurrent();
+                            TILE *tile = mapGetTileFromVector(map, target.x);
+                            if(tile){
+                                if(tile->visibility == FOW_SCOUTED){
+                                    SelectUnit(you);
+                                }
+                            }
+                        }
+                 }
             }
 
             ClickPoint2D_A[0]= ClickPoint2D_B[0] = mouse_pos.x;
@@ -370,10 +398,29 @@ function UnitControl()
        }
     }
     if(mouse_right && !MouseRightLast){
+        var CmdType = EFFECTS2D_TYPE_GOTO;
 
+        if(mouse_panel == 0){
+            vec_set(temp, vector(mouse_pos.x,mouse_pos.y, camera.clip_far));
+            vec_for_screen(temp,camera);
+            c_trace(camera.x, temp,USE_POLYGON | IGNORE_PASSENTS);
+            if(you != 0){
+                 if(you->group==GROUP_ENEMY_UNIT  || you->group == GROUP_ENEMY_SPAWNER){
+                    SetVictimForSelectd(you);
+                    CmdType = EFFECTS2D_TYPE_ATTACK;
+                    if(unit_getType(you) == UNIT_Z){
+                       CmdType = EFFECTS2D_TYPE_MINE;
+                    }
+
+
+                }
+            }
+        }
         VECTOR Dest;
         PosToMap(Dest,mouse_pos.x,mouse_pos.y);
-        SetDestForSelectd(Dest);
+        if(SetDestForSelectd(Dest) > 0){
+            effects2d_spawn(Dest, CmdType);
+        }
     }
 
     int i;
