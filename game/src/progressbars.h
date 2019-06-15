@@ -7,6 +7,6 @@
 //! @param _target Render Target
 //! @param progress 0 ... 100
 //! @param color foreground color
-void progressbar_radial_render(BMAP * _target, var progress, COLOR * color, var alpha);
+void progressbar_radial_render(BMAP * _target, var progress, var radius, COLOR * color, var alpha);
 
 #endif // PROGRESSBARS_H
