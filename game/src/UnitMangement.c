@@ -137,7 +137,7 @@ void UnitMangement_open(){
 
             var z = maploader_get_height(vector(x,y,0));
 
-            you = ent_create("marine.mdl",vector(x,y,z),NULL);
+            you = ent_create("sputnik.mdl",vector(x,y,z),NULL);
             you.ambient = 0;
             if(you.y == 0){
                 you.ambient = 200;
