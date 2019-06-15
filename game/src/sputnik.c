@@ -17,6 +17,7 @@
 #define SPUTNIK_ANIMSTATEATK skill22
 #define SPUTNIK_DIDATTACK skill26
 #define SPUTNIK_HITTHRESHOLD skill27
+#define SPUTNIK_RUNNINGTIMER skill28
 
 
 #define SPUTNIK_WALKANIM "walk"
@@ -82,15 +83,17 @@ void SPUTNIK__wait_or_walk(ENTITY * ptr)
 	
 	
 	vec_set(ptr->x, unit->pos3d);
-	if(unit->isMoving)
+	if(unit->isMoving) ptr->SPUTNIK_RUNNINGTIMER = 8;
+	if(ptr->SPUTNIK_RUNNINGTIMER > 0)
 	{
+		ptr->SPUTNIK_RUNNINGTIMER = maxv(ptr->SPUTNIK_RUNNINGTIMER-time_step,0);
 		VECTOR diff, temp;
 		vec_diff(diff, unit->pos3d, unit->prevPos3d);
-		if(vec_to_angle(temp, diff) > 0.01) ptr->pan += ang(temp.x-ptr->pan)*0.5*time_step;
+		if(vec_to_angle(temp, diff) > time_step) ptr->pan += ang(temp.x-ptr->pan)*0.5*time_step;
 
 		ptr->SPUTNIK_DIDATTACK = 0;
 		ptr->SPUTNIK_ANIMSTATEATK = 0;
-		ptr->SPUTNIK_ANIMSTATE += 0.5 * ptr->SPUTNIK_RUNSPEED * time_step;
+		ptr->SPUTNIK_ANIMSTATE += 0.45 * ptr->SPUTNIK_RUNSPEED * time_step;
 		ent_animate(ptr, SPUTNIK_WALKANIM, ptr->SPUTNIK_ANIMSTATE, ANM_CYCLE);		
 	}
 	else

@@ -1182,11 +1182,15 @@ MAP* jpsMapLoadFromFile(char* filename)
 	mapJPSUpdate(map);
 	mapUpdateBmap(map);
 	
-	entJPSDummyPlane = ent_create("jpsPlane.mdl", vector(0,0,500), NULL);
-	set(entJPSDummyPlane, PASSABLE | TRANSLUCENT);
-	ent_setskin(entJPSDummyPlane, map->bmp, 1);
-	vec_set(entJPSDummyPlane->scale_x, vector(sizeX/64.0*tileSize, sizeY/64.0*tileSize, 0));
-	entJPSDummyPlane->material = jpsDummyNoFilter_mat;
+	if(0)
+	{
+		entJPSDummyPlane = ent_create("jpsPlane.mdl", vector(0,0,500), NULL);
+		set(entJPSDummyPlane, PASSABLE | TRANSLUCENT);
+		entJPSDummyPlane.flags2 |= UNTOUCHABLE;
+		ent_setskin(entJPSDummyPlane, map->bmp, 1);
+		vec_set(entJPSDummyPlane->scale_x, vector(sizeX/64.0*tileSize, sizeY/64.0*tileSize, 0));
+		entJPSDummyPlane->material = jpsDummyNoFilter_mat;
+	}
 	
 	return map;
 }
