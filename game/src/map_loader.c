@@ -240,11 +240,12 @@ void maploader_load(char const * fileName)
 
     int i; for(i = 0; i < 100; i++)
     {
-        ent_create(
+        you = ent_create(
             "StrasseGerade.mdl",
-            vector(58 * i, 0, 0),
+            vector(580 * i, 0, 0),
             NULL
         );
+        you.z = maploader_get_height(you.x);
     }
 
 
