@@ -37,7 +37,7 @@ void getz()
 
 void stub_init()
 {
-	on_mouse_left = setmousepos;
+	//on_mouse_left = setmousepos;
 	on_p = producesputnik;
 	on_k = getz;
 	fancysputnik = unit_spawn(0, vector(0,0,500), UNIT_PLAYER);
@@ -49,6 +49,7 @@ void stub_init()
 
 void stub_update()
 {
+	return;
 	if (mouseupdate == 1)
 	{
 		mouseupdate = 0;

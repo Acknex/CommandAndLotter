@@ -77,8 +77,8 @@ float4 ps_terraintex3(out_terraintex3 In) : COLOR
     float vegetation = attribs.g;
     float elevation = attribs.b;
 
-    float4 ground_digital = tex2D(sDigital, In.world.xz / 512.0);
-    float4 ground_analog  = textureNoTile(In.world.xz / 512.0);
+    float4 ground_digital = tex2D(sDigital, In.world.xz / 256.0);
+    float4 ground_analog  = textureNoTile(In.world.xz / 256.0);
 
     float4 road_digital = tex2D(sStreetDigital, In.world.xz / 512.0);
     float4 road_analog  = tex2D(sStreetAnalog, In.world.xz / 512.0);

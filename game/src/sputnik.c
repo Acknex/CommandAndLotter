@@ -2,7 +2,6 @@
 #include "framework.h"
 #include "sputnik.h"
 #include "scan.h"
-#include "enemy_hit.h"
 #include "ang.h"
 #include "unit.h"
 #include "map_loader.h"
@@ -16,7 +15,6 @@
 #define SPUTNIK_ANIMSTATE skill21
 #define SPUTNIK_ANIMSTATEATK skill22
 #define SPUTNIK_DIDATTACK skill26
-#define SPUTNIK_HITTHRESHOLD skill27
 
 
 #define SPUTNIK_WALKANIM "walk"
@@ -25,7 +23,7 @@
 #define SPUTNIK_DIEANIM "Die"
 
 #define SPUTNIK_FEET 30
-#define SPUTNIK_TARGETDIST 100
+#define SPUTNIK_TARGETDIST 70
 
 SOUND* sputnik_snd_death   = "sputnik_death.wav";
 SOUND* sputnik_snd_attack1 = "sputnik_attack1.wav";
@@ -43,7 +41,6 @@ void Sputnik()
 	my->SPUTNIK_ANIMSTATEATK = 0;
 	my->HEALTH = 23;
 	my->MAXHEALTH = my->HEALTH;
-	ENEMY_HIT_init(my);
 	set(my, SHADOW);
 	c_setminmax(me);
 	my->min_z += SPUTNIK_FEET;
@@ -118,7 +115,8 @@ void SPUTNIK_Update()
 		
 		if (ptr->DAMAGE_HIT > 0)
 		{
-			SPUTNIK__hit(ptr);
+			if (ptr->ENTITY_HITTHRESHOLD == 0)
+				SPUTNIK__hit(ptr);
 		}
 
 		switch(ptr->ENTITY_STATE)    	
@@ -156,8 +154,7 @@ void SPUTNIK_Update()
 
 void SPUTNIK__hit(ENTITY* ptr)
 {
-	ptr->event = NULL;
-	ptr->SPUTNIK_HITTHRESHOLD = 3;				
+	ptr->ENTITY_HITTHRESHOLD = 3;				
 
 	ptr->HEALTH = maxv(0, ptr->HEALTH - ptr->DAMAGE_HIT);
 	ptr->DAMAGE_HIT = 0;
@@ -172,18 +169,18 @@ void SPUTNIK__hit(ENTITY* ptr)
 
 void SPUTNIK__hitcheck(ENTITY* ptr)
 {
-	if (ptr->SPUTNIK_HITTHRESHOLD > 0)
+	if (ptr->ENTITY_HITTHRESHOLD > 0)
 	{
-		ptr->SPUTNIK_HITTHRESHOLD -= time_step;
+		ptr->ENTITY_HITTHRESHOLD -= time_step;
 		
-		if (ptr->SPUTNIK_HITTHRESHOLD <= 0)
+		if (ptr->ENTITY_HITTHRESHOLD <= 0)
 		{
-			ptr->SPUTNIK_HITTHRESHOLD = 0;
-			ptr->event = ENEMY_HIT_event;
+			ptr->ENTITY_HITTHRESHOLD = 0;
 		}
 	}
 }
 
+#ifdef blafusel
 void SPUTNIK__wait(ENTITY* ptr)
 {
 	ptr->SPUTNIK_ANIMSTATE += 7 * time_step;
@@ -230,6 +227,7 @@ void SPUTNIK__walk(ENTITY* ptr)
 		ent_animate(ptr, SPUTNIK_WALKANIM, ptr->SPUTNIK_ANIMSTATE, ANM_CYCLE);		
 	}
 }
+#endif
 
 void SPUTNIK__attack(ENTITY* ptr)
 {
@@ -252,14 +250,11 @@ void SPUTNIK__attack(ENTITY* ptr)
 	{
 		if (ptr->SPUTNIK_DIDATTACK == 0)
 		{
-			me = ptr;
-			var mode = IGNORE_ME | IGNORE_WORLD | IGNORE_PUSH | IGNORE_SPRITES | IGNORE_CONTENT | ACTIVATE_SHOOT;
-			if (ptr->group == GROUP_PLAYER_UNIT)
-			c_ignore(GROUP_PLAYER_UNIT, GROUP_PLAYER_SPAWNER,0);
-			else
-			c_ignore(GROUP_ENEMY_UNIT, GROUP_ENEMY_SPAWNER,0);
-			//ENEMY_HIT_setAttack()
-			c_trace(ptr->x, unit_getTarget(ptr), mode);			
+			ENTITY* victim = unit_getVictim(ptr);
+			if (SCAN_IsEntityNear(ptr, victim, ptr->SPUTNIK_ATTACKRANGE))
+			{
+				unit_setDamage(victim, ptr->ENTITY_DAMAGE);
+			}			
 		}
 		ptr->SPUTNIK_DIDATTACK = 1;
 	}

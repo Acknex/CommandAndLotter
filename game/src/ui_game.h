@@ -31,6 +31,8 @@ PANEL *ui_radial_skull;
 PANEL *ui_radial_esel;
 PANEL *ui_radial_sputnik;
 
+PANEL *ui_minimap;
+
 PANEL *ui_life_indicator[2000];
 
 PANEL *ui_portrait;
@@ -39,9 +41,9 @@ PANEL *ui_minimap;
 BMAP *ui_radial_prototype1 = "ui_placeholder_unit.png";
 BMAP *ui_radial_prototype2 = "ui_placeholder_counter.png";
 
-BMAP *ui_bmap_resources = "h3.png";
-BMAP *ui_bmap_units = "h2.png";
-BMAP *ui_bmap_gamemenu = "h1.png";
+BMAP *ui_bmap_resources = "H3.png";
+BMAP *ui_bmap_units = "H2.png";
+BMAP *ui_bmap_gamemenu = "H1.png";
 
 BMAP *ui_bmap_dead_indicator;
 BMAP *ui_bmap_life_indicator;
@@ -64,6 +66,8 @@ BMAP *ui_icon_cbabe = "ui_H2.png";
 BMAP *ui_icon_sputnik = "ui_H1.png";
 BMAP *ui_icon_skull = "ui_H4.png";
 BMAP *ui_icon_esel = "ui_H3.png";
+
+BMAP *ui_icon_blank = "ico_s_2.png";
 
 ENTITY* last_building;
 ENTITY* main_unit;
@@ -90,6 +94,12 @@ int ui_lifebar_counter = 0;
 
 var scale_factor_x = 1;
 var scale_factor_y = 1;
+
+var ui_map_shift_x = 410;
+var ui_map_shift_y = 96;
+var ui_map_offset_x = 0;
+var ui_map_offset_y = 0;
+
 
 void ui_game_init();
 void ui_game_open();
