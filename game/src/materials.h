@@ -7,6 +7,11 @@
 
 BMAP *bmapPPOriginal = NULL;
 
+MATERIAL *matTrees =
+{
+    effect = "trees.fx";
+}
+
 MATERIAL *matPPFilter =
 {
     effect = "pp_filter.fx";
