@@ -4,10 +4,12 @@
 #include "framework.h"
 #include "camera.h"
 #include <acknex.h>
+#include "UnitMangement.h"
 
 void game_init(void)
 {
 	ui_game_init();
+    UnitMangement_init();
 }
 
 void game_open(void)
@@ -18,12 +20,14 @@ void game_open(void)
 
 	ui_game_open();
 	topdown_camera_open();
+    UnitMangement_open();
 }
 
 void game_update(void)
 {
 	ui_game_update();
 	topdown_camera_update();
+    UnitMangement_update();
 }
 
 void game_close(void)
