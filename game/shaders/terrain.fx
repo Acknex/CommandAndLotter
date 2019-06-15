@@ -78,10 +78,13 @@ float4 ps_terraintex3(out_terraintex3 In) : COLOR
 
     float4 pattern = tex2D(sSplatter, In.world.xz / 512.0);
 
+    float4 analog = textureNoTile(In.world.xz / 512.0);
+
     float4 surface = lerp(
         tex2D(sDigital, In.world.xz / 256.0),
-        textureNoTile(In.world.xz / 512.0),
-        step(pattern.r, smoothstep(0.0, 1.0, attribs.g)));
+        analog,
+        pow(length(analog), 0.2) * smoothstep(0.0, 1.0, attribs.g)
+    );
 
 
     return surface * (0.5 + attribs.b);
