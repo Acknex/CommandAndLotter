@@ -49,3 +49,4 @@ function main()
 #include "particle.c"
 #include "spawner.c"
 #include "building.c"
+#include "jps.c"

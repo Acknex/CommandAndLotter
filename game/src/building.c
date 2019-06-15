@@ -1,7 +1,16 @@
 #include "building.h"
 
+#include "global.h"
+#include "framework.h"
+#include "spawner.h"
+#include "enemy_hit.h"
+
+#define BUILDING_TYPE skill[20]
+#define BUILDING_WORK_LEFT skill[21]
+
 char* buildingPlacement_assets[BUILDING_NUMBER];
 char* buildingPlacement_constructionAssets[BUILDING_NUMBER];
+var buildingPlacement_buildtimes[BUILDING_NUMBER];
 
 ENTITY *buildingPlacement_previewModel;
 int buildingPlacement_selection;
@@ -10,8 +19,8 @@ int buildingPlacement_selection;
 void buildingPlacement_init()
 {
 	buildingPlacement_assets[0] = "the_tower.mdl";
-	
 	buildingPlacement_constructionAssets[0] = "the_tower_wireframe.mdl";
+	buildingPlacement_buildtimes[0] = 10;
 }
 
 void buildingPlacement_open()
@@ -25,13 +34,19 @@ void buildingPlacement_movePreview()
 {
 	VECTOR *_hit = get_pos_under_cursor();
 	if(_hit != NULL)
-	{
-		DEBUG_VAR(_hit->x, 100);
-		DEBUG_VAR(_hit->y, 130);
-		DEBUG_VAR(_hit->z, 160);
 		vec_set(&buildingPlacement_previewModel->x, _hit);	
-	}
 }
+
+
+
+void ConstructionSite()
+{
+   framework_setup(my, SUBSYSTEM_CONSTRUCTION);
+//	ENEMY_HIT_init(my);
+	set(my, SHADOW);
+	c_setminmax(me);
+}
+
 
 void buildingPlacement_beginConstruction(int selection)
 {
@@ -51,12 +66,18 @@ void buildingPlacement_endConstruction()
 void buildingPlacement_placeConstruction()
 {
 	char* asset = buildingPlacement_constructionAssets[buildingPlacement_selection];
-	ENTITY *constructionSite = ent_create(asset, buildingPlacement_previewModel->x, NULL);
-	
+	ENTITY *constructionSite = ent_create(asset, buildingPlacement_previewModel->x, ConstructionSite);
+	constructionSite->BUILDING_TYPE = buildingPlacement_selection;
+	constructionSite->BUILDING_WORK_LEFT = buildingPlacement_buildtimes[buildingPlacement_selection];
 	
 	buildingPlacement_endConstruction();
 }
 
+
+void buildingPlacement_constructionFinished(ENTITY *construction)
+{
+	spawner_spawn(construction->BUILDING_TYPE, &construction->x, SPAWNER_PLAYER);
+}
 
 void buildingPlacement_update()
 {
@@ -73,5 +94,17 @@ void buildingPlacement_update()
 			buildingPlacement_placeConstruction();
 		if(mouse_right) 
 			buildingPlacement_endConstruction();
+	}
+	
+	
+	ENTITY *ptr;
+	SUBSYSTEM_LOOP(ptr, SUBSYSTEM_CONSTRUCTION)
+	{
+		ptr->BUILDING_WORK_LEFT -= time_step;
+		if(ptr->BUILDING_WORK_LEFT <= 0)
+		{
+			buildingPlacement_constructionFinished(ptr);
+			framework_remove(ptr);
+		}
 	}
 }
