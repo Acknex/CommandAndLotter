@@ -258,7 +258,7 @@ void SPAWNER__hitcheck(ENTITY* ptr)
 
 void SPAWNER__construct(ENTITY* ptr)
 {
-  	ptr->SPAWNER_PROGRESS += 10 * time_step;
+    ptr->SPAWNER_PROGRESS += 5 * time_step;
 	if (ptr->SPAWNER_PROGRESS >= 100)
 	{
 		ptr->SPAWNER_PROGRESS = 100;
@@ -269,7 +269,7 @@ void SPAWNER__construct(ENTITY* ptr)
     var percentage = ptr->SPAWNER_PROGRESS * (ptr.max_z + 200) / 100;
     ptr->skill41 = floatv(percentage);
     ptr->skill42 = floatv(ptr->max_x * 0.5);
-    ptr->skill43 = floatv(1.0 - clamp((percentage - 90.0)/10.0, 0.0, 1.0));
+    ptr->skill43 = floatv(clamp((80.0 - ptr->SPAWNER_PROGRESS)/20.0, 0.0, 1.0));
 
     ptr->skill45 = floatv(ptr->x);
     ptr->skill46 = floatv(ptr->z);
