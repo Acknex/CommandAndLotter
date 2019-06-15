@@ -265,7 +265,8 @@ function SetDestForSelectd(VECTOR * Dest)
     ENTITY * ent;
     SUBSYSTEM_LOOP(ent, SUBSYSTEM_UNIT_MANAGEMENT){
         if(ent.SELCTED_SKILL){
-            vec_set(ent.UNIT_DEST_SKILL,Dest);
+				unit_setTarget(ent, Dest);
+            //vec_set(ent.UNIT_DEST_SKILL,Dest);
         }
     }
 }

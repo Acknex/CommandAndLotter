@@ -38,7 +38,7 @@ void stub_update()
 	{
 		mouseupdate = 0;
 		stubtoggle = 1 - stubtoggle;
-		unit_setTarget(fancysputnik, mousevec);
+		//unit_setTarget(fancysputnik, mousevec);
 		if (stubtoggle > 0)
 			unit_setVictim(fancysputnik, fancytarget);
 		else
