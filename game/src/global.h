@@ -10,8 +10,8 @@ typedef int bool;
 
 
 #define ENTITY_STATE_INACTIVE 0
-#define ENTITY_STATE_WAIT 1
-#define ENTITY_STATE_WALK 2
+#define ENTITY_STATE_WAIT_OR_WALK 1 // pathfinding (+ flocking) decide state
+//#define ENTITY_STATE_WALK 2
 #define ENTITY_STATE_ATTACK 3
 #define ENTITY_STATE_DIE 4
 #define ENTITY_STATE_DEAD 5
