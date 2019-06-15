@@ -18,6 +18,7 @@ typedef int bool;
 #define ENTITY_STATE_HIT 6
 
 
+#define MAXHEALTH skill49 //remove after attaching unit system to entity code
 #define HEALTH skill50 //remove after attaching unit system to entity code
 // old hit system - to be fiddled together with unit system and maybe remove later on
 #define DAMAGE_HIT skill51
@@ -46,13 +47,15 @@ typedef int bool;
 #define SUBSYSTEM_UNIT_LERCHE       103
 #define SUBSYSTEM_UNIT_SPHERE       104
 #define SUBSYSTEM_TERRAIN_SYSTEM    105
-#define SUBSYSTEM_UNIT_MANAGEMENT   	106
+#define SUBSYSTEM_UNIT_MANAGEMENT   106
 // HIER WEITERE SUBSYSTEME DEFINIEREN
 
 #define SUBSYSTEM_LOOP(ptr,system) for(ptr = ent_next(NULL); ptr != NULL; ptr = ent_next(ptr)) if(ptr->SK_SUBSYSTEM == (system))
 
 /* do not modify unless you really know what you do! */
-#define GROUP_PLAYER_UNIT 10
-#define GROUP_ENEMY_UNIT  11
+#define GROUP_PLAYER_UNIT    10
+#define GROUP_PLAYER_SPAWNER 11
+#define GROUP_ENEMY_UNIT     12
+#define GROUP_ENEMY_SPAWNER  13
 
 #endif // GLOBAL_H
