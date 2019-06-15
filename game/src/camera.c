@@ -1,12 +1,12 @@
 
 #include "camera.h"
 
-void topdown_camera_init() {
+void topdown_camera_open() {
+	camera.z = 3000;
+	camera.tilt = -70;
 }
 
 void topdown_camera_update() {
-	camera.z = 3000;
-	camera.tilt = -70;
 	/*
 	bool a = (mouse_pos.x<CAMERA_MOVEBORDER);
 	bool b = ((screen_size.x-mouse_pos.x)<CAMERA_MOVEBORDER);

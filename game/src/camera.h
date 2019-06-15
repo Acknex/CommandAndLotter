@@ -5,9 +5,7 @@
 #define CAMERA_MOVEBORDER 10
 #define CAMERA_HEIGHT 1000
 
-VIEW *topdown_camera;
-
-void topdown_camera_init();
+void topdown_camera_open();
 void topdown_camera_update();
  
 #endif CAMERA_H
