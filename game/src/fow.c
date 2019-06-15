@@ -46,6 +46,22 @@ void Fog(PARTICLE *p)
     p->skill_d = random(0.5)+0.5;
 }
 
+bool fow_hasDirectLOS(MAP *map, VECTOR* t1, VECTOR *t2)
+{
+	VECTOR tp1, tp2;
+	
+	//mapGetVectorFromTile(map, &tp1, t1);
+	//mapGetVectorFromTile(map, &tp2, t2);
+	vec_set(&tp1, t1);
+	vec_set(&tp2, t2);
+	
+	tp1.z += 300;
+	tp2.z += 300;
+	if(maploader_trace(&tp1, &tp2) == NULL)				
+		return 1;
+	return 0;
+}
+
 int fow_isTileInLOS(MAP* map, TILE* sourceTile, int range, int playerNumber)
 {
 	if(!sourceTile) return NULL;
@@ -60,24 +76,18 @@ int fow_isTileInLOS(MAP* map, TILE* sourceTile, int range, int playerNumber)
 			TILE* tile = mapTileGet(map, i, j);
 				
 			int currentPlayer;
-			if(tile) {
-				VECTOR otherPos;
-				mapGetVectorFromTile(map, &otherPos, tile);
+			if(!tile) 
+				continue;
 				
-				if(vec_dist(pos, &otherPos) > range)
-					continue;
-				if(tile->numUnits[playerNumber]) 
-				{
-					//vec_set(pos, maploader_get_height(pos));
-					//vec_set(otherPos, maploader_get_height(otherPos));
-					VECTOR tp;
-					vec_set(&tp, pos);
-					tp.z += 300;
-					otherPos.z += 300;
-					if(maploader_trace(&tp, &otherPos) == NULL)				
-						return 1;
-				}
-			}
+			VECTOR otherPos;
+			mapGetVectorFromTile(map, &otherPos, tile);
+			if(vec_dist(pos, &otherPos) > range)
+				continue;
+			
+			if(!tile->numUnits[playerNumber]) 
+				continue;
+			if(fow_hasDirectLOS(map, &pos, &otherPos))			
+				return 1;
 		}
 	}
 	return 0;
@@ -118,14 +128,17 @@ void fov_uncover(VECTOR *pos, var range)
 		for(j = tile->pos[1]-iRange; j <= tile->pos[1]+iRange; j++)
 		{
 			TILE *otherTile = mapTileGet(map, i, j);
-			if(otherTile)
-			{
+			if(!otherTile)
+				continue;
+			
 			VECTOR otherPos;
 			mapGetVectorFromTile(map, &otherPos, otherTile);
 			
-			if(vec_dist(pos, &otherPos) < range)
+			if(vec_dist(pos, &otherPos) > range)
+				continue;
+				
+			if(fow_hasDirectLOS(map, pos, &otherPos))
 				otherTile->visibility = FOW_SCOUTED;
-			}
 		}
 }
 
@@ -144,12 +157,8 @@ void fow_update()
 	{
 		TILE *tile = &((map->tiles)[i]);
 		if(tile->visibility == FOW_HIDDEN)
-		{
 			if(fow_isTileInLOS(map, tile, FOW_SIGHT_RANGE, PLAYER_ID_PLAYER)) 
-			{
-				tile->visibility = FOW_SCOUTED;	
-			}
-		}
+				tile->visibility = FOW_SCOUTED;
 	}
 	fow_calcoffset++;
 	fow_calcoffset = fow_calcoffset%fow_calcoffsetMAX;
