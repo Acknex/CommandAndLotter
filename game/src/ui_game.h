@@ -1,6 +1,7 @@
 #ifndef UI_GAME
 #define UI_GAME
 
+
 #define UI_ANIM_OFF 0
 #define UI_ANIM_PROGRESS 1
 #define UI_ANIM_ON 2
@@ -25,9 +26,12 @@ PANEL *ui_game_menu;
 
 PANEL *ui_radial_delete;
 PANEL *ui_radial_counter;
-PANEL *ui_radial_unit;
+PANEL *ui_radial_cbabe;
+PANEL *ui_radial_skull;
+PANEL *ui_radial_esel;
+PANEL *ui_radial_sputnik;
 
-PANEL *ui_life_indicator[200];
+PANEL *ui_life_indicator[2000];
 
 PANEL *ui_portrait;
 PANEL *ui_minimap;
@@ -54,12 +58,19 @@ BMAP *ui_hide_button_n = "hide_button_n.png";
 BMAP *ui_hide_button_o = "hide_button_o.png";
 BMAP *ui_hide_button_p = "hide_button_p.png";
 
+BMAP *ui_radial_o = "ui_placeholder_counter.png";
+BMAP *ui_radial_n = "ui_placeholder_unit.png";
 
-ENTITY* some_prototype_ents[4];
+BMAP *ui_icon_cbabe = "ui_H2.png";
+BMAP *ui_icon_sputnik = "ui_H1.png";
+BMAP *ui_icon_skull = "ui_H4.png";
+BMAP *ui_icon_esel = "ui_H3.png";
+
 ENTITY* last_building;
 ENTITY* main_unit;
 
 ENTITY *ui_active;
+ENTITY *ui_active_building;
 
 FONT *ui_hud_font = "HUD_font.png";
 
@@ -73,7 +84,11 @@ var ui_switch_frame = 0;
 int ui_frame_order[19] = {0, 1, 0, 1, 2, 1, 0, 1, 1, 2, 0, 2, 0, 0, 1, 2, 0, 1, 2};
 int ui_selected_max_type = 0;
 int ui_command_group_status = 0;
+int ui_lifebar_counter = 0;
 
+
+var scale_factor_x = 1;
+var scale_factor_y = 1;
 
 void ui_game_init();
 void ui_game_open();
