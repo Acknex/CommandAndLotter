@@ -55,7 +55,7 @@ void game_open(void)
     UnitMangement_open();
     fow_open();
 
-    SetupPostprocessing();
+    //SetupPostprocessing();
 
 	SPUTNIK_Init();
 	SPAWNER_Init();
@@ -73,7 +73,7 @@ void game_open(void)
 
 void game_update(void)
 {
-    updateRenderTargetsIfNeeded();
+    //updateRenderTargetsIfNeeded();
     topdown_camera_update();
     ui_game_update();
 	jpsGameUpdate(mapGetCurrent());

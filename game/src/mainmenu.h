@@ -4,8 +4,13 @@
 #include "global.h"
 
 int mainmenu_current_response = 0;
-uimenu_window_t * wndMenuMain;
-uimenu_window_t * wndMenuOptions;
+uimenu_window_t * mainmenu_wndMenuBackground;
+uimenu_window_t * mainmenu_wndMenuMain;
+uimenu_element_t * mainmenu_btnNewGame;
+uimenu_element_t * mainmenu_btnOptions;
+uimenu_element_t * mainmenu_btnCredits;
+uimenu_element_t * mainmenu_btnExit;
+uimenu_window_t * mainmenu_wndMenuOptions;
 
 BMAP * mainmenu_btn_new_game = "NewGame.png";
 BMAP * mainmenu_btn_options = "Options.png";
@@ -22,6 +27,7 @@ BMAP * mainmenu_background = "MenueBackground_fc.png";
 void mainmenu_init(void);
 void mainmenu_open(void);
 void mainmenu_update(void);
+void mainmenu_resolution_update(void);
 void mainmenu_close(void);
 
 void mainmenu_set_start(void);

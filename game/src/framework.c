@@ -7,6 +7,7 @@
 #include "music_player.h"
 #include "jps.h"
 #include "ui_game.h"
+#include "materials.h"
 
 #include <acknex.h>
 #include <windows.h>
@@ -156,6 +157,7 @@ void framework_update()
     if(framework.state != FRAMEWORK_STATE_STARTUP)
     {
         uimenu_update();
+        updateRenderTargetsIfNeeded();
     }
 
     switch(framework.state)
@@ -164,6 +166,7 @@ void framework_update()
         if(framework.frameCounter == 1)
         {
             // spiel im ersten frame initialisieren
+            SetupPostprocessing();
             music_init();
             mainmenu_init();
             game_init();
