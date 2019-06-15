@@ -1051,7 +1051,7 @@ void unitMove(MAP* map, UNIT* unit)
 			TILE* nextTile = (jpsPath->tiles)[jpsPath->currentNode];
 			if(!nextTile) error("ERROR");
 			//if(!mapTraceDo(map,unitTile->pos,nextTile->pos,0))
-			if(vec_length( vector(unitTile->pos[0]-nextTile->pos[0], unitTile->pos[1]-nextTile->pos[1], 0) ) < 0.5 )
+			if(vec_length( vector(unitTile->pos[0]-nextTile->pos[0], unitTile->pos[1]-nextTile->pos[1], 0) ) < 0.25 )
 			{
 				jpsPath->currentNode--;
 				if(jpsPath->currentNode >= 0) nextTile = (jpsPath->tiles)[jpsPath->currentNode];
@@ -1274,7 +1274,7 @@ MAP* jpsMapLoadFromFile(char* filename)
 	
 	if(0)
 	{
-		entJPSDummyPlane = ent_create("jpsPlane.mdl", vector(0,0,500), NULL);
+		entJPSDummyPlane = ent_create("jpsPlane.mdl", vector(0,0,800), NULL);
 		set(entJPSDummyPlane, PASSABLE | TRANSLUCENT);
 		entJPSDummyPlane.flags2 |= UNTOUCHABLE;
 		ent_setskin(entJPSDummyPlane, map->bmp, 1);
