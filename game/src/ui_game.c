@@ -163,10 +163,8 @@ void ui_game_init()
 	ui_minimap = pan_create("", 99);
 	
 	ui_radial_counter->bmap = ui_radial_n;
-	ui_radial_counter->flags = CENTER_X | CENTER_Y | UNTOUCHABLE | LIGHT;
-	ui_radial_counter->red = 128;
-	ui_radial_counter->green = 128;
-	ui_radial_counter->blue = 128;
+	ui_radial_counter->flags = CENTER_X | CENTER_Y | UNTOUCHABLE;
+	pan_setwindow(ui_radial_counter, 0, -5, -4, 128, 128, ui_radial_progress, 0, 0);
 	pan_setdigits(ui_radial_counter, 0, bmap_width(ui_radial_n) / 2, bmap_height(ui_radial_n) / 2 , "%.0f", ui_hud_font, 1, &a_dummy_var);
 	
 	pan_setbutton(ui_game_menu, 0, 0, 1, 151, ui_hide_button_p, ui_hide_button_n, ui_hide_button_o, ui_hide_button_n, ui_show_commando_groups, NULL, NULL);
@@ -239,26 +237,23 @@ void ui_game_update()
 	scale_factor_x = screen_size.x / 1920;
 	scale_factor_y = screen_size.y / 1080;
 
-	if(key_m)
+	BMAP* bmp = mapGetBitmap(NULL);
+	if(bmp)
 	{
-		BMAP* bmp = mapGetBitmap(NULL);
-		if(bmp)
+		int size = 4;
+		draw_quad(bmp,vector(000,0,0),NULL,NULL,vector(size,size,0),NULL,100,0);
+		int unitDrawSize = 4;
+		int currentPlayer;
+		for(currentPlayer = 0; currentPlayer < MAX_PLAYERS; currentPlayer++)
 		{
-			int size = 4;
-			draw_quad(bmp,vector(000,0,0),NULL,NULL,vector(size,size,0),NULL,100,0);
-			int unitDrawSize = 4;
-			int currentPlayer;
-			for(currentPlayer = 0; currentPlayer < MAX_PLAYERS; currentPlayer++)
+			UNIT *unit = mapCurrent.unitFirst[currentPlayer];
+			while(unit)
 			{
-				UNIT *unit = mapCurrent.unitFirst[currentPlayer];
-				while(unit)
+				if(unit->isActive)
 				{
-					if(unit->isActive)
-					{
-						draw_quad(NULL,vector(unit->pos2d.x*size-unitDrawSize/2,unit->pos2d.y*size-unitDrawSize/2,0),NULL,vector(4,4,0),NULL,COLOR_RED,50,0);
-					}
-					unit = unit->next;
+					draw_quad(NULL,vector(unit->pos2d.x*size-unitDrawSize/2,unit->pos2d.y*size-unitDrawSize/2,0),NULL,vector(4,4,0),NULL,COLOR_RED,50,0);
 				}
+				unit = unit->next;
 			}
 		}
 	}
@@ -348,12 +343,6 @@ void ui_game_update()
 				ui_radial_delete->skill_y = ent;
 				ui_radial_counter->skill_y = ent;
 				a_dummy_var = spawner_getQueue(ent);
-				
-				//				var sp = spawner_getProgress(ent);
-				//				
-				//				ui_radial_counter->red = 128 + 128 * sp;
-				//				ui_radial_counter->green = 128 + 128 * sp;
-				//				ui_radial_counter->blue = 128 + 128 * sp;
 			}
 		}
 	}
@@ -549,12 +538,6 @@ void ui_game_update()
 		ui_scale2 = 0.1;
 		ui_scale3 = 0.1;
 	}
-	
-	
-	
-	
-	
-	
 }
 
 var ui_game_isdone()
@@ -566,7 +549,5 @@ void ui_game_after_all()
 {
 	ENTITY * ent = ui_radial_counter->skill_y;
 	if(ent)
-	progressbar_radial_render(ui_radial_progress, 100 - 100 * spawner_getProgress(ent), vector(0, 1, 0), 80);
-	
-	DEBUG_BMAP(ui_radial_progress, 16, 1);
+		progressbar_radial_render(ui_radial_progress, 100 - 100 * spawner_getProgress(ent), 60, vector(0, 1, 0), 50);
 }
