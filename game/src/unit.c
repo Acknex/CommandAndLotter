@@ -118,7 +118,7 @@ void unit_setDamage(ENTITY* ent, var damage)
 	}
 }
 
-int uint_getType(ENTITY* ent)
+int unit_getType(ENTITY* ent)
 {
 	if (ent != NULL)
 	{
