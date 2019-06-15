@@ -47,7 +47,16 @@ void buildingPlacement_endConstruction()
 
 void buildingPlacement_placeConstruction()
 {
-	spawner_spawn(buildingPlacement_selection, &buildingPlacement_previewModel->x, SPAWNER_PLAYER);
+	switch(buildingPlacement_selection)
+	{
+		case BUILDING_TOWER:
+		//case ..
+			spawner_spawn(buildingPlacement_selection, &buildingPlacement_previewModel->x, SPAWNER_PLAYER);
+		//case nichtspawnergebaeude
+		break;
+		default:
+			error("unbekannter Gebauedetyp");
+	}
 	
 	buildingPlacement_endConstruction();
 }
