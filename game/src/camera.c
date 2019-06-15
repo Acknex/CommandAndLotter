@@ -23,6 +23,9 @@ void topdown_camera_update() {
 	int key_leftright = (key_a-key_d) + ((int)_up-(int)_down);
 
 
-	camera.x += key_updown*time_step*CAMERA_SPEED;
-	camera.y += key_leftright*time_step*CAMERA_SPEED;
+	//camera.x += key_updown*time_step*CAMERA_SPEED;
+	//camera.y += key_leftright*time_step*CAMERA_SPEED;
+	
+	camera.x += (key_updown*cosv(camera.pan)- key_leftright*sinv(camera.pan))*time_step*CAMERA_SPEED;
+	camera.y += (key_leftright*cosv(camera.pan)+ key_updown*sinv(camera.pan))*time_step*CAMERA_SPEED;
 }
