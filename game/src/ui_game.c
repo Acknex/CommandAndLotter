@@ -1,12 +1,21 @@
 #include "ui_game.h"
 #include "unit.h"
+#include "spawner.h"
 
-void ui_spawn_event_cbabe(var num, PANEL *panel)
+void ui_spawn_event_sputnik(var num, PANEL *panel)
 {
 	ENTITY *ent = panel->skill_y;
 	if (!ent) { return; } // NOOOO
 	spawner_produce(ent);
 	ent->skill[39] = 1;
+}
+
+void ui_destroy_event_sputnik(var num, PANEL *panel)
+{
+	ENTITY *ent= panel->skill_y;
+	if (!ent) { return; } // NOOOO
+	ent->HEALTH = 0;
+	ent->ENTITY_STATE = 4;
 }
 
 void ui_show_commando_groups()
@@ -74,14 +83,14 @@ void ui_repos_radial(PANEL *rad, int x, int y)
 	rad->pos_y = y;
 }
 
-PANEL* ui_create_radial_button(BMAP *initial_icon)
+PANEL* ui_create_radial_button(BMAP *initial_icon, void *ev)
 {
 	PANEL *rad = pan_create("", 2);
 	
 	rad->size_x = bmap_width(ui_radial_n);
 	rad->size_y = bmap_height(ui_radial_n);
 	
-	pan_setbutton(rad, 0, 0, 0, 0, ui_radial_o, ui_radial_n, ui_radial_o, ui_radial_n, ui_spawn_event_cbabe, NULL, NULL);
+	pan_setbutton(rad, 0, 0, 0, 0, ui_radial_o, ui_radial_n, ui_radial_o, ui_radial_n, ev, NULL, NULL);
 	
 	rad->scale_x = scale_factor_x;
 	rad->scale_y = scale_factor_x;
@@ -137,12 +146,14 @@ void ui_game_init()
 	scale_factor_x = screen_size.x / 1920;
 	scale_factor_y = screen_size.y / 1080;
 	
-	ui_radial_delete = ui_create_radial_button(NULL);
+	ui_radial_delete = ui_create_radial_button(NULL, ui_destroy_event_sputnik);
 	ui_radial_counter = pan_create("", 2);
-	ui_radial_cbabe = ui_create_radial_button(ui_icon_cbabe);
-	ui_radial_sputnik = ui_create_radial_button(ui_icon_sputnik);
-	ui_radial_skull = ui_create_radial_button(ui_icon_skull);
-	ui_radial_esel = ui_create_radial_button(ui_icon_esel);
+	ui_radial_cbabe = ui_create_radial_button(ui_icon_cbabe, NULL);
+	ui_radial_sputnik = ui_create_radial_button(ui_icon_sputnik, ui_spawn_event_sputnik);
+	ui_radial_skull = ui_create_radial_button(ui_icon_skull, NULL);
+	ui_radial_esel = ui_create_radial_button(ui_icon_esel, NULL);
+	
+
 	
 	ui_main_resources = pan_create("", 99);
 	ui_unit_meta = pan_create("", 99);
@@ -329,7 +340,7 @@ void ui_game_update()
 				
 				update_or_create_lifebar(ent);
 				
-				ui_radial_cbabe->skill_y = ent;
+				ui_radial_sputnik->skill_y = ent;
 				ui_radial_delete->skill_y = ent;
 				a_dummy_var = spawner_getQueue(ent);
 				
@@ -449,14 +460,14 @@ void ui_game_update()
 	
 	if( ui_anim_state == UI_ANIM_RESTARTED )
 	{
-		ui_orbit_radial(ui_radial_cbabe,screen.x, screen.y, 270, 200);
+		ui_orbit_radial(ui_radial_sputnik,screen.x, screen.y, 270, 200);
 		ui_orbit_radial(ui_radial_delete,screen.x, screen.y, 230, 200);
 		ui_orbit_radial(ui_radial_counter,screen.x, screen.y, 190, 200);
 		
 		
 		
-		ui_show_radial(ui_radial_cbabe);
-		ui_scale_radial(ui_radial_cbabe, 0.1);
+		ui_show_radial(ui_radial_sputnik);
+		ui_scale_radial(ui_radial_sputnik, 0.1);
 		
 		ui_show_radial(ui_radial_delete);
 		ui_scale_radial(ui_radial_delete, 0.1);
@@ -469,7 +480,7 @@ void ui_game_update()
 	} 
 	else if( ui_anim_state == UI_ANIM_PROGRESS ) 
 	{
-		ui_orbit_radial(ui_radial_cbabe,screen.x, screen.y, 270, 200);
+		ui_orbit_radial(ui_radial_sputnik,screen.x, screen.y, 270, 200);
 		ui_orbit_radial(ui_radial_delete,screen.x, screen.y, 230, 200);
 		ui_orbit_radial(ui_radial_counter,screen.x, screen.y, 190, 200);
 		
@@ -499,7 +510,7 @@ void ui_game_update()
 			ui_scale3 = scale_factor_x;
 		}
 		
-		ui_scale_radial(ui_radial_cbabe, ui_scale1);
+		ui_scale_radial(ui_radial_sputnik, ui_scale1);
 		ui_scale_radial(ui_radial_delete, ui_scale2);
 		
 		ui_radial_counter->scale_x = ui_scale3;
@@ -512,11 +523,11 @@ void ui_game_update()
 	}
 	else if( ui_anim_state == UI_ANIM_ON ) 
 	{
-		ui_orbit_radial(ui_radial_cbabe,screen.x, screen.y, 270, 200);
+		ui_orbit_radial(ui_radial_sputnik,screen.x, screen.y, 270, 200);
 		ui_orbit_radial(ui_radial_delete,screen.x, screen.y, 230, 200);
 		ui_orbit_radial(ui_radial_counter,screen.x, screen.y, 190, 200);
 		
-		ui_scale_radial(ui_radial_cbabe, scale_factor_x);
+		ui_scale_radial(ui_radial_sputnik, scale_factor_x);
 		ui_scale_radial(ui_radial_delete, scale_factor_x);
 		
 		ui_radial_counter->scale_x = scale_factor_x;
@@ -525,7 +536,7 @@ void ui_game_update()
 	}
 	else if ( ui_anim_state == UI_ANIM_OFF )
 	{
-		ui_hide_radial(ui_radial_cbabe);
+		ui_hide_radial(ui_radial_sputnik);
 		ui_hide_radial(ui_radial_delete);
 		ui_radial_counter->flags &= ~SHOW;
 		
