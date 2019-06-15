@@ -101,11 +101,10 @@ void Spawner()
    framework_setup(my, SUBSYSTEM_SPAWNER);
 	my->HEALTH = 23;//TODO HOOK TO UNIT SYSTEM
 	ENEMY_HIT_init(my);
-	vec_scale(&my->scale_x, 1.2);
 	set(my, SHADOW);
 	c_setminmax(me);
-	//my->ENTITY_STATE = SPAWNER_STATE_CONSTRUCT;
-	my->ENTITY_STATE = SPAWNER_STATE_DIE;
+	my->ENTITY_STATE = SPAWNER_STATE_CONSTRUCT;
+	//my->ENTITY_STATE = SPAWNER_STATE_DIE;
 
 	my->SPAWNER_QUEUE = 0;
 	my->SPAWNER_BUILDTIMER = SPAWNER_BUILDTIME;

@@ -5,10 +5,6 @@
 #include "spawner.h"
 #include "enemy_hit.h"
 
-char* buildingPlacement_assets[BUILDING_NUMBER];
-char* buildingPlacement_constructionAssets[BUILDING_NUMBER];
-var buildingPlacement_buildtimes[BUILDING_NUMBER];
-
 ENTITY *buildingPlacement_previewModel;
 int buildingPlacement_selection;
 
@@ -17,7 +13,6 @@ void buildingPlacement_init()
 {
 	buildingPlacement_assets[0] = "the_tower.mdl";
 	buildingPlacement_constructionAssets[0] = "the_tower_wireframe.mdl";
-	buildingPlacement_buildtimes[0] = 10;
 }
 
 void buildingPlacement_open()
