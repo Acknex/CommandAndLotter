@@ -82,9 +82,10 @@
 		int presetID;
 		int playerID;
 		int isActive;
+		int isMoving;
 		int HP;
 		int speed;
-		VECTOR pos2d, pos3d;
+		VECTOR pos2d, pos3d, prevPos3d;
 		VECTOR target2d, prevTarget2d, currentTarget2d;
 		ENTITY* ent;
 		TILE* tile;
@@ -213,8 +214,6 @@
 	#define POINTER_ARRAY_MAX 1024
 	void* pointerArray[POINTER_ARRAY_MAX]; // yes!
 	int pointerArrayNum = 0;
-
-	LIST* mapGetNearbyUnits_listbased(MAP* map, TILE* sourceTile, int range);
 
 	int mapGetNearbyUnits(MAP* map, TILE* sourceTile, int range);
 	int mapIsAnyUnitNearby(MAP* map, TILE* sourceTile, int range);

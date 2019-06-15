@@ -58,6 +58,11 @@ ENTITY* unit_getVictim(ENTITY* ent)
 
 ENTITY* unit_spawn(int unittype, VECTOR* pos, var owner)
 {
+	return unit_spawn(unittype, pos, pos, owner);
+}
+
+ENTITY* unit_spawn(int unittype, VECTOR* pos, VECTOR* targetPos, var owner)
+{
 	ENTITY* ent = NULL;
 	switch (unittype)
 	{
@@ -78,14 +83,14 @@ ENTITY* unit_spawn(int unittype, VECTOR* pos, var owner)
 	if (ent != NULL)
 	{
 		ent->SK_ENTITY_JPS_POINTER_TO_UNIT_STRUCT = jpsUnitCreate(PLAYER_ID_PLAYER, unittype, ent);
-		unit_setTarget(ent, ent->x);
-		unit_setVictim(ent,NULL);
 		
 		if (owner == UNIT_ENEMY)
 			ent->group = GROUP_ENEMY_UNIT;
 		else
 			ent->group = GROUP_PLAYER_UNIT;		
-		cprintf1("\n unit_spawn: ent(%p)", ent);
+
+		unit_setTarget(ent, targetPos);
+		unit_setVictim(ent,NULL);
 	}
 	
 	return ent;

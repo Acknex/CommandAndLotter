@@ -12,6 +12,7 @@
 var unit_setTarget(ENTITY* ent, VECTOR* pos);
 var unit_setVictim(ENTITY* ent, ENTITY* victim);
 ENTITY* unit_spawn(int unittype, VECTOR* pos, var owner);
+ENTITY* unit_spawn(int unittype, VECTOR* pos, VECTOR* targetPos, var owner);
 VECTOR* unit_getTarget(ENTITY* ent);
 ENTITY* unit_getVictim(ENTITY* ent);
 var unit_getHealth(ENTITY* ent);

@@ -35,14 +35,14 @@ SOUND* sputnik_snd_attack3 = "sputnik_attack3.wav";
 
 void Sputnik()
 {
-   framework_setup(my, SUBSYSTEM_UNIT_SPUTNIK);
+	framework_setup(my, SUBSYSTEM_UNIT_SPUTNIK);
 	my->SPUTNIK_RUNSPEED = 30;
 	my->SPUTNIK_TURNSPEED = 50;
 	my->SPUTNIK_ATTACKSPEED = 5;
 	my->SPUTNIK_ATTACKRANGE = 300;
 	my->SPUTNIK_ANIMSTATEATK = 0;
-	my->HEALTH = 23;//HEALTH_SPUTNIK; TODO HOOK TO UNIT SYSTEM
-	my->MAXHEALTH = 23;//HEALTH_SPUTNIK; TODO HOOK TO UNIT SYSTEM
+	my->HEALTH = 23;
+	my->MAXHEALTH = my->HEALTH;
 	ENEMY_HIT_init(my);
 	set(my, SHADOW);
 	c_setminmax(me);
@@ -55,20 +55,20 @@ void SPUTNIK_Init()
 {
 }
 
-void SPUTNIK_Update()
+void SPUTNIK_Update_firo()
 {
 	ENTITY * ptr;
 	SUBSYSTEM_LOOP(ptr, SUBSYSTEM_UNIT_SPUTNIK)
 	{
-			
+		
 		if (ptr->HEALTH > 0)
 		{
 			SPUTNIK__hitcheck(ptr);
 		}
 		
 		if (ptr->DAMAGE_HIT > 0)
-      {
-      	SPUTNIK__hit(ptr);
+		{
+			SPUTNIK__hit(ptr);
 		}
 
 		switch(ptr->ENTITY_STATE)    	
@@ -103,12 +103,76 @@ void SPUTNIK_Update()
 				break;
 			}
 		}	
-	
+		
 		if (ptr->ENTITY_STATE != ENTITY_STATE_DIE && ptr->ENTITY_STATE != ENTITY_STATE_DEAD)
 		{
 			ptr->z = maploader_get_height(ptr->x) - ptr->min_z + SPUTNIK_FEET;			
 		}
+	}	
+}
+
+void sputnik_jps_test(ENTITY * ptr)
+{
+	UNIT* unit = jpsUnitGetFromEntity(ptr);
+	if(!unit) return;
+	vec_set(ptr->x, unit->pos3d);
+	if(unit->isMoving)
+	{
+		//ANG_turnToPos(ptr, unit_getTarget(ptr), ptr->SPUTNIK_TURNSPEED, 5);
+		VECTOR diff, temp;
+		vec_diff(diff, unit->pos3d, unit->prevPos3d);
+		if(vec_to_angle(temp, diff) > 0.01) ptr->pan += ang(temp.x-ptr->pan)*0.25*time_step;
+
+		ptr->SPUTNIK_DIDATTACK = 0;
+		ptr->SPUTNIK_ANIMSTATEATK = 0;
+		ptr->SPUTNIK_ANIMSTATE += 0.5 * ptr->SPUTNIK_RUNSPEED * time_step;
+		ent_animate(ptr, SPUTNIK_WALKANIM, ptr->SPUTNIK_ANIMSTATE, ANM_CYCLE);		
+	}
+	else
+	{
+		ptr->SPUTNIK_ANIMSTATE += 7 * time_step;
+		ent_animate(ptr, SPUTNIK_WAITANIM, ptr->SPUTNIK_ANIMSTATE, ANM_CYCLE);
+	}
+}
+
+
+void SPUTNIK_Update()
+{
+	ENTITY * ptr;
+	SUBSYSTEM_LOOP(ptr, SUBSYSTEM_UNIT_SPUTNIK)
+	{
+		sputnik_jps_test(ptr);
+		/*
+		if (ptr->HEALTH > 0)
+		{
+			SPUTNIK__hitcheck(ptr);
+		}
 		
+		if (ptr->DAMAGE_HIT > 0)
+		{
+			SPUTNIK__hit(ptr);
+		}
+
+		switch(ptr->ENTITY_STATE)    	
+		{
+
+			case ENTITY_STATE_DIE:
+			{
+				SPUTNIK__die(ptr);
+				break;
+			}
+			
+			default:
+			{
+				sputnik_jps_test(ptr);
+				break;
+			}
+		}	*/
+		
+		if (ptr->ENTITY_STATE != ENTITY_STATE_DIE && ptr->ENTITY_STATE != ENTITY_STATE_DEAD)
+		{
+			ptr->z = maploader_get_height(ptr->x) - ptr->min_z + SPUTNIK_FEET;			
+		}
 	}	
 }
 
@@ -138,16 +202,17 @@ void SPUTNIK__hitcheck(ENTITY* ptr)
 		{
 			ptr->SPUTNIK_HITTHRESHOLD = 0;
 			ptr->event = ENEMY_HIT_event;
-			vec_zero(ptr->DAMAGE_VEC);
 		}
 	}
 }
 
 void SPUTNIK__wait(ENTITY* ptr)
 {
-  	ptr->SPUTNIK_ANIMSTATE += 7 * time_step;
+	ptr->SPUTNIK_ANIMSTATE += 7 * time_step;
 	ent_animate(ptr, SPUTNIK_WAITANIM, ptr->SPUTNIK_ANIMSTATE, ANM_CYCLE);
-		
+	
+	//UNIT* unit = jpsUnitGetFromEntity(ent);
+	
 	/* transitions */
 	// Unit is near enough to attack
 	if (SCAN_IsEntityNear(ptr, unit_getVictim(ptr), ptr->SPUTNIK_ATTACKRANGE))
@@ -212,9 +277,9 @@ void SPUTNIK__attack(ENTITY* ptr)
 			me = ptr;
 			var mode = IGNORE_ME | IGNORE_WORLD | IGNORE_PUSH | IGNORE_SPRITES | IGNORE_CONTENT | ACTIVATE_SHOOT;
 			if (ptr->group == GROUP_PLAYER_UNIT)
-				c_ignore(GROUP_PLAYER_UNIT, GROUP_PLAYER_SPAWNER,0);
+			c_ignore(GROUP_PLAYER_UNIT, GROUP_PLAYER_SPAWNER,0);
 			else
-				c_ignore(GROUP_ENEMY_UNIT, GROUP_ENEMY_SPAWNER,0);
+			c_ignore(GROUP_ENEMY_UNIT, GROUP_ENEMY_SPAWNER,0);
 			//ENEMY_HIT_setAttack()
 			c_trace(ptr->x, unit_getTarget(ptr), mode);			
 		}

@@ -18,13 +18,9 @@ typedef int bool;
 #define ENTITY_STATE_HIT 6
 
 
-#define MAXHEALTH skill49 //remove after attaching unit system to entity code
-#define HEALTH skill50 //remove after attaching unit system to entity code
-// old hit system - to be fiddled together with unit system and maybe remove later on
 #define DAMAGE_HIT skill51
-#define DAMAGE_VEC skill52
-//#define DAMAGE_VEC skill53
-//#define DAMAGE_VEC skill54
+#define MAXHEALTH skill52
+#define HEALTH skill53
 #define ENTITY_STATE skill55
 #define ENTITY_ANIM skill56
 #define ENTITY_VICTIM skill57
@@ -73,7 +69,7 @@ typedef int bool;
 #define PLAYER_ID_AI 1
 
 
-#define GAME_OPEN_DEBUG
+//#define GAME_OPEN_DEBUG
 #ifdef GAME_OPEN_DEBUG
 	#define CONSOLE_SHOW
 #endif
