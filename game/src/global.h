@@ -10,8 +10,8 @@ typedef int bool;
 
 
 #define ENTITY_STATE_INACTIVE 0
-#define ENTITY_STATE_WAIT 1
-#define ENTITY_STATE_WALK 2
+#define ENTITY_STATE_WAIT_OR_WALK 1 // pathfinding (+ flocking) decide state
+//#define ENTITY_STATE_WALK 2
 #define ENTITY_STATE_ATTACK 3
 #define ENTITY_STATE_DIE 4
 #define ENTITY_STATE_DEAD 5
@@ -54,6 +54,7 @@ typedef int bool;
 #define SUBSYSTEM_UNIT_SPHERE       104
 #define SUBSYSTEM_TERRAIN_SYSTEM    105
 #define SUBSYSTEM_UNIT_MANAGEMENT   106
+#define SUBSYSTEM_Z                 107
 // HIER WEITERE SUBSYSTEME DEFINIEREN
 
 #define SUBSYSTEM_LOOP(ptr,system) for(ptr = ent_next(NULL); ptr != NULL; ptr = ent_next(ptr)) if(ptr->SK_SUBSYSTEM == (system))

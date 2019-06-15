@@ -47,7 +47,7 @@ void Sputnik()
 	set(my, SHADOW);
 	c_setminmax(me);
 	my->min_z += SPUTNIK_FEET;
-	my->ENTITY_STATE = ENTITY_STATE_WAIT;
+	my->ENTITY_STATE = ENTITY_STATE_WAIT_OR_WALK;
 	my->ENTITY_DAMAGE = 5;
 }
 
@@ -55,73 +55,38 @@ void SPUTNIK_Init()
 {
 }
 
-void SPUTNIK_Update_firo()
-{
-	ENTITY * ptr;
-	SUBSYSTEM_LOOP(ptr, SUBSYSTEM_UNIT_SPUTNIK)
-	{
-		
-		if (ptr->HEALTH > 0)
-		{
-			SPUTNIK__hitcheck(ptr);
-		}
-		
-		if (ptr->DAMAGE_HIT > 0)
-		{
-			SPUTNIK__hit(ptr);
-		}
-
-		switch(ptr->ENTITY_STATE)    	
-		{
-
-			case ENTITY_STATE_WAIT:
-			{
-				SPUTNIK__wait(ptr);
-				break;
-			}
-
-			case ENTITY_STATE_WALK:
-			{
-				SPUTNIK__walk(ptr);
-				break;
-			}
-
-			case ENTITY_STATE_ATTACK:
-			{
-				SPUTNIK__attack(ptr);
-				break;
-			}
-
-			case ENTITY_STATE_DIE:
-			{
-				SPUTNIK__die(ptr);
-				break;
-			}
-
-			default:
-			{
-				break;
-			}
-		}	
-		
-		if (ptr->ENTITY_STATE != ENTITY_STATE_DIE && ptr->ENTITY_STATE != ENTITY_STATE_DEAD)
-		{
-			ptr->z = maploader_get_height(ptr->x) - ptr->min_z + SPUTNIK_FEET;			
-		}
-	}	
-}
-
-void sputnik_jps_test(ENTITY * ptr)
+void SPUTNIK__wait_or_walk(ENTITY * ptr)
 {
 	UNIT* unit = jpsUnitGetFromEntity(ptr);
 	if(!unit) return;
+	
+	MAP* map = mapGetCurrent();
+	JPSPATH *jpsPath = unit->jpsPath;
+	if(jpsPath && unit->tile)
+	{
+		if(jpsPath->length > 0)
+		{
+			DEBUG_VAR(jpsPath->length,400);
+			int i;
+			for(i = 1; i < jpsPath->length; i++)
+			{
+				TILE* prevTile = (jpsPath->tiles)[i-1];
+				TILE* nextTile = (jpsPath->tiles)[i];
+				VECTOR vPrev, vNext;
+				mapGetVector3DFromVector2D(map, vPrev, vector(prevTile->pos[0]+0.5, prevTile->pos[1]+0.5, 0));
+				mapGetVector3DFromVector2D(map, vNext, vector(nextTile->pos[0]+0.5, nextTile->pos[1]+0.5, 0));
+				draw_line3D2(vPrev, vNext, COLOR_GREEN, 75);
+			}
+		}
+	}
+	
+	
 	vec_set(ptr->x, unit->pos3d);
 	if(unit->isMoving)
 	{
-		//ANG_turnToPos(ptr, unit_getTarget(ptr), ptr->SPUTNIK_TURNSPEED, 5);
 		VECTOR diff, temp;
 		vec_diff(diff, unit->pos3d, unit->prevPos3d);
-		if(vec_to_angle(temp, diff) > 0.01) ptr->pan += ang(temp.x-ptr->pan)*0.25*time_step;
+		if(vec_to_angle(temp, diff) > 0.01) ptr->pan += ang(temp.x-ptr->pan)*0.5*time_step;
 
 		ptr->SPUTNIK_DIDATTACK = 0;
 		ptr->SPUTNIK_ANIMSTATEATK = 0;
@@ -133,6 +98,11 @@ void sputnik_jps_test(ENTITY * ptr)
 		ptr->SPUTNIK_ANIMSTATE += 7 * time_step;
 		ent_animate(ptr, SPUTNIK_WAITANIM, ptr->SPUTNIK_ANIMSTATE, ANM_CYCLE);
 	}
+	
+	if (SCAN_IsEntityNear(ptr, unit_getVictim(ptr), ptr->SPUTNIK_ATTACKRANGE))
+	{
+		ptr->ENTITY_STATE = ENTITY_STATE_ATTACK;
+	}
 }
 
 
@@ -141,8 +111,6 @@ void SPUTNIK_Update()
 	ENTITY * ptr;
 	SUBSYSTEM_LOOP(ptr, SUBSYSTEM_UNIT_SPUTNIK)
 	{
-		sputnik_jps_test(ptr);
-		/*
 		if (ptr->HEALTH > 0)
 		{
 			SPUTNIK__hitcheck(ptr);
@@ -155,7 +123,18 @@ void SPUTNIK_Update()
 
 		switch(ptr->ENTITY_STATE)    	
 		{
-
+			case ENTITY_STATE_WAIT_OR_WALK:
+			{
+				SPUTNIK__wait_or_walk(ptr);
+				break;
+			}
+			
+			case ENTITY_STATE_ATTACK:
+			{
+				SPUTNIK__attack(ptr);
+				break;
+			}
+			
 			case ENTITY_STATE_DIE:
 			{
 				SPUTNIK__die(ptr);
@@ -164,10 +143,9 @@ void SPUTNIK_Update()
 			
 			default:
 			{
-				sputnik_jps_test(ptr);
 				break;
 			}
-		}	*/
+		}	
 		
 		if (ptr->ENTITY_STATE != ENTITY_STATE_DIE && ptr->ENTITY_STATE != ENTITY_STATE_DEAD)
 		{
@@ -221,7 +199,7 @@ void SPUTNIK__wait(ENTITY* ptr)
 	}
 	else if (SCAN_IsTargetNear(ptr, unit_getTarget(ptr), SPUTNIK_TARGETDIST) == 0)
 	{
-		ptr->ENTITY_STATE = ENTITY_STATE_WALK;
+		ptr->ENTITY_STATE = ENTITY_STATE_WAIT_OR_WALK;
 	}
 	else
 	{
@@ -242,7 +220,7 @@ void SPUTNIK__walk(ENTITY* ptr)
 	// Unit reached target
 	if (SCAN_IsTargetNear(ptr, unit_getTarget(ptr), SPUTNIK_TARGETDIST))
 	{
-		ptr->ENTITY_STATE = ENTITY_STATE_WAIT;
+		ptr->ENTITY_STATE = ENTITY_STATE_WAIT_OR_WALK;
 	}
 	else // Still walking
 	{
@@ -293,7 +271,7 @@ void SPUTNIK__attack(ENTITY* ptr)
 	if (ptr->SPUTNIK_ANIMSTATEATK >= 100)
 	{
 		ptr->SPUTNIK_ANIMSTATEATK = 0;
-		ptr->ENTITY_STATE = ENTITY_STATE_WAIT;
+		ptr->ENTITY_STATE = ENTITY_STATE_WAIT_OR_WALK;
 	}
 
 }

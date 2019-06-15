@@ -93,6 +93,13 @@ void draw_line2(VECTOR* vFrom, VECTOR* vTo, COLOR* color, var alpha)
 	draw_line(vTo,color,alpha);
 }
 
+void draw_line3D2(VECTOR* vFrom, VECTOR* vTo, COLOR* color, var alpha)
+{
+	draw_line3d(vFrom,NULL,alpha);
+	draw_line3d(vFrom,color,alpha);
+	draw_line3d(vTo,color,alpha);
+}
+
 ///////////////////////////////
 
 JPSPATH *jpsPathCreate(int maxLength)
@@ -422,11 +429,13 @@ void mapTileCalculateVisibility(MAP* map)
 	}
 }
 
+#define JPS_DEBUG
+
 int mapJPSPathGet(MAP* map, TILE* startTile, TILE *targetTile, JPSPATH *jpsPathOut)
 {
 	dtimer();
 	#ifdef JPS_DEBUG
-		cprintf1("\n mapJPSPathGet: START at frame %d: ", ITF);
+		cprintf3("\n mapJPSPathGet: START at frame %d: startTile(%p) targetTile(%p)", ITF, startTile, targetTile);
 	#endif
 	
 	if(jpsPathOut)
@@ -1031,13 +1040,8 @@ void mapMoveUnits(MAP* map)
 				vec_set(unit->prevPos3d, unit->pos3d);
 				unitMove(map, unit);
 				mapGetVector3DFromVector2D(map, unit->pos3d, unit->pos2d);
-				unit->isMoving = (unit->pos3d.x-unit->prevPos3d.x || unit->pos3d.y-unit->prevPos3d.y);
+				unit->isMoving = (abs(unit->pos3d.x-unit->prevPos3d.x) > 0.025 || abs(unit->pos3d.y-unit->prevPos3d.y) > 0.025);
 				//if(unit->ent) mapGetVector3DFromVector2D(map, unit->ent.x, unit->pos2d);
-				
-				if(unit->HP <= 0 && 0)
-				{
-					unit->isActive = 0; // delay removal for one frame to void projectiles
-				}
 				prev = unit;
 			}
 			else
@@ -1098,7 +1102,7 @@ void unitSetTargetFromVector2D(MAP* map, UNIT* unit, VECTOR *vTarget)
 	if(vec_dist(unit->target2d, unit->prevTarget2d) > 0.2)
 	{
 		vec_set(unit->prevTarget2d, unit->target2d);
-		unit->targetTile = targetTile;
+		unit->targetTile = mapTileGet(map, vTarget.x, vTarget.y);
 		//if(targetTile && unit->tile)
 		if(!unit->jpsPath) unit->jpsPath = jpsPathCreate(16);
 		mapJPSPathGet(map, unit->tile, targetTile, unit->jpsPath);
@@ -1107,6 +1111,7 @@ void unitSetTargetFromVector2D(MAP* map, UNIT* unit, VECTOR *vTarget)
 
 void unitSetTargetFromTile(MAP* map, UNIT* unit, TILE* targetTile)
 {
+	error("unitSetTargetFromTile: bad function, delete this!");
 	vec_set(unit->target2d, vector(targetTile->pos[0]+0.5, targetTile->pos[1]+0.5, 0));
 	if(vec_dist(unit->target2d, unit->prevTarget2d) > 0.2)
 	{

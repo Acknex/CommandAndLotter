@@ -208,6 +208,7 @@
 
 	void presetsInit();
 
+void draw_line3D2(VECTOR* vFrom, VECTOR* vTo, COLOR* color, var alpha);
 
 	void mapUpdateUnits(MAP* map);
 
