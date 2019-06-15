@@ -13,6 +13,18 @@ var SCAN_IsCameraNear(ENTITY* ent)
 		return 0;
 }
 
+var SCAN_IsEntityNear(ENTITY* ent, ENTITY* targetEnt, var distance)
+{
+	if (ent != NULL && targetEnt != NULL)
+	{
+		return SCAN_IsTargetNear(ent, targetEnt->x, distance);
+	}
+	else
+	{
+		return 0;
+	}
+}
+
 var SCAN_IsTargetNear(ENTITY* ent, VECTOR* pos, var distance)
 {
 	if (ent == NULL)

@@ -4,6 +4,7 @@ VECTOR mousevec;
 int mouseupdate = 0;
 ENTITY* fancysputnik;
 ENTITY* fancytarget;
+int stubtoggle = 0;
 
 void setmousepos()
 {
@@ -23,7 +24,7 @@ void stub_init()
 {
 	mouse_mode = 4;
 	on_mouse_left = setmousepos;
-	fancysputnik = unit_spawn(0, vector(0,0,500));
+	fancysputnik = unit_spawn(0, vector(0,0,500), UNIT_PLAYER);
 	fancytarget = ent_create(SPHERE_MDL, vector(100,100,500), NULL);
 	vec_scale (&fancytarget->scale_x, 5);	
 }
@@ -33,6 +34,14 @@ void stub_update()
 	if (mouseupdate == 1)
 	{
 		mouseupdate = 0;
+		stubtoggle = 1 - stubtoggle;
 		unit_setTarget(fancysputnik, mousevec);
+		if (stubtoggle > 0)
+			unit_setVictim(fancysputnik, fancytarget);
+		else
+			unit_setVictim(fancysputnik, NULL);
 	}
+	
+	if (stubtoggle > 0)
+		draw_text("Targeting enemy unit" ,0, 0, vector(255,255,255));
 }
