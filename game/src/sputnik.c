@@ -87,6 +87,7 @@ void SPUTNIK__wait_or_walk(ENTITY * ptr)
 		ent_animate(ptr, SPUTNIK_WAITANIM, ptr->SPUTNIK_ANIMSTATE, ANM_CYCLE);
 	}
 	
+	//sputnik was hit
 	if (ptr->DAMAGE_HIT > 0)
 	{
 		if (ptr->ENTITY_STATE != ENTITY_STATE_HIT)
