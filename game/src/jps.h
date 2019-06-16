@@ -62,12 +62,12 @@
 	typedef struct _JPSPATH JPSPATH; // PATH might be an acknex keyword
 
 
-	#define MAX_PRESETS 2
+	#define MAX_PRESETS 5
 	struct _UNIT_PRESET
 	{
 		int ID;
 		char file[32];
-		int maxSpeed;
+		float maxSpeed;
 		int maxHP;
 		var radius;
 	};
