@@ -121,6 +121,9 @@ void SPUTNIK_Update()
 	ENTITY * ptr;
 	SUBSYSTEM_LOOP(ptr, SUBSYSTEM_UNIT_SPUTNIK)
 	{
+		if(ptr->ENTITY_STATE != ENTITY_STATE_WAIT_OR_WALK)
+			ptr->SPUTNIK_IDLECOUNTER = 0;
+		
 		jpsAllowMovementForEntity(ptr, false);
 		
 		switch(ptr->ENTITY_STATE)    	
