@@ -45,7 +45,7 @@ void Sputnik()
 	my->SPUTNIK_IDLECOUNTER = 0;
 	my->HEALTH = 23;
 	my->MAXHEALTH = my->HEALTH;
-	set(my, SHADOW);
+    reset(my, SHADOW);
 	c_setminmax(me);
 	my->min_z += SPUTNIK_FEET;
 	my->ENTITY_STATE = ENTITY_STATE_WAIT_OR_WALK;
