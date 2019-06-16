@@ -12,6 +12,11 @@ MATERIAL *matTrees =
     effect = "trees.fx";
 }
 
+MATERIAL *matCrystals =
+{
+    effect = "crystals.fx";
+}
+
 MATERIAL *matPPFilter =
 {
     effect = "pp_filter.fx";

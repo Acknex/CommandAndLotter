@@ -2,6 +2,7 @@
 #include "framework.h"
 #include "z.h"
 #include "map_loader.h"
+#include "materials.h"
 
 #define Z_VALUE 10
 
@@ -31,6 +32,7 @@ void Z()
 	c_setminmax(me);
 	my->ENTITY_STATE = ENTITY_STATE_WAIT_OR_WALK;
     my->ENTITY_UNITTYPE = UNIT_Z;
+    my->material = matCrystals;
 }
 
 void Z_Init()
