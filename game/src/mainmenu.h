@@ -11,6 +11,10 @@ uimenu_element_t * mainmenu_btnOptions;
 uimenu_element_t * mainmenu_btnCredits;
 uimenu_element_t * mainmenu_btnExit;
 uimenu_window_t * mainmenu_wndMenuOptions;
+uimenu_window_t * mainmenu_wndMenuOptionsGeneral;
+uimenu_window_t * mainmenu_wndMenuOptionsVideo;
+uimenu_window_t * mainmenu_wndMenuOptionsAudio;
+uimenu_window_t * mainmenu_wndMenuOptionsControls;
 
 BMAP * mainmenu_btn_new_game = "NewGame.png";
 BMAP * mainmenu_btn_options = "Options.png";

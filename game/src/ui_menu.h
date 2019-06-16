@@ -14,6 +14,7 @@ FONT * uimenu_default_font = "Arial#16";
 #define UIMENU_TYPE_CHECKBOX    6
 #define UIMENU_TYPE_SOLIDCOLOR  7
 #define UIMENU_TYPE_TEXTBUTTON  8
+#define UIMENU_TYPE_SLIDER      9
 
 #define UIMENU_WINDOW_TITLE_BAR_SIZE    32
 #define UIMENU_WINDOW_BORDER_SIZE       4
@@ -51,6 +52,7 @@ typedef struct uimenu_element_t
     BMAP * bmap_hover;    
     void * callback;
     int element_index;
+    var * var_pointer;
     
     var skill[10]; // Properties
 
@@ -77,6 +79,7 @@ typedef struct uimenu_window_t
     PANEL * _panel;
     PANEL * _content_panel;
     uimenu_element_t * _first; // Linked list
+    struct uimenu_window_t * _child; 
     struct uimenu_window_t * _next; 
     struct uimenu_window_t * _parent;
     var _moving_start_offset[3];
@@ -97,6 +100,7 @@ uimenu_window_t * uimenu_window_create_borderless(var x, var y, var width, var h
 uimenu_element_t * uimenu_element_create(int type, var x, var y, var width, var height);
 
 void uimenu_add_element_to_window(uimenu_window_t * window, uimenu_element_t * element);
+void uimenu_slave_window_to_window(uimenu_window_t * master, uimenu_window_t * slave);
 
 uimenu_element_t * uimenu_make_text(var x, var y, var width, var height, char * text, COLOR * colorBGR, FONT * font);
 uimenu_element_t * uimenu_make_button(var x, var y, var width, var height, BMAP * bmap, BMAP * bmapHover, BMAP * bmapActive, void * callback);
@@ -105,7 +109,9 @@ uimenu_element_t * uimenu_make_simple_button(var x, var y, var width, var height
 uimenu_element_t * uimenu_make_simple_button(var x, var y, var height, char * text, FONT * font, void * callback);
 uimenu_element_t * uimenu_make_image(var x, var y, var width, var height, BMAP * bmap);
 
-BMAP * uimenu_make_button_graphic(int width, int height, int pressed);
+BMAP * uimenu_make_button_graphic(int width, int height, int pressed, int tab);
+BMAP * uimenu_make_slider_bg_graphic(int width);
+BMAP * uimenu_make_slider_knob_graphic(int width, int height);
 
 void uimenu_window_initialize(uimenu_window_t * window);
 void uimenu_element_initialize(uimenu_window_t * window, uimenu_element_t * element);
@@ -116,6 +122,7 @@ VECTOR * uimenu_get_cursor_offset_to_window(uimenu_element_t * element);
 int uimenu_is_cursor_in_window_titlebar(uimenu_window_t * window);
 void uimenu_window_show(uimenu_window_t * window);
 void uimenu_window_hide(uimenu_window_t * window);
+void uimenu_window_make_dirty(uimenu_window_t * window);
 void uimenu_element_update(uimenu_element_t * element);
 void uimenu_window_update(uimenu_window_t * window);
 void uimenu_window_destroy(uimenu_window_t * window);

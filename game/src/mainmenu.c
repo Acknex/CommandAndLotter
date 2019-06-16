@@ -46,20 +46,16 @@ void mainmenu_init(void)
 
 	uimenu_window_initialize(mainmenu_wndMenuOptions);
 
-	// TESTING
-	// uimenu_window_t * mainMenuWindow2 = uimenu_window_create(150, 50, 128, 32 * 5, "Menue");
-	// uimenu_element_t * btnNewGame2 = uimenu_make_button(0, 32 * 0, 128, 32, mainmenu_btn_new_game, mainmenu_btn_new_game_hi, mainmenu_btn_new_game_hi, mainmenu_set_start);
-	// uimenu_element_t * btnOptions2 = uimenu_make_button(0, 32 * 1, 128, 32, mainmenu_btn_options, mainmenu_btn_options_hi, mainmenu_btn_options_hi, NULL);
-	// uimenu_element_t * btnCredits2 = uimenu_make_button(0, 32 * 2, 128, 32, mainmenu_btn_credits, mainmenu_btn_credits_hi, mainmenu_btn_credits_hi, mainmenu_set_credits);
-	// uimenu_element_t * btnExit2 = uimenu_make_simple_button(0, 32 * 4, 128, 32, "exit", uimenu_default_font, mainmenu_set_exit);
+	// General TAB
+	mainmenu_wndMenuOptionsGeneral = uimenu_window_create_borderless(0, 32, 640 - 8, 380);
 
-	// uimenu_add_element_to_window(mainMenuWindow2, btnNewGame2);
-	// uimenu_add_element_to_window(mainMenuWindow2, btnOptions2);
-	// uimenu_add_element_to_window(mainMenuWindow2, btnCredits2);
-	// uimenu_add_element_to_window(mainMenuWindow2, btnExit2);
+	uimenu_element_t * generalInfo = uimenu_make_text(5, 5, 100, 32, "Nothing to see here", NULL, NULL);
 
-	// uimenu_window_initialize(mainMenuWindow2);
-	// uimenu_window_show(mainMenuWindow2);
+	uimenu_add_element_to_window(mainmenu_wndMenuOptionsGeneral, generalInfo);
+
+	uimenu_slave_window_to_window(mainmenu_wndMenuOptions, mainmenu_wndMenuOptionsGeneral);
+
+	uimenu_window_initialize(mainmenu_wndMenuOptionsGeneral);
 }
 
 
@@ -70,32 +66,49 @@ void mainmenu_set_start(void)
 
 void mainmenu_show_options_general(void)
 {
-
+	uimenu_window_show(mainmenu_wndMenuOptionsGeneral);
+	uimenu_window_hide(mainmenu_wndMenuOptionsVideo);
+	uimenu_window_hide(mainmenu_wndMenuOptionsAudio);
+	uimenu_window_hide(mainmenu_wndMenuOptionsControls);
 }
 
 void mainmenu_show_options_video(void)
 {
-
+	uimenu_window_hide(mainmenu_wndMenuOptionsGeneral);
+	uimenu_window_show(mainmenu_wndMenuOptionsVideo);
+	uimenu_window_hide(mainmenu_wndMenuOptionsAudio);
+	uimenu_window_hide(mainmenu_wndMenuOptionsControls);
 }
 
 void mainmenu_show_options_audio(void)
 {
-
+	uimenu_window_hide(mainmenu_wndMenuOptionsGeneral);
+	uimenu_window_hide(mainmenu_wndMenuOptionsVideo);
+	uimenu_window_show(mainmenu_wndMenuOptionsAudio);
+	uimenu_window_hide(mainmenu_wndMenuOptionsControls);
 }
 
 void mainmenu_show_options_controls(void)
 {
-
+	uimenu_window_hide(mainmenu_wndMenuOptionsGeneral);
+	uimenu_window_hide(mainmenu_wndMenuOptionsVideo);
+	uimenu_window_hide(mainmenu_wndMenuOptionsAudio);
+	uimenu_window_show(mainmenu_wndMenuOptionsControls);
 }
 
 
 void mainmenu_show_options(void)
 {
 	uimenu_window_show(mainmenu_wndMenuOptions);
+	mainmenu_show_options_general();
 }
 void mainmenu_hide_options(void)
 {
 	uimenu_window_hide(mainmenu_wndMenuOptions);
+	uimenu_window_hide(mainmenu_wndMenuOptionsGeneral);
+	uimenu_window_hide(mainmenu_wndMenuOptionsVideo);
+	uimenu_window_hide(mainmenu_wndMenuOptionsAudio);
+	uimenu_window_hide(mainmenu_wndMenuOptionsControls);
 }
 
 void mainmenu_set_credits(void)
