@@ -1,72 +1,89 @@
+#include <define>
+#include <transform>
+#include <sun>
+#include <lights>
+#include <fog>
+#include <normal>
+
 Texture entSkin1;
+float4 vecTime;
 
-sampler sMaskTex = sampler_state {
-    Texture = <entSkin1>;
-    MipFilter = Point;
-    MinFilter = Point;
-    MagFilter = Point;
+sampler sTexture = sampler_state { Texture = <entSkin1>; MipFilter = Linear; };
+
+Texture ColorLUT_bmap;
+sampler sLUT = sampler_state
+{
+	Texture = <ColorLUT_bmap>;
+	AddressU = Clamp;
+	AddressV = Clamp;
+	MipFilter = Linear;
 };
 
-Texture maploader_terrain_digital_bmap;
-Texture maploader_terrain_analogue_bmap;
-Texture maploader_terrain_splatter_bmap;
-Texture maploader_terrain_street_bmap;
-Texture shader_noise_bmap;
-
-sampler sDigital = sampler_state { Texture = <maploader_terrain_digital_bmap>; MipFilter = Linear; };
-sampler sAnalog = sampler_state { Texture = <maploader_terrain_analogue_bmap>; MipFilter = Linear; };
-sampler sSplatter = sampler_state { Texture = <maploader_terrain_splatter_bmap>; MipFilter = Linear; };
-sampler sNoise = sampler_state { Texture = <shader_noise_bmap>; MipFilter = Linear; };
-sampler sStreet = sampler_state { Texture = <maploader_terrain_street_bmap>; MipFilter = Linear; };
-
-
-float4x4 matWorld;
-float4x4 matWorldViewProj;
-
-//////////////////////////////////////////////////////////////////////
-struct out_terraintex3 // Output to the pixelshader fragment
+struct out_ps // Output to the pixelshader fragment
 {
-    float4 pos        : POSITION;
-    // float  Fog        : FOG;
-    float2 uv         : TEXCOORD0;
-    float3 normal     : TEXCOORD1;
-    float3 world      : TEXCOORD2;
+	float4 Pos		: POSITION;
+	float2 uv       : TEXCOORD0;
+	float3 WorldPos : TEXCOORD1;
 };
 
-
-
-out_terraintex3 vs_terraintex3(
-	float4 inPos       : POSITION,
-	float3 inNormal    : NORMAL,
-	float2 inTexCoord0 : TEXCOORD0
-)
+out_ps vs(
+	float4 inPos : POSITION,
+	float2 inTexCoord0 : TEXCOORD0)
 {
-	out_terraintex3 Out;
+	out_ps Out;
 
-	Out.pos = mul(inPos, matWorldViewProj);
-	Out.normal = mul(inNormal, (float3x3)matWorld);
-	Out.world = mul(inPos, matWorld);
-	Out.uv = inTexCoord0.xy;
+	inPos.y += 10 * sin(0.005 * inPos.x + vecTime.w*0.032);
+	inPos.y -= 10 * cos(0.005 * inPos.z + vecTime.w*0.028);
 
+	Out.WorldPos = mul(matWorld, float4(inPos.xyz, 1.0));
+
+	float fCycle = vecTime.w*0.05;
+	float fAmp = 0.002;
+	float fMod = 1+25;
+	Out.uv = Out.WorldPos.xz*0.0001;
+	Out.uv.x += fAmp*sin(Out.uv.y*fMod + fCycle);
+	Out.uv.y -= fAmp*sin(Out.uv.x*fMod + fCycle);
+
+	inPos.y += 5 * sin(Out.uv.x);
+	inPos.y -= 5 * cos(Out.uv.y);
+
+	Out.Pos = DoTransform(inPos);
 	return Out;
 }
 
-float4 ps_terraintex3(out_terraintex3 In) : COLOR
+float4 ps(out_ps In): COLOR
 {
-  if((abs(In.world.x) - 4000) < 0 && (abs(In.world.z) - 6000) < 0)
+  if((abs(In.WorldPos.x) - 4000) < 0 && (abs(In.WorldPos.z) - 6000) < 0)
     clip(-1);
 
-  return float4(0.5,0.5,0.5,1.0);
+
+	//float fac = pow(tex2D(sTexture, 10 * In.uv).r * tex2D(sTexture, In.uv).r, 0.5);
+	float fac = tex2D(sTexture, 10 * In.uv + float2(0.002 * vecTime.w, 0.00025 * vecTime.w)).r;
+	float fac2 = tex2D(sTexture, 8 * In.uv + float2(0.00175 * vecTime.w, -0.00025 * vecTime.w)).r;
+	float fac3 = tex2D(sTexture, 1 * In.uv + float2(0.000175 * vecTime.w, 0)).r;
+	fac = clamp(fac * (fac2 * 2) * (fac3 * 4),0,1);
+
+	float hl0 = 1.0 - tex2D(sTexture, 2 * In.uv + float2(0.0004 * vecTime.w, -0.0001 * vecTime.w)).r;
+	float hl1 = 1.0 - tex2D(sTexture, 2 * In.uv + float2(0.0006 * vecTime.w,  0.0003 * vecTime.w)).r;
+
+	float highlight = hl0 * hl1;
+
+	float4 a = tex2D(sLUT, float2(0.5 * fac, 1.5/64.0));
+	float4 b = tex2D(sLUT, float2(0.5 * saturate(highlight), 2.5/64.0));
+	return a+(b*0.4) * saturate(length(a));
 }
 
-technique terraintex3_13
+technique object
 {
 	pass one
 	{
+		VertexShader = compile vs_2_0 vs();
+		PixelShader = compile ps_2_0 ps();
 		AlphaBlendEnable = false;
 		ZWriteEnable = true;
 		ZEnable = true;
-		VertexShader = compile vs_3_0 vs_terraintex3();
-		PixelShader = compile ps_3_0 ps_terraintex3();
 	}
 }
+
+// fallback if nothing works
+technique fallback { pass one { } }

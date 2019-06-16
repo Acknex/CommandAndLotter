@@ -20,6 +20,7 @@
 #define PRAGMA_PATH "map"
 
 BMAP * shader_noise = "noise.png";
+BMAP * ColorLUT = "pal.png";
 
 function main()
 {
