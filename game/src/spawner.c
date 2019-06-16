@@ -52,7 +52,7 @@ MATERIAL * building_wireframe_material =
 
 MATERIAL * building_material =
 {
-  flags = AUTORELOAD;
+  flags = AUTORELOAD | PASS_SOLID;
   effect = "building.fx";
 }
 
