@@ -2,6 +2,7 @@
 #include "jps.h"
 
 
+#define FOW_LIGHTNING_RANGE 2.5
 
 BMAP* FogBmap = "fow_fog2.png";
 int fow_lightningX[] = {-100,-100,-100};
@@ -29,7 +30,11 @@ void FogEvent(PARTICLE *p)
 		int i;
 		for(i=0; i<fow_numLigntnings; ++i)
 		{
-			if(abs(tile->pos[0]-fow_lightningX[i])<2 && abs(tile->pos[1]-fow_lightningY[i])<2)
+			VECTOR dist;
+			dist.x = tile->pos[0]-fow_lightningX[i];
+			dist.y = tile->pos[1]-fow_lightningY[i];
+			dist.z = 0;
+			if(vec_length(&dist)<FOW_LIGHTNING_RANGE)
 				p.flags |= BRIGHT;
 		}
 		
@@ -158,7 +163,7 @@ void fov_uncover(VECTOR *pos, var range)
 
 int fow_calcoffset = 0;
 int fow_calcoffsetMAX = 16;
-var fow_lightningDuration = 0.08;
+var fow_lightningDuration = 0.2;
 void fow_update()
 {
 #ifdef USE_FOW
@@ -179,7 +184,7 @@ void fow_update()
 	fow_lightningDuration -= time_step;
 	if(fow_lightningDuration <= 0)
 	{
-		fow_lightningDuration = 0.1;
+		fow_lightningDuration = 0.3;
 		fow_numLigntnings = random(3);
 		for(i=0; i<fow_numLigntnings; ++i)
 		{
