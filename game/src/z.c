@@ -97,7 +97,11 @@ void Z_Update()
 
 void Z__hit(ENTITY* ptr)
 {	
-	snd_play(z_collect_snd, 100, 0);
+	if (num_sounds < 6)
+	{
+ 		var hndl = snd_play(z_collect_snd, 50, 0);
+		snd_tune(hndl,0,random(10)+95,0);
+	}
 	z_amount += minv(Z_VALUE, ptr->DAMAGE_HIT*Z_PER_DAMAGE);
 	
 	ptr->Z_VALUE_LEFT -= ptr->DAMAGE_HIT*Z_PER_DAMAGE;
