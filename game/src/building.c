@@ -71,6 +71,7 @@ void buildingPlacement_beginConstruction(int selection)
 	buildingPlacement_previewModel = ent_create(buildingPlacement_constructionAssets[selection], nullvector, NULL);
 	buildingPlacement_previewModel->flags |= TRANSLUCENT;
 	buildingPlacement_previewModel->alpha = 70;
+	buildingPlacement_previewModel->pan = random(360);
 }
 
 void buildingPlacement_endConstruction()
@@ -90,7 +91,7 @@ void buildingPlacement_placeConstruction()
 		case BUILDING_BANK:
 		//case ..
 		if(!buildingPlacement_previewModel) error("buildingPlacement_placeConstruction: !buildingPlacement_previewModel !!!");
-		spawner_spawn(buildingPlacement_selection, &buildingPlacement_previewModel->x, SPAWNER_PLAYER);
+		spawner_spawn(buildingPlacement_selection, &buildingPlacement_previewModel->x, buildingPlacement_previewModel->pan, SPAWNER_PLAYER);
 		//case nichtspawnergebaeude
 		break;
 		default:

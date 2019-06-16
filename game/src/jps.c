@@ -783,20 +783,23 @@ int mapGetNearbyUnitsOfTypeForPos(VECTOR *vpos, int typeID, int owner, var maxDi
 			TILE* tile = mapTileGet(map, i, j);
 			if(tile)
 			{
-				int k;
-				int currentPlayer;
-				for(currentPlayer = ownerMin; currentPlayer < ownerMax; ++currentPlayer)
-				{		
-					for(k = 0; k < tile->numUnits[currentPlayer]; k++)
-					{
-						UNIT* unit = tile->unitArray[k];
-						ENTITY* ent = unit->ent;
-						if(ent)
+				if (tile->visibility == FOW_SCOUTED)
+				{
+					int k;
+					int currentPlayer;
+					for(currentPlayer = ownerMin; currentPlayer < ownerMax; ++currentPlayer)
+					{		
+						for(k = 0; k < tile->numUnits[currentPlayer]; k++)
 						{
-							if(owner < 0 || owner == unit_getType(ent))
+							UNIT* unit = tile->unitArray[k];
+							ENTITY* ent = unit->ent;
+							if(ent)
 							{
-								pointerArray[pointerArrayNum++] = tile->unitArray[k];
-								if(pointerArrayNum >= POINTER_ARRAY_MAX || pointerArrayNum >= maxNumEntities) return pointerArrayNum;
+								if(owner < 0 || owner == unit_getType(ent))
+								{
+									pointerArray[pointerArrayNum++] = tile->unitArray[k];
+									if(pointerArrayNum >= POINTER_ARRAY_MAX || pointerArrayNum >= maxNumEntities) return pointerArrayNum;
+								}
 							}
 						}
 					}

@@ -3,6 +3,7 @@
 #include "z.h"
 #include "map_loader.h"
 #include "materials.h"
+#include "jps.h"
 
 #define Z_VALUE 10
 #define Z_PER_DAMAGE 0.2
@@ -29,6 +30,30 @@ bool z_pay(var amount)
 		return false;
 	z_amount -= amount;
 	return true;
+}
+
+ENTITY* z_findNear(VECTOR* pos, var maxdist)
+{
+	ENTITY *zUnit, *zUnitNear = NULL;
+	var minDist = maxdist;
+	SUBSYSTEM_LOOP(zUnit, SUBSYSTEM_Z)
+	{
+		MAP *map = mapGetCurrent();
+		VECTOR zPos;
+		vec_set(&zPos, &zUnit->x);
+		vec_sub(&zPos, pos);
+		if(vec_length(&zPos) < minDist)
+		{
+			TILE *tile = mapGetTileFromVector(map, &zUnit->x);
+
+			if(tile->visibility == FOW_SCOUTED) 
+			{
+				zUnitNear = zUnit;
+				minDist = vec_length(&zPos);
+			}
+		}
+	}
+	return zUnitNear;
 }
 
 ENTITY* z_spawn(VECTOR* pos)

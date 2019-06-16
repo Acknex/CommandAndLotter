@@ -323,8 +323,6 @@ function SetDestForSelectd(VECTOR * Dest)
     ENTITY * ent;
     for(ent = ent_next(NULL); ent != NULL; ent = ent_next(ent)){
         if(ent->group==GROUP_PLAYER_UNIT && ent.SELCTED_SKILL){
-			unit_setVictim(ent, NULL);
-        	unit_set_state(ent, ENTITY_STATE_WAIT_OR_WALK);
             unit_setTarget(ent, Dest);
             Count++;
         }

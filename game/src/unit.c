@@ -42,9 +42,9 @@ var unit_setVictim(ENTITY* ent, ENTITY* victim)
 					return 1;
 				}
 			}
+			ent->ENTITY_VICTIMTYPE = UNIT_INVALID;
+			ent->ENTITY_VICTIM = NULL;	
 		}
-		ent->ENTITY_VICTIMTYPE = UNIT_INVALID;
-		ent->ENTITY_VICTIM = NULL;	
 	}
 	return 0;
 }
@@ -88,7 +88,7 @@ ENTITY* unit_spawn(int unittype, VECTOR* pos, VECTOR* targetPos, var owner)
 		
 		case UNIT_BABE:
 			ent = ent_create("cbabe.mdl", pos, Sputnik);
-			vec_scale(ent->scale_x, 10); //hack my babe			break;
+			break;
 		
 		default:
 			break;
@@ -138,10 +138,54 @@ int unit_getType(ENTITY* ent)
 	return -1;
 }
 
-
-
-void unit_set_state(ENTITY* ptr, int state)
+void unit_findNextVictim(ENTITY* ptr, var unittype)
 {
-	if(!ptr) return;
-	ptr->ENTITY_STATE = state;
+	ptr->ENTITY_VICTIMTYPE = unittype;
+	unit_findNextVictim(ptr);	
 }
+
+void unit_findNextVictim(ENTITY* ptr)
+{
+	/* following requirements have to be met for auto-picking of next victim
+	   1) no victim active
+	   2) unit type of last victim is still valid
+	   
+	   if unit type of last victim is cleared, no new victim is searched
+	 */
+	
+	if (unit_getVictim(ptr) == NULL && ptr->ENTITY_VICTIMTYPE != UNIT_INVALID)
+	{
+		cprintf0("\n unit__findNextVictim: TRYFIND...");
+		ENTITY* ent;
+		if(ptr->ENTITY_VICTIMTYPE == UNIT_Z)
+		{
+			ent = z_findNear(&ptr->x, 2000);
+			if(ent)
+			{
+				unit_setTarget(ptr, &ent->x);
+				unit_setVictim(ptr, ent);
+			}
+		}
+		else
+		{
+			//meh.
+			var owner;
+			if (ptr->group == GROUP_ENEMY_UNIT)	
+				owner = UNIT_ENEMY;
+			else
+				owner = UNIT_PLAYER;
+		
+			int count = mapGetNearbyUnitsOfTypeForPos(ptr->x, ptr->ENTITY_VICTIMTYPE, owner, 2000, 1);
+			if (count > 0)
+			{
+				cprintf1("FOUND!(%d)", count);
+				ent = jpsGetEntityFromUnitArray(0);
+				
+				//set new target and victim
+				unit_setTarget(ptr, &ent->x);
+				unit_setVictim(ptr, ent);
+			}
+		}
+	}
+}
+
