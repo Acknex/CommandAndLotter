@@ -16,8 +16,11 @@ int buildingState()
 
 void buildingPlacement_init()
 {
-	buildingPlacement_assets[0] = "the_tower.mdl";
-	buildingPlacement_constructionAssets[0] = "the_tower_wireframe.mdl";
+//	buildingPlacement_assets[0] = "the_tower.mdl";
+//	buildingPlacement_constructionAssets[0] = "the_tower_wireframe.mdl";
+
+	buildingPlacement_assets[0] = "sputnik_trash_press.mdl";
+	buildingPlacement_constructionAssets[0] = "sputnik_trash_press_wf.mdl";
 
     buildingPlacement_assets[1] = "lark_farm.mdl";
     buildingPlacement_constructionAssets[1] = "lark_farm_wireframe.mdl";
