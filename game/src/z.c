@@ -7,9 +7,10 @@
 #define Z_VALUE 10
 #define Z_PER_DAMAGE 0.2
 #define Z_VALUE_LEFT skill[20]
+#define Z_SIZE skill11
 
 SOUND* z_collect_snd = "z_collect.wav";
-var z_amount = 0;
+var z_amount;
 
 var z_get()
 {
@@ -42,9 +43,9 @@ void Z()
 {
 	framework_setup(my, SUBSYSTEM_Z);
     set(my, SHADOW);
-    var size = 2.0 + random(2);
+    my->Z_SIZE = 2.0 + random(2);
     my->pan = random(360);
-    vec_set(my->scale_x, vector(size, size, size));
+    vec_set(my->scale_x, vector(my->Z_SIZE , my->Z_SIZE , my->Z_SIZE ));
 	c_setminmax(me);
 	my->ENTITY_STATE = ENTITY_STATE_WAIT_OR_WALK;
     my->ENTITY_UNITTYPE = UNIT_Z;
@@ -54,7 +55,7 @@ void Z()
 
 void Z_Init()
 {
-	z_amount = 0;
+	z_amount = 1000;
 }
 
 void Z_Update()
@@ -96,7 +97,11 @@ void Z_Update()
 
 void Z__hit(ENTITY* ptr)
 {	
-	snd_play(z_collect_snd, 100, 0);
+	if (num_sounds < 6)
+	{
+ 		var hndl = snd_play(z_collect_snd, 50, 0);
+		snd_tune(hndl,0,random(10)+95,0);
+	}
 	z_amount += minv(Z_VALUE, ptr->DAMAGE_HIT*Z_PER_DAMAGE);
 	
 	ptr->Z_VALUE_LEFT -= ptr->DAMAGE_HIT*Z_PER_DAMAGE;
@@ -120,8 +125,8 @@ void Z__wait(ENTITY* ptr)
 void Z__die(ENTITY* ptr)
 {
 	ptr->ENTITY_ANIM -= 15 * time_step;
-	ptr->scale_x = 10*maxv(ptr->ENTITY_ANIM, 0) * 0.01;
-	ptr->scale_y = 10*maxv(ptr->ENTITY_ANIM, 0) * 0.01;
+	ptr->scale_x = ptr->Z_SIZE * maxv(ptr->ENTITY_ANIM, 0) * 0.01;
+	ptr->scale_y = ptr->scale_x;
 
 	/* transitions */
 	if(ptr->ENTITY_ANIM <= 0)

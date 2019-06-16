@@ -61,12 +61,16 @@ void SPUTNIK__wait_or_walk(ENTITY * ptr)
 {
 	UNIT* unit = jpsAllowMovementForEntity(ptr, true);
 	if(!unit) return;
-	
+
 	vec_set(ptr->x, unit->pos3d);
 	VECTOR diff, temp;
 	vec_diff(diff, unit->pos3d, unit->prevPos3d);
-	var len = vec_to_angle(temp, diff)/time_step;
-	if(len > 8) ptr->SPUTNIK_RUNCOUNTER = 3;
+	
+	var len = vec_to_angle(temp, diff);///time_step; //crashes for cbabe and eye for whatever reason
+
+	if(len > 8) ptr->SPUTNIK_RUNCOUNTER = 4;
+	//if(unit->isMoving) ptr->SPUTNIK_RUNCOUNTER = 12;
+
 	if(ptr->SPUTNIK_RUNCOUNTER > 0)
 	{
 		ptr->SPUTNIK_RUNCOUNTER = maxv(ptr->SPUTNIK_RUNCOUNTER-time_step,0);
@@ -77,6 +81,7 @@ void SPUTNIK__wait_or_walk(ENTITY * ptr)
 		ptr->SPUTNIK_ANIMSTATE += len*0.425*time_step;//0.5 * ptr->SPUTNIK_RUNSPEED * time_step;
 		ent_animate(ptr, SPUTNIK_WALKANIM, ptr->SPUTNIK_ANIMSTATE, ANM_CYCLE);		
 		
+		ptr->SPUTNIK_IDLECOUNTER = 0;
 	}
 	else
 	{
@@ -102,7 +107,6 @@ void SPUTNIK__wait_or_walk(ENTITY * ptr)
 		{
 			ptr->ENTITY_VICTIMTYPE = UNIT_Z;
 			SPUTNIK__findNextVictim(ptr);
-			cprintf0("\n SPUTNIK__findNextVictim");
 		}
 		if (SCAN_IsEntityNear(ptr, unit_getVictim(ptr), ptr->SPUTNIK_ATTACKRANGE))
 		{
@@ -118,13 +122,6 @@ void SPUTNIK_Update()
 	SUBSYSTEM_LOOP(ptr, SUBSYSTEM_UNIT_SPUTNIK)
 	{
 		jpsAllowMovementForEntity(ptr, false);
-		
-		/*VECTOR temp;
-		vec_set(temp, ptr->x);
-		if(vec_to_screen(temp, camera))
-		{
-			draw_text(str_printf(NULL, "%d\nidle %d\nvictim %p", (int)ptr->ENTITY_STATE, (int)ptr->SPUTNIK_IDLECOUNTER, unit_getVictim(ptr)), temp.x,temp.y+20,COLOR_RED);
-		}*/
 		
 		switch(ptr->ENTITY_STATE)    	
 		{
@@ -184,6 +181,8 @@ void SPUTNIK__findNextVictim(ENTITY* ptr)
 		else
 		owner = UNIT_PLAYER;
 		
+		cprintf0("\n SPUTNIK__findNextVictim: TRYFIND...");
+		
 		if(ptr->ENTITY_VICTIMTYPE == UNIT_Z)
 		{
 			ENTITY *zUnit, *zUnitNear = NULL;
@@ -210,6 +209,7 @@ void SPUTNIK__findNextVictim(ENTITY* ptr)
 			int count = mapGetNearbyUnitsOfTypeForPos(ptr->x, ptr->ENTITY_VICTIMTYPE, owner, 2000, 1);
 			if (count > 0)
 			{
+				cprintf1("FOUND!(%d)", count);
 				ENTITY* ent = jpsGetEntityFromUnitArray(0);
 				
 				//set new target and victim
@@ -248,11 +248,14 @@ void SPUTNIK__attack(ENTITY* ptr)
 	ANG_turnToPos(ptr, unit_getTarget(ptr), ptr->SPUTNIK_TURNSPEED, 5);
 	if (ptr->SPUTNIK_ANIMSTATEATK == 0)
 	{
-		switch(integer(random(2)))
+		if (num_sounds < 6)
 		{
-			case 0: snd_play(sputnik_snd_attack1, 100, 0); break;
-			case 1: snd_play(sputnik_snd_attack2, 100, 0); break;
-			case 2: snd_play(sputnik_snd_attack3, 100, 0); break;
+			switch(integer(random(2)))
+			{
+				case 0: snd_play(sputnik_snd_attack1, 30+random(10), 0); break;
+				case 1: snd_play(sputnik_snd_attack2, 30+random(10), 0); break;
+				case 2: snd_play(sputnik_snd_attack3, 30+random(10), 0); break;
+			}
 		}
 	}
 	ptr->SPUTNIK_ANIMSTATEATK += ptr->SPUTNIK_ATTACKSPEED * time_step;
