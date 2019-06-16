@@ -4,7 +4,9 @@
 
 
 BMAP* FogBmap = "fow_fog2.png";
-
+int fow_lightningX[] = {-100,-100,-100};
+int fow_lightningY[] = {-100,-100,-100};
+int fow_numLigntnings = 0;
 void FogEvent(PARTICLE *p)
 {
     p.lifespan = 2;
@@ -20,6 +22,17 @@ void FogEvent(PARTICLE *p)
     	p->alpha -= 10*time_step;
     	if(p->alpha <= 0)
     		p.lifespan = 0;
+	}
+	else
+	{
+		p.flags &= ~BRIGHT;
+		int i;
+		for(i=0; i<fow_numLigntnings; ++i)
+		{
+			if(abs(tile->pos[0]-fow_lightningX[i])<2 && abs(tile->pos[1]-fow_lightningY[i])<2)
+				p.flags |= BRIGHT;
+		}
+		
 	}
         
 }
@@ -143,7 +156,6 @@ void fov_uncover(VECTOR *pos, var range)
 }
 
 
-//var fow_updatedelay = 0;
 int fow_calcoffset = 0;
 int fow_calcoffsetMAX = 16;
 void fow_update()
@@ -163,6 +175,15 @@ void fow_update()
 		}
 	}
 	
+	//if(random(1)>0.8)
+	{
+		fow_numLigntnings = random(3);
+		for(i=0; i<fow_numLigntnings; ++i)
+		{
+			fow_lightningX[i] = (int)random(map->size[0]);
+			fow_lightningY[i] = (int)random(map->size[1]);
+		}
+	}
 	
 	for(i = fow_calcoffset; i< mapSize; i = i+fow_calcoffsetMAX)
 	{
@@ -173,28 +194,6 @@ void fow_update()
 	}
 	fow_calcoffset++;
 	fow_calcoffset = fow_calcoffset%fow_calcoffsetMAX;
-	
-	/*
-	fow_updatedelay += time_step;
-	if(fow_updatedelay > 1) 
-	{
-		fow_updatedelay = 0;
-		
-		int x, y;
-		for(x = 0; x<map->size[0]; ++x)
-			for(y = 0; y<map->size[1]; ++y)
-			{
-				TILE *tile = mapTileGet(map, x,y);
-				if(tile->visibility == FOW_HIDDEN){
-					if(mapIsAnyFriendlyUnitNearby(map, tile, FOW_SIGHT_RANGE, PLAYER_ID_PLAYER)) 
-					{
-						tile->visibility = FOW_SCOUTED;	
-					}
-				}
-					
-			}
-	}
-	*/
 	
 #endif
 }
