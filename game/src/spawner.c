@@ -89,9 +89,6 @@ ENTITY* spawner_spawn(int unittype, VECTOR* pos, var angle, var owner)
 		mapSetTileValueAtPos3D(mapGetCurrent(), pos, 1); // 1 == solid, non-traversable
 		mapJPSUpdate(mapGetCurrent());
 
-		if(owner == PLAYER_ID_PLAYER)
-			fov_uncover(pos, SPAWNER_LOS);
-
 		ent->ENTITY_UNITTYPE = unittype;
 		if (owner == SPAWNER_ENEMY)
 		{
@@ -101,6 +98,7 @@ ENTITY* spawner_spawn(int unittype, VECTOR* pos, var angle, var owner)
 		{
 			ent->group = GROUP_PLAYER_SPAWNER;
 			snd_play(spawner_spawn_snd, 100, 0);
+			fov_uncover(pos, SPAWNER_LOS);
 		}
 
 		ent->material = building_material;
