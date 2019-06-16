@@ -83,12 +83,12 @@ void Z__hit(ENTITY* ptr)
 	ptr->ENTITY_ANIM = 100;
 	snd_play(z_collect_snd, 100, 0);
 	z_amount += Z_VALUE;
-	ptr->DAMAGE_HIT = 0;
+    ptr->DAMAGE_HIT = 0;
 }
 
 void Z__wait(ENTITY* ptr)
 {
-
+    ptr->red = ptr->green = ptr->blue = 100 + (sin(ptr->x + ptr->y + total_ticks * 0.1) * 0.5 + 0.5) * 100.0;
 }
 
 

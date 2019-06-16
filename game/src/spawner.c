@@ -99,6 +99,7 @@ ENTITY* spawner_spawn(int unittype, VECTOR* pos, var owner)
         if(wireframe != NULL)
         {
             wireframe->material = building_wireframe_material;
+            reset(wireframe, SHADOW);
             ent->SPAWNER_WIREFRAME = wireframe;
         }
 	}
@@ -280,6 +281,12 @@ void SPAWNER__construct(ENTITY* ptr)
         wireframe->skill45 = floatv(wireframe->x);
         wireframe->skill46 = floatv(wireframe->z);
         wireframe->skill47 = floatv(wireframe->y);
+    }
+
+    if(ptr->ENTITY_STATE == SPAWNER_STATE_ACTIVE)
+    {
+        ptr->SPAWNER_WIREFRAME = NULL;
+        ent_remove(wireframe);
     }
 }
 
