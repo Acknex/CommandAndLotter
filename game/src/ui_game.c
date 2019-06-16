@@ -158,7 +158,7 @@ void ui_add_dot_to_minimap(ENTITY *ent, int size, BMAP *dot, int counter)
 	var t1 = pan_setwindow(ui_minimap, counter, px * bmap_width(ui_mm), py * bmap_height(ui_mm), size, size, dot, 0, 0);
 	if(!t1)
 	{
-		pan_setwindow(ui_minimap, 0, px * bmap_width(ui_mm) * scale_factor_x, py * bmap_height(ui_mm) * scale_factor_x, size, size, dot, 0, 0);
+		pan_setwindow(ui_minimap, 0, px * bmap_width(ui_mm) * scale_factor_x * mini_map_extra_scale_x, py * bmap_height(ui_mm) * scale_factor_x * mini_map_extra_scale_y, size, size, dot, 0, 0);
 	}
 }
 
@@ -169,17 +169,17 @@ void ui_add_camera_to_minimap()
 	var t1 = pan_setneedle(ui_minimap, 1, px * bmap_width(ui_mm), py * bmap_height(ui_mm), ui_bmap_camera, 8, 16, 0, 0, 360, camera.pan );
 	if(!t1)
 	{
-		pan_setneedle(ui_minimap, 0, px * bmap_width(ui_mm) * scale_factor_x, py * bmap_height(ui_mm) * scale_factor_x, ui_bmap_camera, 8, 16, 0, 0, 360, camera.pan );
+		pan_setneedle(ui_minimap, 0, px * bmap_width(ui_mm) * scale_factor_x * mini_map_extra_scale_x, py * bmap_height(ui_mm) * scale_factor_x * mini_map_extra_scale_y, ui_bmap_camera, 8, 16, 0, 0, 360, camera.pan );
 	}
 }
 
 void ui_minimap_click(PANEL *panel)
 {
-	var mpx = mouse_pos.x - panel->pos_x - (bmap_width(ui_mm) * scale_factor_x) / 2;
-	var mpy = mouse_pos.y - panel->pos_y - (bmap_height(ui_mm) * scale_factor_x) / 2;
+	var mpx = mouse_pos.x - panel->pos_x - (bmap_width(ui_mm) * scale_factor_x * mini_map_extra_scale_x) / 2;
+	var mpy = mouse_pos.y - panel->pos_y - (bmap_height(ui_mm) * scale_factor_x * mini_map_extra_scale_y) / 2;
 	
-	mpx /= (bmap_width(ui_mm) * scale_factor_x);
-	mpy /= (bmap_height(ui_mm) * scale_factor_x);
+	mpx /= (bmap_width(ui_mm) * scale_factor_x * mini_map_extra_scale_x);
+	mpy /= (bmap_height(ui_mm) * scale_factor_x * mini_map_extra_scale_y);
 	
 	mpx = mpx * 16000 * -1;
 	mpy = mpy * 16000 * -1;
@@ -377,8 +377,8 @@ void ui_game_update()
 	ui_portrait->scale_x = scale_factor_x;
 	ui_portrait->scale_y = scale_factor_x;
 
-	ui_minimap->scale_x = scale_factor_x;
-	ui_minimap->scale_y = scale_factor_x;
+	ui_minimap->scale_x = scale_factor_x * mini_map_extra_scale_x;
+	ui_minimap->scale_y = scale_factor_x * mini_map_extra_scale_y;
 	
 	ui_monitor->scale_x = scale_factor_x;
 	ui_monitor->scale_y = scale_factor_x;
@@ -569,7 +569,7 @@ void ui_game_update()
 
 	if( !ui_selected_max_type)
 	{
-		ui_anim_unit_state = UI_ANIM_UNIT_OFF;
+		ui_anim_unit_state = UI_ANIM_UNIT_OFF; 
 	}
 
 	if( ui_anim_unit_state == UI_ANIM_UNIT_RESTARTED )
@@ -596,13 +596,26 @@ void ui_game_update()
 	}
 	else if( ui_anim_unit_state == UI_ANIM_UNIT_ON )
 	{
-		ui_minimap->pos_x = 409;
-		ui_minimap->pos_y = 98;
-		ui_minimap->flags |= SHOW;
+		
 	}
 	else if ( ui_anim_unit_state == UI_ANIM_UNIT_OFF )
 	{
 		pan_setwindow(ui_unit_meta, 1, 0, 0, 0, 0, (ui_bmap_cbabe)[0], 0, 0);
+		if( ui_unit_meta->flags & SHOW )
+		{
+			ui_minimap->pos_x = 412 * scale_factor_x;
+			ui_minimap->pos_y = screen_size.y - (202 * scale_factor_x);
+			mini_map_extra_scale_x = 0.69;
+			mini_map_extra_scale_y = 0.58;
+			ui_minimap->scale_x = scale_factor_x * mini_map_extra_scale_x;
+			ui_minimap->scale_y = scale_factor_x * mini_map_extra_scale_y;
+			ui_minimap->flags |= SHOW;
+		} 
+		else
+		{
+			mini_map_extra_scale_x = 1;
+			mini_map_extra_scale_y = 1;
+		}
 	}
 
 

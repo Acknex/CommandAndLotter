@@ -6,7 +6,7 @@ var unit_setTarget(ENTITY* ent, VECTOR* pos)
 	MAP* map = mapGetCurrent();
 	mapGetVector2DFromVector3D(map, target2D, pos);
 	
-	cprintf2("\n unit_setTarget(%p): group(%d)", ent, ent->group);
+	//cprintf2("\n unit_setTarget(%p): group(%d)", ent, ent->group);
 	
 	if (ent != NULL)
 	{
