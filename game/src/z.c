@@ -16,6 +16,20 @@ var z_get()
 	return z_amount;
 }
 
+
+bool z_isSufficient(var amount)
+{
+	return (amount <= z_amount);
+}
+
+bool z_pay(var amount)
+{
+	if(amount > z_amount)
+		return false;
+	z_amount -= amount;
+	return true;
+}
+
 ENTITY* z_spawn(VECTOR* pos)
 {
 	ENTITY* ent;

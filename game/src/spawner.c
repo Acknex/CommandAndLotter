@@ -308,11 +308,13 @@ void SPAWNER__produce(ENTITY* ptr)
 	var progress = 100 * (1 - (ptr->SPAWNER_BUILDTIMER / SPAWNER_BUILDTIME));
 	ent_animate(ptr, SPAWNER_PRODUCEANIM, progress, 0);
 	
-	if (ptr->SPAWNER_BUILDTIMER <= 0)
+	if (ptr->SPAWNER_BUILDTIMER <= 0 && z_isSufficient(spawner_unit_cost[ptr->ENTITY_UNITTYPE]))
 	{
 		ptr->SPAWNER_BUILDTIMER = SPAWNER_BUILDTIME;
 		ptr->SPAWNER_QUEUE--;
-
+		
+		z_pay(spawner_unit_cost[ptr->ENTITY_UNITTYPE]);
+		
 		//meh.
 		var owner;
 		if (ptr->group == GROUP_ENEMY_SPAWNER)	

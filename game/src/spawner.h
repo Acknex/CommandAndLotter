@@ -4,6 +4,9 @@
 #define SPAWNER_ENEMY 1
 #define SPAWNER_PLAYER 0
 
+int spawner_unit_cost[UNIT_CLASSES] = {10,20,50,35,0};
+
+
 ENTITY* spawner_spawn(int spawnertype, VECTOR* pos, var owner);
 var spawner_produce(ENTITY* ent);
 var spawner_getQueue(ENTITY* ent);
