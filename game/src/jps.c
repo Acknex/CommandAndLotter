@@ -625,13 +625,31 @@ void presetsInit()
 {
 	// 1st unit
 	UNIT_PRESET* unitPreset = &unitPresets[0];
-	strcpy(unitPreset->file, "warlock.mdl");
+	//strcpy(unitPreset->file, "warlock.mdl");
 	unitPreset->ID = 0;
-	unitPreset->maxSpeed = 10;
+	unitPreset->maxSpeed = 0.125;
+	unitPreset->maxHP = 100;
+	unitPreset->radius = 0.2;
+	
+	// 2nd unit
+	UNIT_PRESET* unitPreset = &unitPresets[1];
+	unitPreset->ID = 0;
+	unitPreset->maxSpeed = 0.1;
+	unitPreset->maxHP = 100;
+	unitPreset->radius = 0.15;
+	
+		UNIT_PRESET* unitPreset = &unitPresets[2];
+	unitPreset->ID = 0;
+	unitPreset->maxSpeed = 0.175;
 	unitPreset->maxHP = 100;
 	unitPreset->radius = 0.175;
 	
-	// 2nd unit
+		UNIT_PRESET* unitPreset = &unitPresets[3];
+	unitPreset->ID = 0;
+	unitPreset->maxSpeed = 0.135;
+	unitPreset->maxHP = 100;
+	unitPreset->radius = 0.175;
+	
 }
 
 VECTOR* mapGetVectorFromTile(MAP* map, VECTOR* v, TILE* tile)
@@ -1062,8 +1080,8 @@ void unitMove(MAP* map, UNIT* unit)
 	}
 	int size = 12;
 	//draw_line2(vector(unit->pos2d.x*size,unit->pos2d.y*size,0), vector(currentTarget.x*size,currentTarget.y*size,0), vector(0,255,255), 50);
-
-	float maxSpeed = 0.125;
+			UNIT_PRESET* unitPreset = &unitPresets[unit->presetID];
+	float maxSpeed = unitPreset->maxSpeed;
 	vec_diff(vDir, currentTarget, unit->pos2d);
 	vDir.z = 0;
 	var length = vec_length(vDir);
@@ -1135,6 +1153,7 @@ void jpsGameUpdate(MAP* map)
 
 void unitInitializeFromPreset(UNIT *unit, int presetID)
 {
+	if(presetID < 0 || presetID >= UNIT_CLASSES) error("unitInitializeFromPreset: invalid presetID!");
 	unit->presetID = presetID;
 	UNIT_PRESET* unitPreset = &unitPresets[unit->presetID];
 	unit->HP = unitPreset->maxHP;

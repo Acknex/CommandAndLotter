@@ -6,7 +6,7 @@ var unit_setTarget(ENTITY* ent, VECTOR* pos)
 	MAP* map = mapGetCurrent();
 	mapGetVector2DFromVector3D(map, target2D, pos);
 	
-	cprintf2("\n unit_setTarget(%p): group(%d)", ent, ent->group);
+	//cprintf2("\n unit_setTarget(%p): group(%d)", ent, ent->group);
 	
 	if (ent != NULL)
 	{
@@ -14,6 +14,7 @@ var unit_setTarget(ENTITY* ent, VECTOR* pos)
 		{
 			vec_set(ent->UNIT_TARGET, pos);
 			unitSetTargetFromVector2D(map, jpsUnitGetFromEntity(ent), target2D);
+			unit_setVictim(ent, NULL);
 			return 1;
 		}
 	}
@@ -41,8 +42,9 @@ var unit_setVictim(ENTITY* ent, ENTITY* victim)
 					return 1;
 				}
 			}
-			ent->ENTITY_VICTIM = NULL;
 		}
+		ent->ENTITY_VICTIMTYPE = UNIT_INVALID;
+		ent->ENTITY_VICTIM = NULL;	
 	}
 	return 0;
 }
@@ -86,8 +88,7 @@ ENTITY* unit_spawn(int unittype, VECTOR* pos, VECTOR* targetPos, var owner)
 		
 		case UNIT_BABE:
 			ent = ent_create("cbabe.mdl", pos, Sputnik);
-			vec_scale(ent->scale_x, 10); //hack my babe
-			break;
+			vec_scale(ent->scale_x, 10); //hack my babe			break;
 		
 		default:
 			break;

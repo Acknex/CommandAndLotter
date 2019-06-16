@@ -135,6 +135,8 @@ int ui_lifebar_counter = 0;
 
 var scale_factor_x = 1;
 var scale_factor_y = 1;
+var mini_map_extra_scale_x = 1;
+var mini_map_extra_scale_y = 1;
 
 var ui_map_shift_x = 410;
 var ui_map_shift_y = 96;
