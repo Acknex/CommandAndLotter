@@ -1,2 +1,77 @@
 h1;This was
 h2;LOL
+s;8
+h2;An AckCon 2019 Production
+s;8;
+h3;AckCon Staff
+s;4;
+l;Felix "MasterQ32" Queiﬂner
+r;Framework
+r;Level Loader
+r;Credits
+s;2
+l;Robert "firoball" J‰ger
+r;Enemy AI
+r;Build Script
+r;Final Release Fixes
+s;2
+l;Nils "slin" Daumann
+r;Shader Master
+r;Effects
+s;2
+l;Felix "superku" Pohl
+r;Pathfinding
+r;Flocking
+s;2
+l;Michael "xwcg" Schwarz
+r;Main Menu
+s;2
+l;Henrik "hen-woll" Wollmann
+r;2D & 3D Assets
+r;Texturing
+r;Animation
+r;UI & Menue
+s;2
+l;Andreas "lemming" Holm
+r;Buildings
+r;Texturing
+r;Animation
+s;2
+l;Kitsune "Kitsu" Schwarzfeuer
+r;Buildings
+r;Texturing
+r;Animation
+s;2
+l;Steffen "D.E.M" Pohl
+r;Fog of War
+r;Effects
+r;Enemy AI
+s;2
+l;Philipp "DigitalNW" Meiﬂner
+r;Fog of War
+r;Unit Selection
+s;2
+l;Patrick "JenGS" Jendral
+r;Game UI
+s;2
+l;Korbinian "KorbiFraser" Kaulfuﬂ
+r;???
+s;4
+
+s;4;
+h3;Special Thanks To
+s;4;
+x;Kanal 21;Providing the location
+s;1;
+x;Roman "Uncle Roman" Neumann;ALL THE PIZZA!
+s;1;
+s;8
+h3;Many Thanks To
+s;4;
+x;oP Group Germany;Not provoding 
+s;8
+c;All donkey-larks were harmed during the production of this game.
+c;(A LOT)
+s;8
+c;Gamestudio wasn't updated since March 2016, still waiting for the 2017 update!
+c;(It's 2019 by the way)
