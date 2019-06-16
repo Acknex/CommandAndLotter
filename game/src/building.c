@@ -8,6 +8,11 @@
 ENTITY *buildingPlacement_previewModel;
 int buildingPlacement_selection;
 
+int buildingState()
+{
+	return buildingPlacement_selection;
+}
+
 
 void buildingPlacement_init()
 {
@@ -51,6 +56,11 @@ void buildingPlacement_movePreview()
 
 void buildingPlacement_beginConstruction(int selection)
 {
+	if(  buildingPlacement_selection != BUILDING_NONE )
+	{
+		buildingPlacement_endConstruction();
+	}
+	
 	buildingPlacement_selection = selection;
 	buildingPlacement_previewModel = ent_create(buildingPlacement_constructionAssets[selection], nullvector, NULL);
 	buildingPlacement_previewModel->flags |= TRANSLUCENT;

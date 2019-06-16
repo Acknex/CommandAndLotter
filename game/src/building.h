@@ -17,6 +17,8 @@ void buildingPlacement_init();
 void buildingPlacement_open();
 void buildingPlacement_update();
 
+void buildingPlacement_endConstruction();
 void buildingPlacement_beginConstruction(int selection);
+int buildingState();
 
 #endif
