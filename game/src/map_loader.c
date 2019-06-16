@@ -257,7 +257,7 @@ void maploader_load(char const * fileName)
             {
                 if(v > 0.2)
                 {
-                    if(random(100) < pow(v, 6.0) * 100) {
+                    if(random(100) < pow(v, 6.0) * 30) {
                         char const * boom = "tree01.mdl";
                         var r = random(1);
                         if(r > 0.66)
