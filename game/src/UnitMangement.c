@@ -131,6 +131,7 @@ SOUND * unit_management_taunt_move01 = "taunt-fritz-01.ogg";
 SOUND * unit_management_taunt_move02 = "taunt-fritz-04.ogg";
 SOUND * unit_management_taunt_move03 = "taunt-galep-01.ogg";
 SOUND * unit_management_taunt_move04 = "taunt-jcl-01.ogg";
+SOUND * unit_management_taunt_move05 = "infinity.wav";
 
 SOUND * unit_management_taunt_attack01 = "taunt-fritz-02.ogg";
 SOUND * unit_management_taunt_attack02 = "taunt-jcl-02.ogg";
@@ -146,9 +147,11 @@ SOUND * unit_management_taunt_move[9];
 SOUND * unit_management_taunt_attack[9];
 SOUND * unit_management_taunt_mine[9];
 
-#define UNIT_MANAGEMENT_TAINT_MOVE_COUNT   9
+#define UNIT_MANAGEMENT_TAINT_MOVE_COUNT   10
 #define UNIT_MANAGEMENT_TAINT_ATTACK_COUNT 9
 #define UNIT_MANAGEMENT_TAINT_MINE_COUNT   9
+
+var unit_management_current_taunt_sound;
 
 void UnitMangement_init(){
 
@@ -161,6 +164,7 @@ void UnitMangement_init(){
     unit_management_taunt_move[6] = unit_management_taunt_move02;
     unit_management_taunt_move[7] = unit_management_taunt_move03;
     unit_management_taunt_move[8] = unit_management_taunt_move04;
+    unit_management_taunt_move[9] = unit_management_taunt_move05;
 
     unit_management_taunt_attack[0] = unit_management_taunt_generic01;
     unit_management_taunt_attack[1] = unit_management_taunt_generic02;
@@ -192,7 +196,7 @@ void UnitMangement_init(){
 
 
 void UnitMangement_open(){
-
+    unit_management_current_taunt_sound = 0;
 }
 
 
@@ -414,17 +418,17 @@ function UnitControl()
     mouse_mode = 4;
     if(mouse_left){
         if(MouseLeftLast == 0 ){
-        	
+
         	if(mouse_panel == 0){
 	            if(!key_shiftl){
 	                DeselectAllOfGroup(GROUP_PLAYER_UNIT);
 	               // DeselectAllOfGroup(GROUP_PLAYER_SPAWNER);
-	
+
 	                //DeselectAllOfGroup(GROUP_ENEMY_SPAWNER);
 	            }
 	            DeselectAllOfGroup(GROUP_ENEMY_UNIT);
 	            DeselectAllOfSubsystem(SUBSYSTEM_SPAWNER);
-            
+
                 vec_set(temp, vector(mouse_pos.x,mouse_pos.y, camera.clip_far));
                 vec_for_screen(temp,camera);
                 c_trace(camera.x, temp,USE_POLYGON | IGNORE_PASSENTS | IGNORE_SPRITES);
@@ -502,7 +506,8 @@ function UnitControl()
 
             int sndid = (int)random(count);
 
-            snd_play(group[sndid], 100, 0);
+            if(unit_management_current_taunt_sound == 0)
+                unit_management_current_taunt_sound = snd_play(group[sndid], 100, 0);
 
             effects2d_spawn(Dest, CmdType);
         }
@@ -527,12 +532,15 @@ void UnitMangement_update()
 {
     UnitControl();
    // DebugDrawDests();
-}
 
-bool UnitMangement_is_done(){
-
+    if(unit_management_current_taunt_sound != 0)
+    {
+        if(!snd_playing(unit_management_current_taunt_sound))
+            unit_management_current_taunt_sound = 0;
+    }
 }
 
 void UnitMangement_close(){
-
+    if(unit_management_current_taunt_sound != 0)
+        snd_stop(unit_management_current_taunt_sound);
 }

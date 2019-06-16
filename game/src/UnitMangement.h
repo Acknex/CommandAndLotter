@@ -4,7 +4,6 @@
 void UnitMangement_init();
 void UnitMangement_open();
 void UnitMangement_update();
-bool UnitMangement_is_done();
 void UnitMangement_close();
 
 
