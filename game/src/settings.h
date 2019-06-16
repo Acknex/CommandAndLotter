@@ -9,6 +9,7 @@ struct settings_t
     bool enable_bloom;
     int max_framerate;
     int res_x, res_y;
+    int master_volume;
 };
 
 struct settings_t settings;
