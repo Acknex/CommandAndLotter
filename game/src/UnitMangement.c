@@ -131,6 +131,7 @@ SOUND * unit_management_taunt_move01 = "taunt-fritz-01.ogg";
 SOUND * unit_management_taunt_move02 = "taunt-fritz-04.ogg";
 SOUND * unit_management_taunt_move03 = "taunt-galep-01.ogg";
 SOUND * unit_management_taunt_move04 = "taunt-jcl-01.ogg";
+SOUND * unit_management_taunt_move05 = "infinity.wav";
 
 SOUND * unit_management_taunt_attack01 = "taunt-fritz-02.ogg";
 SOUND * unit_management_taunt_attack02 = "taunt-jcl-02.ogg";
@@ -146,7 +147,7 @@ SOUND * unit_management_taunt_move[9];
 SOUND * unit_management_taunt_attack[9];
 SOUND * unit_management_taunt_mine[9];
 
-#define UNIT_MANAGEMENT_TAINT_MOVE_COUNT   9
+#define UNIT_MANAGEMENT_TAINT_MOVE_COUNT   10
 #define UNIT_MANAGEMENT_TAINT_ATTACK_COUNT 9
 #define UNIT_MANAGEMENT_TAINT_MINE_COUNT   9
 
@@ -161,6 +162,7 @@ void UnitMangement_init(){
     unit_management_taunt_move[6] = unit_management_taunt_move02;
     unit_management_taunt_move[7] = unit_management_taunt_move03;
     unit_management_taunt_move[8] = unit_management_taunt_move04;
+    unit_management_taunt_move[9] = unit_management_taunt_move05;
 
     unit_management_taunt_attack[0] = unit_management_taunt_generic01;
     unit_management_taunt_attack[1] = unit_management_taunt_generic02;
