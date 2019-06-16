@@ -160,6 +160,7 @@ void Spawner()
 	my->HEALTH = 50;
 	my->MAXHEALTH = my->HEALTH;
 	set(my, SHADOW);
+    reset(my, TRANSLUCENT);
 	c_setminmax(me);
 	my->ENTITY_STATE = SPAWNER_STATE_CONSTRUCT;
 
