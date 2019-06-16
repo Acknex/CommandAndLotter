@@ -74,6 +74,7 @@ SOURCES += \
 
 HEADERS += \
   shaders/terrain.fx \
+  src/ai.h \
   src/ang.h \
   src/building.h \
   src/camera.h \

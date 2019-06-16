@@ -33,17 +33,7 @@ struct out_terraintex3 // Output to the pixelshader fragment
     float3 world      : TEXCOORD2;
 };
 
-const float MTL_BARRICADE = 0.0;
-const float MTL_STREET    = 32.0 / 255.0;
-const float MTL_WATER     = 64.0 / 255.0;
-const float MTL_LAVA      = 128.0 / 255.0;
-const float MTL_HOLE      = 192.0 / 255.0;
-const float MTL_DEFAULT   = 1.0;
 
-bool is_material(float t, float mtl)
-{
-	return abs(t - mtl) < (8.0 / 255.0);
-}
 
 out_terraintex3 vs_terraintex3(
 	float4 inPos       : POSITION,
@@ -63,15 +53,18 @@ out_terraintex3 vs_terraintex3(
 
 float4 ps_terraintex3(out_terraintex3 In) : COLOR
 {
-  return float4(0.5,0.5,1.0,0.5);
+  if((abs(In.world.x) - 4000) < 0 && (abs(In.world.z) - 6000) < 0)
+    clip(-1);
+
+  return float4(0.5,0.5,0.5,1.0);
 }
 
 technique terraintex3_13
 {
 	pass one
 	{
-		AlphaBlendEnable = true;
-		ZWriteEnable = false;
+		AlphaBlendEnable = false;
+		ZWriteEnable = true;
 		ZEnable = true;
 		VertexShader = compile vs_3_0 vs_terraintex3();
 		PixelShader = compile ps_3_0 ps_terraintex3();

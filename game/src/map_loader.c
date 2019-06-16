@@ -40,7 +40,7 @@ MATERIAL * maploader_terrain_material =
 MATERIAL * maploader_water_material =
 {
     effect = "water.fx";
-    flags = TRANSLUCENT | AUTORELOAD;
+    flags = PASS_SOLID | AUTORELOAD;
 }
 
 
@@ -155,14 +155,14 @@ void maploader_load(char const * fileName)
 
     collision_mode = 0;
 
-//    you = ent_createterrain(
-//        bmp,
-//        vector(0, 0, 0),
-//        2,
-//        2,
-//        size_x * maploader_trisize
-//    );
-//    you.material = maploader_water_material;
+    you = ent_createterrain(
+        bmp,
+        vector(0, 0, 200),
+        180,
+        180,
+        256
+    );
+    you.material = maploader_water_material;
 
     maploader.terrain = ent_createterrain(
         bmp,
