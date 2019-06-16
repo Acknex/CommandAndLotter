@@ -66,8 +66,7 @@ void SPUTNIK__wait_or_walk(ENTITY * ptr)
 	VECTOR diff, temp;
 	vec_diff(diff, unit->pos3d, unit->prevPos3d);
 	
-	var len = 0;
-	if(time_step > 0.05) len = vec_to_angle(temp, diff)/time_step; //crashes for cbabe and eye for whatever reason
+	var len = vec_to_angle(temp, diff)/time_step;
 
 	if(len > 8) ptr->SPUTNIK_RUNCOUNTER = 4;
 	//if(unit->isMoving) ptr->SPUTNIK_RUNCOUNTER = 12;
@@ -104,11 +103,12 @@ void SPUTNIK__wait_or_walk(ENTITY * ptr)
 	}
 	else 
 	{
+		//nothing to do? go mining
 		if(ptr->SPUTNIK_IDLECOUNTER > SPUTNIK_MAXIDLE && !unit_getVictim(ptr))
 		{
-			ptr->ENTITY_VICTIMTYPE = UNIT_Z;
-			SPUTNIK__findNextVictim(ptr);
+			unit_findNextVictim(ptr, UNIT_Z);
 		}
+		//selected victim is near - attack
 		if (SCAN_IsEntityNear(ptr, unit_getVictim(ptr), ptr->SPUTNIK_ATTACKRANGE))
 		{
 			ptr->ENTITY_STATE = ENTITY_STATE_ATTACK;
@@ -174,56 +174,6 @@ void SPUTNIK_Update()
 	}	
 }
 
-void SPUTNIK__findNextVictim(ENTITY* ptr)
-{
-	if (unit_getVictim(ptr) == NULL)
-	{
-		//meh.
-		var owner;
-		if (ptr->group == GROUP_ENEMY_UNIT)	
-		owner = UNIT_ENEMY;
-		else
-		owner = UNIT_PLAYER;
-		
-		cprintf0("\n SPUTNIK__findNextVictim: TRYFIND...");
-		
-		if(ptr->ENTITY_VICTIMTYPE == UNIT_Z)
-		{
-			ENTITY *zUnit, *zUnitNear = NULL;
-			var minDist = 2000;
-			SUBSYSTEM_LOOP(zUnit, SUBSYSTEM_Z)
-			{
-				VECTOR zPos;
-				vec_set(&zPos, &zUnit->x);
-				vec_sub(&zPos, &ptr->x);
-				if(vec_length(&zPos) < minDist)
-				{
-					zUnitNear = zUnit;
-					minDist = vec_length(&zPos);
-				}
-			}
-			if(zUnitNear)
-			{
-				unit_setTarget(ptr, zUnitNear->x);
-				unit_setVictim(ptr, zUnitNear);
-			}
-		}
-		else
-		{
-			int count = mapGetNearbyUnitsOfTypeForPos(ptr->x, ptr->ENTITY_VICTIMTYPE, owner, 2000, 1);
-			if (count > 0)
-			{
-				cprintf1("FOUND!(%d)", count);
-				ENTITY* ent = jpsGetEntityFromUnitArray(0);
-				
-				//set new target and victim
-				unit_setTarget(ptr, ent->x);
-				unit_setVictim(ptr, ent);
-			}
-		}
-	}
-}
-
 void SPUTNIK__hit(ENTITY* ptr)
 {
 	ptr->ENTITY_HITTHRESHOLD -= time_step;		
@@ -287,7 +237,7 @@ void SPUTNIK__attack(ENTITY* ptr)
 	if (ptr->SPUTNIK_ANIMSTATEATK >= 100)
 	{
 		ptr->SPUTNIK_ANIMSTATEATK = 0;
-		SPUTNIK__findNextVictim(ptr);
+		unit_findNextVictim(ptr);
 		ptr->ENTITY_STATE = ENTITY_STATE_WAIT_OR_WALK;
 	}
 

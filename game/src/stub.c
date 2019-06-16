@@ -33,7 +33,7 @@ void stub_init()
 	evilsputnik = unit_spawn(0, vector(-1500,0,500), UNIT_ENEMY);
 	unit_spawn(0, vector(-1800,0,500), UNIT_ENEMY);
 	unit_spawn(0, vector(-2100,0,500), UNIT_ENEMY);
-	fancytower = spawner_spawn(0, vector(100,1000,500), SPAWNER_PLAYER);
+	fancytower = spawner_spawn(0, vector(100,1000,500), 0, SPAWNER_PLAYER);
 	fancyz = z_spawn(vector(3000, 0, 500));
 }
 

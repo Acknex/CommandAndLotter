@@ -4,6 +4,7 @@
 var z_get();
 bool z_pay(var);
 bool z_isSufficient(var);
+ENTITY* z_findNear(VECTOR* pos, var maxdist);
 ENTITY* z_spawn(VECTOR* pos);
 void Z();
 void Z_Init();

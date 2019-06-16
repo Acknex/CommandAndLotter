@@ -33,15 +33,17 @@ void ai_spawn_building(int buildingType)
 	cprintf3("\n ai_spawn_building(%d) at frame %d: tile(%p)", buildingType, (int)total_frames, tile);
 	if(tile)
 	{
-		aiSystemInstance->entBuildings[buildingType][aiSystemInstance->buildingCount[buildingType]++] = spawner_spawn(0, mapGetVectorFromTile(map, NULL, tile), UNIT_ENEMY);
+		aiSystemInstance->entBuildings[buildingType][aiSystemInstance->buildingCount[buildingType]++] = spawner_spawn(0, mapGetVectorFromTile(map, NULL, tile), random(360), SPAWNER_ENEMY);
 	}
 }
 
 void ai_spawn_unit(int unitType)
 {
-	int buildingType = 0; // buildingType == unitType?
+	int buildingType = 0; // buildingType == unitType? <-- yes.
 	if(aiSystemInstance->buildingCount[buildingType] <= 0) return;
 	ENTITY* ptr = aiSystemInstance->entBuildings[buildingType][(int)random(aiSystemInstance->buildingCount[buildingType])];
+	//why not use spawner functionality instead of copying..?
+	/*
 	ptr->SPAWNER_SPAWNANGLE += 137.5;
 	ptr->SPAWNER_SPAWNANGLE %= 360;
 	VECTOR* targetPos = vector(256+random(800),0,0);
@@ -50,6 +52,12 @@ void ai_spawn_unit(int unitType)
 	//vec_add(targetPos, ptr->x);
 	
 	unit_spawn(unitType, ptr->x, targetPos, 1);
+	*/
+	
+	//TODO: someone coded payment into spawner.c directly, so do direct access for AI for now
+	//payment system needs extension for AI or needs to be stripped from spawner.c
+	//spawner_produce(ptr);
+	ptr->SPAWNER_QUEUE++;
 }
 
 void ai_update()

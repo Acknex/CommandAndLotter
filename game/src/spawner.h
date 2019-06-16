@@ -1,13 +1,13 @@
 #ifndef SPAWNER_H
 #define SPAWNER_H
 
-#define SPAWNER_ENEMY 1
-#define SPAWNER_PLAYER 0
+#define SPAWNER_ENEMY 0
+#define SPAWNER_PLAYER 1
 
 int spawner_unit_cost[UNIT_CLASSES] = {10,20,50,35,0};
 
 
-ENTITY* spawner_spawn(int spawnertype, VECTOR* pos, var owner);
+ENTITY* spawner_spawn(int unittype, VECTOR* pos, var angle, var owner);
 var spawner_produce(ENTITY* ent);
 var spawner_getQueue(ENTITY* ent);
 var spawner_getProgress(ENTITY* ent);

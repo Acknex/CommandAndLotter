@@ -44,6 +44,8 @@
 
 #define SPAWNER_LOS 2000
 
+SOUND* spawner_spawn_snd = "factory.wav";
+
 MATERIAL * building_wireframe_material =
 {
   flags = AUTORELOAD | TRANSLUCENT;
@@ -56,7 +58,7 @@ MATERIAL * building_material =
   effect = "building.fx";
 }
 
-ENTITY* spawner_spawn(int unittype, VECTOR* pos, var owner)
+ENTITY* spawner_spawn(int unittype, VECTOR* pos, var angle, var owner)
 {
 	ENTITY* ent;
    ENTITY *wireframe;
@@ -82,31 +84,37 @@ ENTITY* spawner_spawn(int unittype, VECTOR* pos, var owner)
 
 	if (ent != NULL)
 	{
+		ent->pan = angle;
+		wireframe->pan = angle;
 		mapSetTileValueAtPos3D(mapGetCurrent(), pos, 1); // 1 == solid, non-traversable
 		mapJPSUpdate(mapGetCurrent());
 
-		if(owner == PLAYER_ID_PLAYER)
-			fov_uncover(pos, SPAWNER_LOS);
-
 		ent->ENTITY_UNITTYPE = unittype;
 		if (owner == SPAWNER_ENEMY)
+		{
 			ent->group = GROUP_ENEMY_SPAWNER;
+		}
 		else
-            ent->group = GROUP_PLAYER_SPAWNER;
+		{
+			ent->group = GROUP_PLAYER_SPAWNER;
+			snd_play(spawner_spawn_snd, 100, 0);
+			fov_uncover(pos, SPAWNER_LOS);
+		}
 
-        ent->material = building_material;
-
-        if(wireframe != NULL)
-        {
-            wireframe->material = building_wireframe_material;
-            reset(wireframe, SHADOW);
-            ent->SPAWNER_WIREFRAME = wireframe;
-        }
+		ent->material = building_material;
+		
+		if(wireframe != NULL)
+		{
+			wireframe->material = building_wireframe_material;
+			reset(wireframe, SHADOW);
+			ent->SPAWNER_WIREFRAME = wireframe;
+		}
 	}
 
 	return ent;
 }
 
+//TODO: zloty interface currently is for player only, needs to support enemy as well
 var spawner_produce(ENTITY* ent)
 {
 	if (ent != NULL)
