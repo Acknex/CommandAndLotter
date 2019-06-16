@@ -145,7 +145,7 @@ void SPUTNIK_Update()
 				TILE* tile = unit->tile;
 				if(tile)
 				{
-					if(!tile->value) ptr->z = maploader_get_height(ptr->x) - ptr->min_z + SPUTNIK_FEET;
+                    if(!tile->value) ptr->z = maploader_get_height(ptr->x) - ptr->min_z - SPUTNIK_FEET;
 				}	
 			}
 		}
