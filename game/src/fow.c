@@ -5,7 +5,7 @@
 #define FOW_LIGHTNING_RANGE 2.5
 #define FOW_LIGHTNING_DURATION 2.0
 
-BMAP* FogBmap = "fow_fog4.png";
+BMAP* FogBmap = "fow_fog2.png";
 int fow_lightningX[] = {-100,-100,-100};
 int fow_lightningY[] = {-100,-100,-100};
 int fow_numLigntnings = 0;
@@ -50,7 +50,7 @@ void Fog(PARTICLE *p)
     p.gravity = 0;
     p.size = 600;
     
-    var cRand = random(0.9)+0.1;
+    var cRand = random(0.3)+0.5;
     p.red = cRand * 255;
     p.green = cRand * 255;
     p.blue = cRand * 255;
