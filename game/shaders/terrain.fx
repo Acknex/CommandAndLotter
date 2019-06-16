@@ -28,6 +28,8 @@ sampler sDigitalWall = sampler_state { Texture = <maploader_terrain_digital_wall
 
 float4x4 matWorld;
 float4x4 matWorldViewProj;
+float4 vecViewPos;
+float4 vecSunDir;
 
 //////////////////////////////////////////////////////////////////////
 struct out_terraintex3 // Output to the pixelshader fragment
@@ -76,6 +78,8 @@ float4 ps_terraintex3(out_terraintex3 In) : COLOR
 {
     float3 fakenormal = normalize(cross(normalize(ddx(In.world)), normalize(ddy(In.world))));
 
+    float specularity = pow(saturate(dot(normalize(float3(0.0f, 1.0f, 0.0f) + vecSunDir.xyz), normalize(vecViewPos - In.world))), 64.0f) * 0.6f;
+
     float use_walls = step(dot(float3(0,1,0), fakenormal), 0.4);
 
     float lighting = lerp(1.0, 0.6, use_walls);
@@ -90,8 +94,9 @@ float4 ps_terraintex3(out_terraintex3 In) : COLOR
 
     float4 noise = tex2D(sNoise, 0.05 * tilepos);
 
+    float4 ground_digital_lame = tex2D(sDigital, In.world.xz / 256.0);
     float4 ground_digital = lerp(
-      tex2D(sDigital, In.world.xz / 256.0),
+      ground_digital_lame + specularity * saturate((1.0f-ground_digital_lame.r*3.0)),
       tex2D(sDigitalFancy, In.world.xz / 256.0),
       step(noise.x, 0.02)
     );

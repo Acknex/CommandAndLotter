@@ -6,7 +6,7 @@ var unit_setTarget(ENTITY* ent, VECTOR* pos)
 	MAP* map = mapGetCurrent();
 	mapGetVector2DFromVector3D(map, target2D, pos);
 	
-	cprintf2("\n unit_setTarget(%p): group(%d)", ent, ent->group);
+	//cprintf2("\n unit_setTarget(%p): group(%d)", ent, ent->group);
 	
 	if (ent != NULL)
 	{
@@ -87,9 +87,8 @@ ENTITY* unit_spawn(int unittype, VECTOR* pos, VECTOR* targetPos, var owner)
 			break;
 		
 		case UNIT_BABE:
-			ent = ent_create("sputnik.mdl", pos, Sputnik);
-			//vec_scale(ent->scale_x, 10); //hack my babe
-			break;
+			ent = ent_create("cbabe.mdl", pos, Sputnik);
+			vec_scale(ent->scale_x, 10); //hack my babe			break;
 		
 		default:
 			break;
@@ -137,4 +136,12 @@ int unit_getType(ENTITY* ent)
 		return ent->ENTITY_UNITTYPE;	
 	}
 	return -1;
+}
+
+
+
+void unit_set_state(ENTITY* ptr, int state)
+{
+	if(!ptr) return;
+	ptr->ENTITY_STATE = state;
 }

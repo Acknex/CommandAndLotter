@@ -5,6 +5,11 @@ var topdown_camera_height;
 VECTOR topdown_camera_center;
 VECTOR topdown_camera_centerTarget;
 
+VECTOR *topdown_target()
+{
+	return &topdown_camera_centerTarget;
+}
+
 void topdown_camera_open() 
 {
 	camera.z = 3000;

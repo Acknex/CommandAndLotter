@@ -63,13 +63,13 @@ void Z_Update()
 	ENTITY * ptr;
 	SUBSYSTEM_LOOP(ptr, SUBSYSTEM_Z)
 	{
-			
+
 		if (ptr->DAMAGE_HIT > 0 && ptr->ENTITY_STATE != ENTITY_STATE_DIE && ptr->ENTITY_STATE != ENTITY_STATE_DEAD)
       	{
       		Z__hit(ptr);
 		}
-		
-		switch(ptr->ENTITY_STATE)    	
+
+		switch(ptr->ENTITY_STATE)
 		{
 
 			case ENTITY_STATE_WAIT_OR_WALK:
@@ -88,29 +88,30 @@ void Z_Update()
 			{
 				break;
 			}
-		}	
-	
+		}
+
         ptr->z = maploader_get_height(ptr->x) - ptr->min_z;
-		
-	}	
+
+	}
 }
 
 void Z__hit(ENTITY* ptr)
-{	
-	if (num_sounds < 6)
-	{
- 		var hndl = snd_play(z_collect_snd, 50, 0);
-		snd_tune(hndl,0,random(10)+95,0);
-	}
+{
 	z_amount += minv(Z_VALUE, ptr->DAMAGE_HIT*Z_PER_DAMAGE);
-	
+
 	ptr->Z_VALUE_LEFT -= ptr->DAMAGE_HIT*Z_PER_DAMAGE;
     ptr->DAMAGE_HIT = 0;
-    
+
     if(ptr->Z_VALUE_LEFT <= 0)
-    {	
+    {
 		ptr->ENTITY_STATE = ENTITY_STATE_DIE;
 		ptr->ENTITY_ANIM = 100;
+
+        if (num_sounds < 6)
+        {
+            var hndl = snd_play(z_collect_snd, 50, 0);
+            snd_tune(hndl,0,random(10)+95,0);
+        }
 	}
 	else
 		ptr->ENTITY_STATE = ENTITY_STATE_WAIT_OR_WALK;

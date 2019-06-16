@@ -45,7 +45,7 @@ void Sputnik()
 	my->SPUTNIK_IDLECOUNTER = 0;
 	my->HEALTH = 23;
 	my->MAXHEALTH = my->HEALTH;
-	set(my, SHADOW);
+    reset(my, SHADOW);
 	c_setminmax(me);
 	my->min_z += SPUTNIK_FEET;
 	my->ENTITY_STATE = ENTITY_STATE_WAIT_OR_WALK;
@@ -66,7 +66,8 @@ void SPUTNIK__wait_or_walk(ENTITY * ptr)
 	VECTOR diff, temp;
 	vec_diff(diff, unit->pos3d, unit->prevPos3d);
 	
-	var len = vec_to_angle(temp, diff);///time_step; //crashes for cbabe and eye for whatever reason
+	var len = 0;
+	if(time_step > 0.05) len = vec_to_angle(temp, diff)/time_step; //crashes for cbabe and eye for whatever reason
 
 	if(len > 8) ptr->SPUTNIK_RUNCOUNTER = 4;
 	//if(unit->isMoving) ptr->SPUTNIK_RUNCOUNTER = 12;
@@ -121,6 +122,9 @@ void SPUTNIK_Update()
 	ENTITY * ptr;
 	SUBSYSTEM_LOOP(ptr, SUBSYSTEM_UNIT_SPUTNIK)
 	{
+		if(ptr->ENTITY_STATE != ENTITY_STATE_WAIT_OR_WALK)
+			ptr->SPUTNIK_IDLECOUNTER = 0;
+		
 		jpsAllowMovementForEntity(ptr, false);
 		
 		switch(ptr->ENTITY_STATE)    	
