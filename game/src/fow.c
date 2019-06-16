@@ -4,7 +4,7 @@
 
 #define FOW_LIGHTNING_RANGE 2.5
 
-BMAP* FogBmap = "fow_fog2.png";
+BMAP* FogBmap = "fow_fog4.png";
 int fow_lightningX[] = {-100,-100,-100};
 int fow_lightningY[] = {-100,-100,-100};
 int fow_numLigntnings = 0;
