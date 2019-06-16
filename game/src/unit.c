@@ -86,6 +86,7 @@ ENTITY* unit_spawn(int unittype, VECTOR* pos, VECTOR* targetPos, var owner)
 		
 		case UNIT_BABE:
 			ent = ent_create("cbabe.mdl", pos, Sputnik);
+			vec_scale(ent->scale_x, 10); //hack my babe
 			break;
 		
 		default:
@@ -134,4 +135,12 @@ int unit_getType(ENTITY* ent)
 		return ent->ENTITY_UNITTYPE;	
 	}
 	return -1;
+}
+
+
+
+void unit_set_state(ENTITY* ptr, int state)
+{
+	if(!ptr) return;
+	ptr->ENTITY_STATE = state;
 }
