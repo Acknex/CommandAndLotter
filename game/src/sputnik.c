@@ -164,15 +164,40 @@ void SPUTNIK__findNextVictim(ENTITY* ptr)
 		owner = UNIT_PLAYER;
 		
 		cprintf0("\n SPUTNIK__findNextVictim: TRYFIND...");
-		int count = mapGetNearbyUnitsOfTypeForPos(ptr->x, ptr->ENTITY_VICTIMTYPE, owner, 1000, 1);
-		if (count > 0)
+		
+		if(ptr->ENTITY_VICTIMTYPE == UNIT_Z)
 		{
-			cprintf1("FOUND!(%d)", count);
-			ENTITY* ent = jpsGetEntityFromUnitArray(0);
-			
-			//set new target and victim
-			unit_setTarget(ptr, ent->x);
-			unit_setVictim(ptr, ent);
+			ENTITY *zUnit, *zUnitNear = NULL;
+			var minDist = 1000;
+			SUBSYSTEM_LOOP(zUnit, SUBSYSTEM_Z)
+			{
+				VECTOR zPos;
+				vec_set(&zPos, &zUnit->x);
+				vec_sub(&zPos, &ptr->x);
+				if(vec_length(&zPos) < minDist)
+				{
+					zUnitNear = zUnit;
+					minDist = vec_length(&zPos);
+				}
+			}
+			if(zUnitNear)
+			{
+				unit_setTarget(ptr, zUnitNear->x);
+				unit_setVictim(ptr, zUnitNear);
+			}
+		}
+		else
+		{
+			int count = mapGetNearbyUnitsOfTypeForPos(ptr->x, ptr->ENTITY_VICTIMTYPE, owner, 1000, 1);
+			if (count > 0)
+			{
+				cprintf1("FOUND!(%d)", count);
+				ENTITY* ent = jpsGetEntityFromUnitArray(0);
+				
+				//set new target and victim
+				unit_setTarget(ptr, ent->x);
+				unit_setVictim(ptr, ent);
+			}
 		}
 	}
 }
