@@ -569,7 +569,7 @@ void ui_game_update()
 
 	if( !ui_selected_max_type)
 	{
-		ui_anim_unit_state = UI_ANIM_UNIT_OFF;
+		ui_anim_unit_state = UI_ANIM_UNIT_OFF; 
 	}
 
 	if( ui_anim_unit_state == UI_ANIM_UNIT_RESTARTED )
