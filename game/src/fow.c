@@ -49,7 +49,7 @@ void Fog(PARTICLE *p)
     p.gravity = 0;
     p.size = 600;
     
-    var cRand = random(0.2)+0.6;
+    var cRand = random(0.9)+0.1;
     p.red = cRand * 255;
     p.green = cRand * 255;
     p.blue = cRand * 255;
