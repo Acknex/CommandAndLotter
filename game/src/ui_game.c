@@ -607,6 +607,8 @@ void ui_game_update()
 			ui_minimap->pos_y = screen_size.y - (202 * scale_factor_x);
 			mini_map_extra_scale_x = 0.69;
 			mini_map_extra_scale_y = 0.58;
+			ui_minimap->scale_x = scale_factor_x * mini_map_extra_scale_x;
+			ui_minimap->scale_y = scale_factor_x * mini_map_extra_scale_y;
 			ui_minimap->flags |= SHOW;
 		} 
 		else
