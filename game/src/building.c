@@ -101,7 +101,7 @@ void buildingPlacement_update()
 	if(buildingPlacement_selection != BUILDING_NONE)
 	{
 		buildingPlacement_movePreview();
-		if(mouse_left)
+		if(mouse_left && !mouse_panel)
 			buildingPlacement_placeConstruction();
 		if(mouse_right)
 			buildingPlacement_endConstruction();
