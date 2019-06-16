@@ -360,17 +360,18 @@ function UnitControl()
     VECTOR temp;
     mouse_mode = 4;
     if(mouse_left){
-        if(MouseLeftLast == 0){
-            if(!key_shiftl){
-                DeselectAllOfGroup(GROUP_PLAYER_UNIT);
-               // DeselectAllOfGroup(GROUP_PLAYER_SPAWNER);
-
-                //DeselectAllOfGroup(GROUP_ENEMY_SPAWNER);
-            }
-            DeselectAllOfGroup(GROUP_ENEMY_UNIT);
-            DeselectAllOfSubsystem(SUBSYSTEM_SPAWNER);
-
-            if(mouse_panel == 0){
+        if(MouseLeftLast == 0 ){
+        	
+        	if(mouse_panel == 0){
+	            if(!key_shiftl){
+	                DeselectAllOfGroup(GROUP_PLAYER_UNIT);
+	               // DeselectAllOfGroup(GROUP_PLAYER_SPAWNER);
+	
+	                //DeselectAllOfGroup(GROUP_ENEMY_SPAWNER);
+	            }
+	            DeselectAllOfGroup(GROUP_ENEMY_UNIT);
+	            DeselectAllOfSubsystem(SUBSYSTEM_SPAWNER);
+            
                 vec_set(temp, vector(mouse_pos.x,mouse_pos.y, camera.clip_far));
                 vec_for_screen(temp,camera);
                 c_trace(camera.x, temp,USE_POLYGON | IGNORE_PASSENTS | IGNORE_SPRITES);
