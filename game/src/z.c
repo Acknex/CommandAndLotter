@@ -60,22 +60,22 @@ ENTITY* z_spawn(VECTOR* pos)
 {
 	ENTITY* ent;
     ent = ent_create("Crystalmeth.mdl", pos, Z);
-	ent->group = GROUP_ENEMY_UNIT; //should be neutral group
+	ent->group = GROUP_NEUTRAL_UNIT;
 	return ent;
 }
 
 void Z()
 {
 	framework_setup(my, SUBSYSTEM_Z);
-    set(my, SHADOW);
-    my->Z_SIZE = 2.0 + random(2);
-    my->pan = random(360);
-    vec_set(my->scale_x, vector(my->Z_SIZE , my->Z_SIZE , my->Z_SIZE ));
+	set(my, SHADOW);
+	my->Z_SIZE = 2.0 + random(2);
+	my->pan = random(360);
+	vec_set(my->scale_x, vector(my->Z_SIZE , my->Z_SIZE , my->Z_SIZE ));
 	c_setminmax(me);
 	my->ENTITY_STATE = ENTITY_STATE_WAIT_OR_WALK;
-    my->ENTITY_UNITTYPE = UNIT_Z;
-    my->material = matCrystals;
-    my->Z_VALUE_LEFT = Z_VALUE;
+	my->ENTITY_UNITTYPE = UNIT_Z;
+	my->material = matCrystals;
+	my->Z_VALUE_LEFT = Z_VALUE;
 }
 
 void Z_Init()
@@ -90,7 +90,7 @@ void Z_Update()
 	{
 
 		if (ptr->DAMAGE_HIT > 0 && ptr->ENTITY_STATE != ENTITY_STATE_DIE && ptr->ENTITY_STATE != ENTITY_STATE_DEAD)
-      	{
+      {
       		Z__hit(ptr);
 		}
 
@@ -123,23 +123,23 @@ void Z_Update()
 void Z__hit(ENTITY* ptr)
 {
 	z_amount += minv(Z_VALUE, ptr->DAMAGE_HIT*Z_PER_DAMAGE);
-
+	
 	ptr->Z_VALUE_LEFT -= ptr->DAMAGE_HIT*Z_PER_DAMAGE;
-    ptr->DAMAGE_HIT = 0;
-
-    if(ptr->Z_VALUE_LEFT <= 0)
-    {
+	ptr->DAMAGE_HIT = 0;
+	
+	if(ptr->Z_VALUE_LEFT <= 0)
+	{
 		ptr->ENTITY_STATE = ENTITY_STATE_DIE;
 		ptr->ENTITY_ANIM = 100;
-
-        if (num_sounds < 6)
-        {
-            var hndl = snd_play(z_collect_snd, 50, 0);
-            snd_tune(hndl,0,random(10)+95,0);
-        }
+	
+		if (num_sounds < 6)
+		{
+		   var hndl = snd_play(z_collect_snd, 50, 0);
+		   snd_tune(hndl,0,random(10)+95,0);
+		}
 	}
 	else
-		ptr->ENTITY_STATE = ENTITY_STATE_WAIT_OR_WALK;
+	ptr->ENTITY_STATE = ENTITY_STATE_WAIT_OR_WALK;
 }
 
 void Z__wait(ENTITY* ptr)

@@ -468,7 +468,7 @@ function UnitControl()
             vec_for_screen(temp,camera);
             c_trace(camera.x, temp,USE_POLYGON | IGNORE_PASSENTS);
             if(you != 0){
-                 if(you->group==GROUP_ENEMY_UNIT  || you->group == GROUP_ENEMY_SPAWNER){
+                 if(you->group==GROUP_ENEMY_UNIT  || you->group==GROUP_NEUTRAL_UNIT  || you->group == GROUP_ENEMY_SPAWNER){
                     SetVictimForSelectd(you);
                     CmdType = EFFECTS2D_TYPE_ATTACK;
                     if(unit_getType(you) == UNIT_Z){

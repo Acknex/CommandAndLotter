@@ -103,15 +103,15 @@ void SPUTNIK__wait_or_walk(ENTITY * ptr)
 	}
 	else 
 	{
-		//nothing to do? go mining
-		if(ptr->SPUTNIK_IDLECOUNTER > SPUTNIK_MAXIDLE && !unit_getVictim(ptr))
-		{
-			unit_findNextVictim(ptr, UNIT_Z);
-		}
 		//selected victim is near - attack
 		if (SCAN_IsEntityNear(ptr, unit_getVictim(ptr), ptr->SPUTNIK_ATTACKRANGE))
 		{
 			ptr->ENTITY_STATE = ENTITY_STATE_ATTACK;
+		}
+		//nothing to do? go mining
+		if(ptr->SPUTNIK_IDLECOUNTER > SPUTNIK_MAXIDLE && !unit_getVictim(ptr))
+		{
+			unit_findNextVictim(ptr, UNIT_Z);
 		}
 	}
 }

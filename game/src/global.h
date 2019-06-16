@@ -78,6 +78,7 @@ typedef int bool;
 #define GROUP_PLAYER_SPAWNER 11
 #define GROUP_ENEMY_UNIT     12
 #define GROUP_ENEMY_SPAWNER  13
+#define GROUP_NEUTRAL_UNIT   14
 
 #define PLAYER_ID_PLAYER 0
 #define PLAYER_ID_AI 1
