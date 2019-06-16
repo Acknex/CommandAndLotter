@@ -153,6 +153,17 @@ void fow_update()
 	
 	int mapSize = map->size[0]*map->size[1];
 	int i;
+	
+	if(key_f3)
+	{
+		for(i = 0; i< mapSize; ++i)
+		{
+			TILE *tile = &((map->tiles)[i]);
+			tile->visibility = FOW_SCOUTED;
+		}
+	}
+	
+	
 	for(i = fow_calcoffset; i< mapSize; i = i+fow_calcoffsetMAX)
 	{
 		TILE *tile = &((map->tiles)[i]);
