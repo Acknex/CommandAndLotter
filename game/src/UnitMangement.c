@@ -121,7 +121,67 @@ function DbgToggleDebugpanel()
 
 #endif
 
+SOUND * unit_management_taunt_generic01 = "taunt-galep-04.ogg";
+SOUND * unit_management_taunt_generic02 = "taunt-galep-05.ogg";
+SOUND * unit_management_taunt_generic03 = "taunt-jcl-04.ogg";
+SOUND * unit_management_taunt_generic04 = "taunt-jcl-05.ogg";
+SOUND * unit_management_taunt_generic05 = "taunt-jcl-06.ogg";
+
+SOUND * unit_management_taunt_move01 = "taunt-fritz-01.ogg";
+SOUND * unit_management_taunt_move02 = "taunt-fritz-04.ogg";
+SOUND * unit_management_taunt_move03 = "taunt-galep-01.ogg";
+SOUND * unit_management_taunt_move04 = "taunt-jcl-01.ogg";
+
+SOUND * unit_management_taunt_attack01 = "taunt-fritz-02.ogg";
+SOUND * unit_management_taunt_attack02 = "taunt-jcl-02.ogg";
+SOUND * unit_management_taunt_attack03 = "taunt-jcl-02.ogg";
+SOUND * unit_management_taunt_attack04 = "taunt-jcl-03.ogg";
+
+SOUND * unit_management_taunt_mine01 = "taunt-fritz-02.ogg";
+SOUND * unit_management_taunt_mine02 = "taunt-fritz-03.ogg";
+SOUND * unit_management_taunt_mine03 = "taunt-galep-03.ogg";
+SOUND * unit_management_taunt_mine04 = "taunt-galep-06.ogg";
+
+SOUND * unit_management_taunt_move[9];
+SOUND * unit_management_taunt_attack[9];
+SOUND * unit_management_taunt_mine[9];
+
+#define UNIT_MANAGEMENT_TAINT_MOVE_COUNT   9
+#define UNIT_MANAGEMENT_TAINT_ATTACK_COUNT 9
+#define UNIT_MANAGEMENT_TAINT_MINE_COUNT   9
+
 void UnitMangement_init(){
+
+    unit_management_taunt_move[0] = unit_management_taunt_generic01;
+    unit_management_taunt_move[1] = unit_management_taunt_generic02;
+    unit_management_taunt_move[2] = unit_management_taunt_generic03;
+    unit_management_taunt_move[3] = unit_management_taunt_generic04;
+    unit_management_taunt_move[4] = unit_management_taunt_generic05;
+    unit_management_taunt_move[5] = unit_management_taunt_move01;
+    unit_management_taunt_move[6] = unit_management_taunt_move02;
+    unit_management_taunt_move[7] = unit_management_taunt_move03;
+    unit_management_taunt_move[8] = unit_management_taunt_move04;
+
+    unit_management_taunt_attack[0] = unit_management_taunt_generic01;
+    unit_management_taunt_attack[1] = unit_management_taunt_generic02;
+    unit_management_taunt_attack[2] = unit_management_taunt_generic03;
+    unit_management_taunt_attack[3] = unit_management_taunt_generic04;
+    unit_management_taunt_attack[4] = unit_management_taunt_generic05;
+    unit_management_taunt_attack[5] = unit_management_taunt_attack01;
+    unit_management_taunt_attack[6] = unit_management_taunt_attack02;
+    unit_management_taunt_attack[7] = unit_management_taunt_attack03;
+    unit_management_taunt_attack[8] = unit_management_taunt_attack04;
+
+    unit_management_taunt_mine[0] = unit_management_taunt_generic01;
+    unit_management_taunt_mine[1] = unit_management_taunt_generic02;
+    unit_management_taunt_mine[2] = unit_management_taunt_generic03;
+    unit_management_taunt_mine[3] = unit_management_taunt_generic04;
+    unit_management_taunt_mine[4] = unit_management_taunt_generic05;
+    unit_management_taunt_mine[5] = unit_management_taunt_mine01;
+    unit_management_taunt_mine[6] = unit_management_taunt_mine02;
+    unit_management_taunt_mine[7] = unit_management_taunt_mine03;
+    unit_management_taunt_mine[8] = unit_management_taunt_mine04;
+
     #ifdef DebugMode
         on_f12 = DbgToggleDebugpanel;
     #endif
@@ -253,14 +313,8 @@ function DrawQuadDemo(){
 var MouseLeftLast = 0;
 var MouseRightLast = 0;
 
-SOUND * unit_management_taunt_jcl_move = "taunt-jcl-05.ogg";
-SOUND * unit_management_taunt_jcl_kill = "taunt-jcl-04.ogg";
-
 function SetDestForSelectd(VECTOR * Dest)
 {
-    if(random(100) < 50)
-        snd_play(unit_management_taunt_jcl_move, 100, 0);
-
     int Count = 0;
     ENTITY * ent;
     for(ent = ent_next(NULL); ent != NULL; ent = ent_next(ent)){
@@ -275,9 +329,6 @@ function SetDestForSelectd(VECTOR * Dest)
 
 function SetVictimForSelectd(ENTITY * Victim)
 {
-    if(random(100) < 50)
-        snd_play(unit_management_taunt_jcl_kill, 100, 0);
-
     int Count = 0;
     ENTITY * ent;
     for(ent = ent_next(NULL); ent != NULL; ent = ent_next(ent)){
@@ -426,6 +477,30 @@ function UnitControl()
         VECTOR Dest;
         PosToMap(Dest,mouse_pos.x,mouse_pos.y);
         if(SetDestForSelectd(Dest) > 0){
+
+            SOUND ** group;
+            int count;
+
+            switch(CmdType)
+            {
+            case EFFECTS2D_TYPE_GOTO:
+                group = unit_management_taunt_move;
+                count = UNIT_MANAGEMENT_TAINT_MOVE_COUNT;
+                break;
+            case EFFECTS2D_TYPE_ATTACK:
+                group = unit_management_taunt_attack;
+                count = UNIT_MANAGEMENT_TAINT_ATTACK_COUNT;
+                break;
+            case EFFECTS2D_TYPE_MINE:
+                group = unit_management_taunt_mine;
+                count = UNIT_MANAGEMENT_TAINT_MINE_COUNT;
+                break;
+            }
+
+            int sndid = (int)random(count);
+
+            snd_play(group[sndid], 100, 0);
+
             effects2d_spawn(Dest, CmdType);
         }
     }
