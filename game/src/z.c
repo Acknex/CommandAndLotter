@@ -30,7 +30,7 @@ void Z()
     vec_set(my->scale_x, vector(size, size, size));
 	c_setminmax(me);
 	my->ENTITY_STATE = ENTITY_STATE_WAIT_OR_WALK;
-	my->ENTITY_UNITTYPE = UNIT_Z;	
+    my->ENTITY_UNITTYPE = UNIT_Z;
 }
 
 void Z_Init()

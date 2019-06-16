@@ -22,6 +22,7 @@ struct out_vertex_main // Output to the pixelshader fragment
     float4 Pos		: POSITION;
     float2 TexCoord : TEXCOORD0;
     float3 Normal : TEXCOORD1;
+    float3 WorldPos : TEXCOORD2;
 };
 
 out_vertex_main vs_building_main(
@@ -33,7 +34,8 @@ out_vertex_main vs_building_main(
 
 	Out.Pos = DoTransform(inPos); // transform to screen coordinates
     Out.TexCoord = inTexCoord0.xy;
-    Out.Normal = inNormal;
+    Out.Normal = mul(float4(inNormal, 0.0), matWorld);
+    Out.WorldPos = mul(inPos, matWorld);
 
 	return Out;
 }
@@ -42,6 +44,7 @@ float4 ps_building_main(out_vertex_main In) : COLOR
 {
     float4 color = tex2D(sColorTex, In.TexCoord) * (fAmbient + 1.0f) * vecColor * 2.0f;
     color.rgb *= saturate(In.Normal.y * 0.5 + 0.5);
+    color.rgb += (1.0 - saturate(dot(normalize(vecViewPos.xyz-In.WorldPos), In.Normal))) * 0.3;
     return color;
 }
 
