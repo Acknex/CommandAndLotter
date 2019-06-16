@@ -117,6 +117,8 @@ PANEL* ui_create_radial_button(BMAP *initial_icon, void *ev)
 
 void update_or_create_lifebar(ENTITY *ent)
 {
+	if( ui_lifebar_counter >= 2000 ) { return; } 
+	
 	var health = unit_getHealth(ent);
 	var fac = health;
 
@@ -149,6 +151,40 @@ void update_or_create_lifebar(ENTITY *ent)
 	ui_lifebar_counter++;
 }
 
+void ui_add_dot_to_minimap(ENTITY *ent, int size, BMAP *dot, int counter)
+{
+	var px = (16000 - abs(ent->y + 8000)) / 16000;
+	var py = (16000 - abs(ent->x + 8000)) / 16000;
+	var t1 = pan_setwindow(ui_minimap, counter, px * bmap_width(ui_mm), py * bmap_height(ui_mm), size, size, dot, 0, 0);
+	if(!t1)
+	{
+		pan_setwindow(ui_minimap, 0, px * bmap_width(ui_mm) * scale_factor_x, py * bmap_height(ui_mm) * scale_factor_x, size, size, dot, 0, 0);
+	}
+}
+
+void ui_add_camera_to_minimap()
+{
+	var px = (16000 - abs(camera->y + 8000)) / 16000;
+	var py = (16000 - abs(camera->x + 8000)) / 16000;
+	var t1 = pan_setneedle(ui_minimap, 1, px * bmap_width(ui_mm), py * bmap_height(ui_mm), ui_bmap_camera, 8, 16, 0, 0, 360, camera.pan );
+	if(!t1)
+	{
+		pan_setneedle(ui_minimap, 0, px * bmap_width(ui_mm) * scale_factor_x, py * bmap_height(ui_mm) * scale_factor_x, ui_bmap_camera, 8, 16, 0, 0, 360, camera.pan );
+	}
+}
+
+void ui_minimap_click(PANEL *panel)
+{
+	var mpx = mouse_pos.x - panel->pos_x - (bmap_width(ui_mm) * scale_factor_x) / 2;
+	var mpy = mouse_pos.y - panel->pos_y - (bmap_height(ui_mm) * scale_factor_x) / 2;
+	
+	mpx /= (bmap_width(ui_mm) * scale_factor_x);
+	mpy /= (bmap_height(ui_mm) * scale_factor_x);
+	
+	mpx = mpx * 16000 * -1;
+	mpy = mpy * 16000 * -1;
+	topdown_camera_set_pos(vector(mpy, mpx, camera.z));
+}
 
 void ui_game_init()
 {
@@ -166,7 +202,8 @@ void ui_game_init()
 	ui_unit_meta = pan_create("", 99);
 	ui_game_menu = pan_create("", 99);
 	ui_portrait = pan_create("", 99);
-	ui_minimap = pan_create("", 99);
+	ui_minimap = pan_create("", 100);
+	ui_monitor = pan_create("", 99);
 
 	ui_radial_counter->bmap = ui_radial_n;
 	ui_radial_counter->flags = CENTER_X | CENTER_Y | UNTOUCHABLE;
@@ -207,6 +244,13 @@ void ui_game_init()
 
 	bmap_fill(ui_bmap_dead_indicator, vector(0, 0, 255), 100);
 	bmap_fill(ui_bmap_life_indicator, vector(0, 255, 0), 100);
+	
+	bmap_fill(ui_bmap_red, vector(0, 0, 255), 100);
+	bmap_fill(ui_bmap_green, vector(0, 255, 0), 100);
+	bmap_fill(ui_bmap_blue, vector(255, 0, 0), 100);
+	bmap_fill(ui_bmap_yellow, vector(0, 255, 255), 100);
+	bmap_fill(ui_bmap_cyan, vector(255, 255, 0), 100);
+	bmap_fill(ui_bmap_magenta, vector(255, 0, 255), 100);
 
 	ui_unit_meta->bmap = ui_bmap_units;
 	ui_unit_meta->pos_x = 3;
@@ -219,10 +263,19 @@ void ui_game_init()
 	ui_main_resources->flags |= ARIGHT;
 	pan_setdigits(ui_main_resources, 0, bmap_width(ui_bmap_resources) - 50, 13, "%.0f", ui_hud_font, 1, &a_stupid_var );
 
+	ui_monitor->bmap = ui_bmap_monitor;
+	ui_minimap->bmap = ui_mm;
+	ui_minimap->event = ui_minimap_click;
+
 }
 
 void ui_game_open()
 {
+	ui_monitor->flags |= SHOW;
+	ui_minimap->flags |= SHOW;
+	ui_minimap->pos_x = 46;
+	ui_minimap->pos_y = screen_size.y - (bmap_height(ui_bmap_monitor) + 14)  * scale_factor_x;
+	
 	ui_game_menu->pos_x = screen_size.x - bmap_width(ui_bmap_gamemenu) + 100;
 	ui_game_menu->pos_y = screen_size.y * 0.15;
 
@@ -236,6 +289,24 @@ void ui_game_close()
 {
 	ui_main_resources->flags &= ~SHOW;
 	ui_unit_meta->flags &= ~SHOW;
+	ui_hide_radial(ui_radial_sputnik);
+	ui_hide_radial(ui_radial_cbabe);
+	ui_hide_radial(ui_radial_skull);
+	ui_hide_radial(ui_radial_esel);
+	ui_game_menu->flags &= ~SHOW;
+	ui_radial_counter->flags &= ~SHOW;
+	ui_portrait->flags &= ~SHOW;
+	ui_minimap->flags &= ~SHOW;
+	ui_radial_delete->flags &= ~SHOW;
+	ui_monitor->flags &= ~SHOW;
+	
+	int i; for(i = 0; i < 2000; i++)
+	{
+		if( ui_life_indicator[i] )
+		{ 
+			ui_life_indicator[i]->flags &= ~SHOW;
+		}
+	}
 }
 
 void ui_game_update()
@@ -280,6 +351,8 @@ void ui_game_update()
 		}
 	}
 	
+	ui_add_camera_to_minimap();
+	
 	if( buildingState() == -1 )
 	{
 		button_state(ui_game_menu, 2, 0);
@@ -306,8 +379,12 @@ void ui_game_update()
 
 	ui_minimap->scale_x = scale_factor_x;
 	ui_minimap->scale_y = scale_factor_x;
-
-
+	
+	ui_monitor->scale_x = scale_factor_x;
+	ui_monitor->scale_y = scale_factor_x;
+	ui_monitor->pos_y = screen_size.y - bmap_height(ui_bmap_monitor) * scale_factor_x;
+	ui_minimap->pos_x = floor(46 * scale_factor_x + 0.5);
+	ui_minimap->pos_y = screen_size.y - bmap_height(ui_mm) * scale_factor_x - 12 * scale_factor_x;// + 18;// * scale_factor_x;
 
 	ui_lifebar_counter = 0;
 
@@ -333,7 +410,7 @@ void ui_game_update()
 	ui_unit_meta->pos_y = screen_size.y - bmap_height(ui_bmap_units) * scale_factor_x - 3;
 
 	int ui_max_type = 0;
-
+	int counter = 1;
 	SUBSYSTEM_LOOP(ent, SUBSYSTEM_SPAWNER)
 	{
 		if( ent->skill[39] )
@@ -372,8 +449,16 @@ void ui_game_update()
 				a_dummy_var = spawner_getQueue(ent);
 			}
 		}
+		
+		if( ent->group == GROUP_ENEMY_SPAWNER )
+		{
+			ui_add_dot_to_minimap(ent, 3, ui_bmap_green, counter);
+			counter++;
+			} else {
+			ui_add_dot_to_minimap(ent, 3, ui_bmap_red, counter);
+			counter++;
+		}
 	}
-
 	for(ent = ent_next(NULL); ent != NULL; ent = ent_next(ent))
 	{
 		if( ent->group == GROUP_PLAYER_UNIT)
@@ -404,12 +489,32 @@ void ui_game_update()
 				}
 				update_or_create_lifebar(ent);
 			}
+			
+			ui_add_dot_to_minimap(ent, 1, ui_bmap_cyan, counter);
+			counter++;
+		} 
+		else 
+		{
+			if( ent->group == GROUP_ENEMY_UNIT && ent->ENTITY_UNITTYPE != UNIT_Z)
+			{
+				ui_add_dot_to_minimap(ent, 1, ui_bmap_red, counter);
+				counter++;
+			}
+			
 		}
+	}
+	
+	SUBSYSTEM_LOOP(ent, SUBSYSTEM_Z)
+	{
+		ui_add_dot_to_minimap(ent, 1, ui_bmap_yellow, counter);
+		counter++;
 	}
 
 	if(ui_has_ents)
 	{
 		ui_unit_meta->flags |= SHOW;
+		ui_monitor->flags &= ~SHOW;
+		ui_minimap->flags &= ~SHOW;
 
 		if( ui_count_sputniks >= ui_count_esel && ui_count_sputniks >= ui_count_cbabes && ui_count_sputniks >= ui_count_skull )
 		{
@@ -435,6 +540,8 @@ void ui_game_update()
 	else
 	{
 		ui_unit_meta->flags &= ~SHOW;
+		ui_monitor->flags |= SHOW;
+		ui_minimap->flags |= SHOW;
 	}
 
 
@@ -489,7 +596,9 @@ void ui_game_update()
 	}
 	else if( ui_anim_unit_state == UI_ANIM_UNIT_ON )
 	{
-
+		ui_minimap->pos_x = 409;
+		ui_minimap->pos_y = 98;
+		ui_minimap->flags |= SHOW;
 	}
 	else if ( ui_anim_unit_state == UI_ANIM_UNIT_OFF )
 	{
@@ -585,6 +694,7 @@ void ui_game_update()
 
 			ui_radial_counter->scale_x = scale_factor_x;
 			ui_radial_counter->scale_y = scale_factor_x;
+			
 
 		}
 		else if ( ui_anim_state == UI_ANIM_OFF )
