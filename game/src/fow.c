@@ -3,6 +3,7 @@
 
 
 #define FOW_LIGHTNING_RANGE 2.5
+#define FOW_LIGHTNING_DURATION 2.0
 
 BMAP* FogBmap = "fow_fog4.png";
 int fow_lightningX[] = {-100,-100,-100};
@@ -163,7 +164,7 @@ void fov_uncover(VECTOR *pos, var range)
 
 int fow_calcoffset = 0;
 int fow_calcoffsetMAX = 16;
-var fow_lightningDuration = 0.2;
+var fow_lightningDuration = FOW_LIGHTNING_DURATION;
 void fow_update()
 {
 #ifdef USE_FOW
@@ -184,7 +185,7 @@ void fow_update()
 	fow_lightningDuration -= time_step;
 	if(fow_lightningDuration <= 0)
 	{
-        fow_lightningDuration = 2.0;
+        fow_lightningDuration = FOW_LIGHTNING_DURATION;
 		fow_numLigntnings = random(3);
 		for(i=0; i<fow_numLigntnings; ++i)
 		{
