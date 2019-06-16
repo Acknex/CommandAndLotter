@@ -117,6 +117,8 @@ PANEL* ui_create_radial_button(BMAP *initial_icon, void *ev)
 
 void update_or_create_lifebar(ENTITY *ent)
 {
+	if( ui_lifebar_counter >= 2000 ) { return; } 
+	
 	var health = unit_getHealth(ent);
 	var fac = health;
 
@@ -296,7 +298,15 @@ void ui_game_close()
 	ui_portrait->flags &= ~SHOW;
 	ui_minimap->flags &= ~SHOW;
 	ui_radial_delete->flags &= ~SHOW;
-	ui_minimap->flags &= ~SHOW;
+	ui_monitor->flags &= ~SHOW;
+	
+	int i; for(i = 0; i < 2000; i++)
+	{
+		if( ui_life_indicator[i] )
+		{ 
+			ui_life_indicator[i]->flags &= ~SHOW;
+		}
+	}
 }
 
 void ui_game_update()
