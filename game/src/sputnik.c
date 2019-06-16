@@ -248,11 +248,14 @@ void SPUTNIK__attack(ENTITY* ptr)
 	ANG_turnToPos(ptr, unit_getTarget(ptr), ptr->SPUTNIK_TURNSPEED, 5);
 	if (ptr->SPUTNIK_ANIMSTATEATK == 0)
 	{
-		switch(integer(random(2)))
+		if (num_sounds < 6)
 		{
-			case 0: snd_play(sputnik_snd_attack1, 100, 0); break;
-			case 1: snd_play(sputnik_snd_attack2, 100, 0); break;
-			case 2: snd_play(sputnik_snd_attack3, 100, 0); break;
+			switch(integer(random(2)))
+			{
+				case 0: snd_play(sputnik_snd_attack1, 30+random(10), 0); break;
+				case 1: snd_play(sputnik_snd_attack2, 30+random(10), 0); break;
+				case 2: snd_play(sputnik_snd_attack3, 30+random(10), 0); break;
+			}
 		}
 	}
 	ptr->SPUTNIK_ANIMSTATEATK += ptr->SPUTNIK_ATTACKSPEED * time_step;
