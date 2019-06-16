@@ -23,6 +23,7 @@
 PANEL *ui_main_resources;
 PANEL *ui_unit_meta;
 PANEL *ui_game_menu;
+PANEL *ui_monitor;
 
 PANEL *ui_radial_delete;
 PANEL *ui_radial_counter;
@@ -48,6 +49,13 @@ BMAP *ui_bmap_gamemenu = "H1.png";
 
 BMAP *ui_bmap_dead_indicator;
 BMAP *ui_bmap_life_indicator;
+BMAP *ui_bmap_yellow = "#2x2x24";
+BMAP *ui_bmap_magenta = "#2x2x24";
+BMAP *ui_bmap_cyan = "#2x2x24";
+BMAP *ui_bmap_red = "#2x2x24";
+BMAP *ui_bmap_green = "#2x2x24";
+BMAP *ui_bmap_blue = "#2x2x24";
+BMAP *ui_bmap_camera = "minimap_cam_marker.png";
 
 BMAP *ui_bmap_cbabe[3];
 BMAP *ui_bmap_sputnik[3];
@@ -98,6 +106,9 @@ BMAP *ui_face_eye3 = "ui_H4.png";
 BMAP *ui_face_noise1 = "Rauschen1.png";
 BMAP *ui_face_noise2 = "Rauschen2.png";
 BMAP *ui_face_noise3 = "Rauschen3.png";
+
+BMAP *ui_mm = "#288x324x24";
+BMAP *ui_bmap_monitor = "monitor.png";
 
 ENTITY* last_building;
 ENTITY* main_unit;

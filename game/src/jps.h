@@ -171,10 +171,10 @@
 	void mapSetTileValueAtPos3D(MAP* map, VECTOR* pos3d, int value);
 	int mapGetTileValueAtPos3D(MAP* map, VECTOR* pos3d);
 	
-TILE* mapGetEmptyTileForAI(MAP* map, int freeBorder);
+	TILE* mapGetEmptyTileForAI(MAP* map, int freeBorder);
 
-// firo, use this:
-int mapGetNearbyUnitsOfTypeForPos(VECTOR *vpos, int typeID, int owner, var maxDistance, int maxNumEntities);
+	// firo, use this:
+	int mapGetNearbyUnitsOfTypeForPos(VECTOR *vpos, int typeID, int owner, var maxDistance, int maxNumEntities);
 
 	/////////////////////////////////////////////////
 	// more available functions
@@ -217,7 +217,7 @@ int mapGetNearbyUnitsOfTypeForPos(VECTOR *vpos, int typeID, int owner, var maxDi
 
 	void presetsInit();
 
-void draw_line3D2(VECTOR* vFrom, VECTOR* vTo, COLOR* color, var alpha);
+	void draw_line3D2(VECTOR* vFrom, VECTOR* vTo, COLOR* color, var alpha);
 
 	void mapUpdateUnits(MAP* map);
 

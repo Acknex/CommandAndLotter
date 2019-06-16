@@ -61,13 +61,16 @@ void SPUTNIK__wait_or_walk(ENTITY * ptr)
 {
 	UNIT* unit = jpsAllowMovementForEntity(ptr, true);
 	if(!unit) return;
-	
+
 	vec_set(ptr->x, unit->pos3d);
 	VECTOR diff, temp;
 	vec_diff(diff, unit->pos3d, unit->prevPos3d);
-	var len = vec_to_angle(temp, diff)/time_step;
+	
+	var len = vec_to_angle(temp, diff);///time_step; //crashes for cbabe and eye for whatever reason
+
 	if(len > 8) ptr->SPUTNIK_RUNCOUNTER = 4;
 	//if(unit->isMoving) ptr->SPUTNIK_RUNCOUNTER = 12;
+
 	if(ptr->SPUTNIK_RUNCOUNTER > 0)
 	{
 		ptr->SPUTNIK_RUNCOUNTER = maxv(ptr->SPUTNIK_RUNCOUNTER-time_step,0);
@@ -87,6 +90,7 @@ void SPUTNIK__wait_or_walk(ENTITY * ptr)
 		ent_animate(ptr, SPUTNIK_WAITANIM, ptr->SPUTNIK_ANIMSTATE, ANM_CYCLE);
 	}
 	
+	//sputnik was hit
 	if (ptr->DAMAGE_HIT > 0)
 	{
 		if (ptr->ENTITY_STATE != ENTITY_STATE_HIT)
@@ -244,11 +248,14 @@ void SPUTNIK__attack(ENTITY* ptr)
 	ANG_turnToPos(ptr, unit_getTarget(ptr), ptr->SPUTNIK_TURNSPEED, 5);
 	if (ptr->SPUTNIK_ANIMSTATEATK == 0)
 	{
-		switch(integer(random(2)))
+		if (num_sounds < 6)
 		{
-			case 0: snd_play(sputnik_snd_attack1, 100, 0); break;
-			case 1: snd_play(sputnik_snd_attack2, 100, 0); break;
-			case 2: snd_play(sputnik_snd_attack3, 100, 0); break;
+			switch(integer(random(2)))
+			{
+				case 0: snd_play(sputnik_snd_attack1, 30+random(10), 0); break;
+				case 1: snd_play(sputnik_snd_attack2, 30+random(10), 0); break;
+				case 2: snd_play(sputnik_snd_attack3, 30+random(10), 0); break;
+			}
 		}
 	}
 	ptr->SPUTNIK_ANIMSTATEATK += ptr->SPUTNIK_ATTACKSPEED * time_step;
