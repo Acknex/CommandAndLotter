@@ -253,10 +253,14 @@ function DrawQuadDemo(){
 var MouseLeftLast = 0;
 var MouseRightLast = 0;
 
-
+SOUND * unit_management_taunt_jcl_move = "taunt-jcl-05.ogg";
+SOUND * unit_management_taunt_jcl_kill = "taunt-jcl-04.ogg";
 
 function SetDestForSelectd(VECTOR * Dest)
 {
+    if(random(100) < 50)
+        snd_play(unit_management_taunt_jcl_move, 100, 0);
+
     int Count = 0;
     ENTITY * ent;
     for(ent = ent_next(NULL); ent != NULL; ent = ent_next(ent)){
@@ -271,6 +275,9 @@ function SetDestForSelectd(VECTOR * Dest)
 
 function SetVictimForSelectd(ENTITY * Victim)
 {
+    if(random(100) < 50)
+        snd_play(unit_management_taunt_jcl_kill, 100, 0);
+
     int Count = 0;
     ENTITY * ent;
     for(ent = ent_next(NULL); ent != NULL; ent = ent_next(ent)){

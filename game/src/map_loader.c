@@ -11,6 +11,7 @@ typedef struct
 	float vegetation;
 	float elevation;
     float zettiness;
+    float streetyness;
 } maploader_cell;
 
 struct maploader_t
@@ -130,10 +131,17 @@ void maploader_load(char const * fileName)
             }
             */
 
-			((maploader.cells)[maploader.w * y + x]).celltype = 0;
+            int type;
+            if(col.blue >= 250)
+                type = MAPLOADER_TILE_BARRIER;
+            else
+                type = MAPLOADER_TILE_DEFAULT;
+
+			((maploader.cells)[maploader.w * y + x]).celltype = type;
 			((maploader.cells)[maploader.w * y + x]).vegetation = col.green / 255.0;
             ((maploader.cells)[maploader.w * y + x]).elevation = col.blue * 3;
             ((maploader.cells)[maploader.w * y + x]).zettiness = 1.0 - alpha / 100.0;
+            ((maploader.cells)[maploader.w * y + x]).streetyness = col.red / 255.0;
 		}
 	}
 
@@ -222,14 +230,29 @@ void maploader_load(char const * fileName)
         for(y = 0; y < maploader.h; y++)
         {
             int type = maploader_tile_type(x, y);
+            float v = maploader_tile_vegetation(x, y);
+            float s = maploader_tile_streetyness(x, y);
             if(type != MAPLOADER_TILE_DEFAULT)
                 continue;
             VECTOR pos;
             maploader_pos_to_vec(pos, x, y);
 
+            pos.x += (maploader_cellsize * maploader_trisize) * (random(1) - 0.5);
+            pos.y += (maploader_cellsize * maploader_trisize) * (random(1) - 0.5);
+
+            if(v < 0.1 && s < 0.2 && random(100) < 3)
+            {
+                you = ent_create("kabel4.mdl", pos, NULL);
+                you->pan = random(360);
+            }
+            else if(v < 0.1 && s < 0.1 && random(100) < 0.5)
+            {
+                you = ent_create("KisteA.mdl", pos, NULL);
+                you->pan = random(360);
+            }
+
             if(random(100) > 50)
             {
-                float v = maploader_tile_vegetation(x, y);
                 if(v > 0.2)
                 {
                     if(random(100) < pow(v, 6.0) * 100) {
@@ -323,6 +346,11 @@ float maploader_tile_height(int x, int y)
 float maploader_tile_zettiness(int x, int y)
 {
     return ((maploader.cells)[maploader.w * y + x]).zettiness;
+}
+
+float maploader_tile_streetyness(int x, int y)
+{
+    return ((maploader.cells)[maploader.w * y + x]).streetyness;
 }
 
 int   maploader_get_type(VECTOR * v)
