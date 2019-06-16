@@ -184,7 +184,7 @@ void fow_update()
 	fow_lightningDuration -= time_step;
 	if(fow_lightningDuration <= 0)
 	{
-		fow_lightningDuration = 0.3;
+        fow_lightningDuration = 2.0;
 		fow_numLigntnings = random(3);
 		for(i=0; i<fow_numLigntnings; ++i)
 		{
