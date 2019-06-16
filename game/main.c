@@ -4,8 +4,6 @@
 
 #define PRAGMA_PATH "%EXE_DIR%\\code"; // fx files
 
-#define DEBUG
-
 #ifdef DEBUG
 #include <default.c>
 #endif
