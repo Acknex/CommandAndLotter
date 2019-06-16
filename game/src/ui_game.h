@@ -68,6 +68,9 @@ BMAP *ui_icon_skull = "ui_H4.png";
 BMAP *ui_icon_esel = "ui_H3.png";
 
 BMAP *ui_icon_blank = "ico_s_2.png";
+BMAP *ui_icon_tower = "Ico_S_2Bui2.png";
+BMAP *ui_icon_farm = "Ico_S_2Bui.png";
+BMAP *ui_icon_bank = "Ico_S_2Bui3.png";
 
 ENTITY* last_building;
 ENTITY* main_unit;
