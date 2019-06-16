@@ -88,10 +88,10 @@ ENTITY* spawner_spawn(int unittype, VECTOR* pos, var angle, var owner)
 		wireframe->pan = angle;
 		mapSetTileValueAtPos3D(mapGetCurrent(), pos, 1); // 1 == solid, non-traversable
 		mapJPSUpdate(mapGetCurrent());
-		
+
 		if(owner == PLAYER_ID_PLAYER)
 			fov_uncover(pos, SPAWNER_LOS);
-		
+
 		ent->ENTITY_UNITTYPE = unittype;
 		if (owner == SPAWNER_ENEMY)
 		{
@@ -112,7 +112,7 @@ ENTITY* spawner_spawn(int unittype, VECTOR* pos, var angle, var owner)
 			ent->SPAWNER_WIREFRAME = wireframe;
 		}
 	}
-	
+
 	return ent;
 }
 
@@ -178,7 +178,7 @@ void Spawner()
 	my->SPAWNER_BUILDTIMER = SPAWNER_BUILDTIME;
 	my->SPAWNER_DIETIMER = SPAWNER_DIETIME;
 
-	my->z = maploader_get_height(my->x) - my->min_z;			
+	my->z = maploader_get_height(my->x) - my->min_z;
 	my->SPAWNER_BASEX = my->x;
 	my->SPAWNER_BASEY = my->y;
 	my->SPAWNER_BASEZ = my->z;
@@ -198,13 +198,13 @@ void SPAWNER_Update()
 		{
 			SPAWNER__hitcheck(ptr);
 		}
-	
+
 		if (ptr->DAMAGE_HIT > 0)
       {
       	SPAWNER__hit(ptr);
 		}
-	
-		switch(ptr->ENTITY_STATE)    	
+
+		switch(ptr->ENTITY_STATE)
 		{
 
 			case SPAWNER_STATE_CONSTRUCT:
@@ -235,14 +235,14 @@ void SPAWNER_Update()
 			{
 				break;
 			}
-		}	
-	
-	}	
+		}
+
+	}
 }
 
 void SPAWNER__hit(ENTITY* ptr)
 {
-	ptr->ENTITY_HITTHRESHOLD = 3;				
+	ptr->ENTITY_HITTHRESHOLD = 3;
 
 	ptr->HEALTH = maxv(0, ptr->HEALTH - ptr->DAMAGE_HIT);
 	ptr->DAMAGE_HIT = 0;
@@ -260,7 +260,7 @@ void SPAWNER__hitcheck(ENTITY* ptr)
 	if (ptr->ENTITY_HITTHRESHOLD > 0)
 	{
 		ptr->ENTITY_HITTHRESHOLD -= time_step;
-		
+
 		if (ptr->ENTITY_HITTHRESHOLD <= 0)
 		{
 			ptr->ENTITY_HITTHRESHOLD = 0;
@@ -272,21 +272,21 @@ void SPAWNER__hitcheck(ENTITY* ptr)
 void SPAWNER__construct(ENTITY* ptr)
 {
 	ptr->SPAWNER_PROGRESS += 5 * time_step;
-	
+
 	var percentage = ptr->SPAWNER_PROGRESS * (ptr.max_z + 200) / 100;
 	ptr->skill41 = floatv(percentage);
 	ptr->skill42 = floatv(ptr->max_x * 0.5);
 	ptr->skill43 = floatv(clamp((80.0 - ptr->SPAWNER_PROGRESS)/20.0, 0.0, 1.0));
-	
+
 	ptr->skill45 = floatv(ptr->x);
 	ptr->skill46 = floatv(ptr->z);
 	ptr->skill47 = floatv(ptr->y);
-	
+
 	ENTITY *wireframe = ptr->SPAWNER_WIREFRAME;
 	if(wireframe != NULL)
 	{
 		wireframe->skill41 = floatv(percentage);
-		
+
 		wireframe->skill45 = floatv(wireframe->x);
 		wireframe->skill46 = floatv(wireframe->z);
 		wireframe->skill47 = floatv(wireframe->y);
@@ -317,16 +317,16 @@ void SPAWNER__produce(ENTITY* ptr)
 {
 	ptr->SPAWNER_BUILDTIMER -= time_step;
 	var progress = 100 * (1 - (ptr->SPAWNER_BUILDTIMER / SPAWNER_BUILDTIME));
-	ent_animate(ptr, SPAWNER_PRODUCEANIM, progress, 0);
-	
+	ent_animate(ptr, SPAWNER_PRODUCEANIM, clamp(progress, 0, 100), 0);
+
 	if (ptr->SPAWNER_BUILDTIMER <= 0)
 	{
 		ptr->SPAWNER_BUILDTIMER = SPAWNER_BUILDTIME;
 		ptr->SPAWNER_QUEUE--;
-		
+
 		//meh.
 		var owner;
-		if (ptr->group == GROUP_ENEMY_SPAWNER)	
+		if (ptr->group == GROUP_ENEMY_SPAWNER)
 			owner = UNIT_ENEMY;
 		else
 			owner = UNIT_PLAYER;
