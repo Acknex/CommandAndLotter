@@ -183,6 +183,7 @@ void SPUTNIK__hit(ENTITY* ptr)
 		ptr->SPUTNIK_ANIMSTATE = 0;
 		snd_play(sputnik_snd_death, 100, 0);
 		set(ptr, PASSABLE);		
+		jpsUnitDestroy(jpsUnitGetFromEntity(ptr));
 	}
 	else if (ptr->ENTITY_HITTHRESHOLD <= 0)
 	{

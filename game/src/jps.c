@@ -773,8 +773,9 @@ int mapGetNearbyUnitsOfTypeForPos(VECTOR *vpos, int typeID, int owner, var maxDi
 	int range = 1+maxDistance/map->tileSize;
 	int ownerMin = 0;
 	int ownerMax = 1;
-	if(owner == 0) ownerMax = 0;
-	if(owner == 1) ownerMin = 1;
+	int currentPlayer;
+	if(owner == UNIT_PLAYER) currentPlayer = 1; 
+	if(owner == UNIT_ENEMY) currentPlayer = 0; 
 	int i,j;
 	for(i = sourceTile->pos[0]-range; i <= sourceTile->pos[0]+range; i++)
 	{
@@ -786,20 +787,17 @@ int mapGetNearbyUnitsOfTypeForPos(VECTOR *vpos, int typeID, int owner, var maxDi
 				if (tile->visibility == FOW_SCOUTED)
 				{
 					int k;
-					int currentPlayer;
-					for(currentPlayer = ownerMin; currentPlayer < ownerMax; ++currentPlayer)
-					{		
-						for(k = 0; k < tile->numUnits[currentPlayer]; k++)
+					for(k = 0; k < tile->numUnits[currentPlayer]; k++)
+					{
+						UNIT* unit = tile->unitArray[k];
+						ENTITY* ent = unit->ent;
+						if(ent)
 						{
-							UNIT* unit = tile->unitArray[k];
-							ENTITY* ent = unit->ent;
-							if(ent)
+							//removing units from jps either does not work or happens too late... filter dead units
+							if(typeID < 0 || typeID == unit_getType(ent) && ent->HEALTH > 0 /* dirty hack */)
 							{
-								if(owner < 0 || owner == unit_getType(ent))
-								{
-									pointerArray[pointerArrayNum++] = tile->unitArray[k];
-									if(pointerArrayNum >= POINTER_ARRAY_MAX || pointerArrayNum >= maxNumEntities) return pointerArrayNum;
-								}
+								pointerArray[pointerArrayNum++] = tile->unitArray[k];
+								if(pointerArrayNum >= POINTER_ARRAY_MAX || pointerArrayNum >= maxNumEntities) return pointerArrayNum;
 							}
 						}
 					}

@@ -175,12 +175,9 @@ void unit_findNextVictim(ENTITY* ptr)
 			else
 				owner = UNIT_PLAYER;
 		
-			int count = mapGetNearbyUnitsOfTypeForPos(ptr->x, ptr->ENTITY_VICTIMTYPE, owner, 2000, 1);
-			if (count > 0)
+			if (mapGetNearbyUnitsOfTypeForPos(ptr->x, ptr->ENTITY_VICTIMTYPE, owner, 2000, 1) > 0)
 			{
-				cprintf1("FOUND!(%d)", count);
 				ent = jpsGetEntityFromUnitArray(0);
-				
 				//set new target and victim
 				unit_setTarget(ptr, &ent->x);
 				unit_setVictim(ptr, ent);
