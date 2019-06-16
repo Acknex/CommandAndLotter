@@ -158,6 +158,7 @@ void fov_uncover(VECTOR *pos, var range)
 
 int fow_calcoffset = 0;
 int fow_calcoffsetMAX = 16;
+var fow_lightningDuration = 0.08;
 void fow_update()
 {
 #ifdef USE_FOW
@@ -175,8 +176,10 @@ void fow_update()
 		}
 	}
 	
-	//if(random(1)>0.8)
+	fow_lightningDuration -= time_step;
+	if(fow_lightningDuration <= 0)
 	{
+		fow_lightningDuration = 0.1;
 		fow_numLigntnings = random(3);
 		for(i=0; i<fow_numLigntnings; ++i)
 		{
