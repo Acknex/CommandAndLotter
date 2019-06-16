@@ -444,7 +444,7 @@ void ui_game_update()
 		{
 			ui_add_dot_to_minimap(ent, 3, ui_bmap_green, counter);
 			counter++;
-		} else {
+			} else {
 			ui_add_dot_to_minimap(ent, 3, ui_bmap_red, counter);
 			counter++;
 		}
@@ -586,7 +586,9 @@ void ui_game_update()
 	}
 	else if( ui_anim_unit_state == UI_ANIM_UNIT_ON )
 	{
-
+		ui_minimap->pos_x = 409;
+		ui_minimap->pos_y = 98;
+		ui_minimap->flags |= SHOW;
 	}
 	else if ( ui_anim_unit_state == UI_ANIM_UNIT_OFF )
 	{
@@ -683,9 +685,6 @@ void ui_game_update()
 			ui_radial_counter->scale_x = scale_factor_x;
 			ui_radial_counter->scale_y = scale_factor_x;
 			
-			ui_minimap->pos_x = 409;
-			ui_minimap->pos_y = 98;
-			ui_minimap->flags |= SHOW;
 
 		}
 		else if ( ui_anim_state == UI_ANIM_OFF )
