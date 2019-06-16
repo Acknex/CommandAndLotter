@@ -135,3 +135,11 @@ int unit_getType(ENTITY* ent)
 	}
 	return -1;
 }
+
+
+
+void unit_set_state(ENTITY* ptr, int state)
+{
+	if(!ptr) return;
+	ptr->ENTITY_STATE = state;
+}
