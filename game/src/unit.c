@@ -77,12 +77,15 @@ ENTITY* unit_spawn(int unittype, VECTOR* pos, VECTOR* targetPos, var owner)
 			break;
 		
 		case UNIT_LERCHE:
+			ent = ent_create("cEselslerche.mdl", pos, Sputnik);
 			break;
 		
 		case UNIT_EYE:
+			ent = ent_create("eye.mdl", pos, Sputnik);
 			break;
 		
 		case UNIT_BABE:
+			ent = ent_create("cbabe.mdl", pos, Sputnik);
 			break;
 		
 		default:

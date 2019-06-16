@@ -59,12 +59,12 @@ MATERIAL * building_material =
 ENTITY* spawner_spawn(int unittype, VECTOR* pos, var owner)
 {
 	ENTITY* ent;
-    ENTITY *wireframe;
+   ENTITY *wireframe;
 	switch (unittype)
 	{
         case UNIT_SPUTNIK:
-            ent = ent_create("the_tower.mdl", pos, Spawner);
-            wireframe = ent_create("the_tower_wireframe.mdl", pos, NULL);
+            ent = ent_create("sputnik_trash_press.mdl", pos, Spawner);
+            wireframe = ent_create("sputnik_trash_press_wf.mdl", pos, NULL);
             break;
         case UNIT_LERCHE:
             ent = ent_create("lark_farm.mdl", pos, Spawner);
@@ -113,7 +113,11 @@ var spawner_produce(ENTITY* ent)
 	{
 		if (ent->group == GROUP_ENEMY_SPAWNER || ent->group == GROUP_PLAYER_SPAWNER)
 		{
-			ent->SPAWNER_QUEUE++;
+			if(z_isSufficient(spawner_unit_cost[ent->ENTITY_UNITTYPE]))
+			{
+				z_pay(spawner_unit_cost[ent->ENTITY_UNITTYPE]);
+				ent->SPAWNER_QUEUE++;
+			}
 			return ent->SPAWNER_QUEUE;
 		}
 	}
@@ -256,38 +260,34 @@ void SPAWNER__hitcheck(ENTITY* ptr)
 
 void SPAWNER__construct(ENTITY* ptr)
 {
-    ptr->SPAWNER_PROGRESS += 5 * time_step;
+	ptr->SPAWNER_PROGRESS += 5 * time_step;
+	
+	var percentage = ptr->SPAWNER_PROGRESS * (ptr.max_z + 200) / 100;
+	ptr->skill41 = floatv(percentage);
+	ptr->skill42 = floatv(ptr->max_x * 0.5);
+	ptr->skill43 = floatv(clamp((80.0 - ptr->SPAWNER_PROGRESS)/20.0, 0.0, 1.0));
+	
+	ptr->skill45 = floatv(ptr->x);
+	ptr->skill46 = floatv(ptr->z);
+	ptr->skill47 = floatv(ptr->y);
+	
+	ENTITY *wireframe = ptr->SPAWNER_WIREFRAME;
+	if(wireframe != NULL)
+	{
+		wireframe->skill41 = floatv(percentage);
+		
+		wireframe->skill45 = floatv(wireframe->x);
+		wireframe->skill46 = floatv(wireframe->z);
+		wireframe->skill47 = floatv(wireframe->y);
+	}
+
 	if (ptr->SPAWNER_PROGRESS >= 100)
 	{
 		ptr->SPAWNER_PROGRESS = 100;
 		ptr->ENTITY_STATE = SPAWNER_STATE_ACTIVE;
+		ptr->SPAWNER_WIREFRAME = NULL;
+		ptr_remove(wireframe);
 	}
-
-
-    var percentage = ptr->SPAWNER_PROGRESS * (ptr.max_z + 200) / 100;
-    ptr->skill41 = floatv(percentage);
-    ptr->skill42 = floatv(ptr->max_x * 0.5);
-    ptr->skill43 = floatv(clamp((80.0 - ptr->SPAWNER_PROGRESS)/20.0, 0.0, 1.0));
-
-    ptr->skill45 = floatv(ptr->x);
-    ptr->skill46 = floatv(ptr->z);
-    ptr->skill47 = floatv(ptr->y);
-
-    ENTITY *wireframe = ptr->SPAWNER_WIREFRAME;
-    if(wireframe != NULL)
-    {
-        wireframe->skill41 = floatv(percentage);
-
-        wireframe->skill45 = floatv(wireframe->x);
-        wireframe->skill46 = floatv(wireframe->z);
-        wireframe->skill47 = floatv(wireframe->y);
-    }
-
-    if(ptr->ENTITY_STATE == SPAWNER_STATE_ACTIVE)
-    {
-        ptr->SPAWNER_WIREFRAME = NULL;
-        ent_remove(wireframe);
-    }
 }
 
 void SPAWNER__active(ENTITY* ptr)
@@ -308,12 +308,10 @@ void SPAWNER__produce(ENTITY* ptr)
 	var progress = 100 * (1 - (ptr->SPAWNER_BUILDTIMER / SPAWNER_BUILDTIME));
 	ent_animate(ptr, SPAWNER_PRODUCEANIM, progress, 0);
 	
-	if (ptr->SPAWNER_BUILDTIMER <= 0 && z_isSufficient(spawner_unit_cost[ptr->ENTITY_UNITTYPE]))
+	if (ptr->SPAWNER_BUILDTIMER <= 0)
 	{
 		ptr->SPAWNER_BUILDTIMER = SPAWNER_BUILDTIME;
 		ptr->SPAWNER_QUEUE--;
-		
-		z_pay(spawner_unit_cost[ptr->ENTITY_UNITTYPE]);
 		
 		//meh.
 		var owner;

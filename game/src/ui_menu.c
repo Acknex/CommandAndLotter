@@ -121,8 +121,9 @@ uimenu_element_t * uimenu_make_simple_button(var x, var y, var width, var height
         finalFont = uimenu_default_font;
     
     uimenu_element_t * element = uimenu_element_create(UIMENU_TYPE_TEXTBUTTON, x, y, width, height);
+    var stringWidth = str_width(text, finalFont);
 
-    element->_related = uimenu_make_text(x + 10, y + 5, width, height, text, vector(0, 0, 0), finalFont);
+    element->_related = uimenu_make_text(x + (width / 2) - (stringWidth / 2) , y + 5, width, height, text, vector(0, 0, 0), finalFont);
     element->callback = callback;
 
     return element;    
