@@ -79,6 +79,18 @@ void uimenu_add_element_to_window(uimenu_window_t * window, uimenu_element_t * e
     window->_first = element;
 }
 
+void uimenu_slave_window_to_window(uimenu_window_t * master, uimenu_window_t * slave)
+{
+    if(slave == NULL) error("UIMENU: slave must not be NULL");
+
+    slave->_parent = master;
+    if(master != NULL)
+    {
+        slave->_child = master->_child;
+        master->_child = slave;
+    }
+}
+
 uimenu_element_t * uimenu_make_text(var x, var y, var width, var height, char * text, COLOR * colorBGR, FONT * font)
 {
     uimenu_element_t * element = uimenu_element_create(UIMENU_TYPE_TEXT, x, y, width, height);
@@ -172,11 +184,8 @@ void uimenu_window_initialize(uimenu_window_t * window)
 
         // Window Borders and colors
         window->_panel->flags |= (LIGHT);
-        //window->_content_panel->flags |= (LIGHT);
         vec_set(window->_panel->blue, vector(UIMENU_WINDOW_BORDER_COLOR_B, UIMENU_WINDOW_BORDER_COLOR_G, UIMENU_WINDOW_BORDER_COLOR_R));
-        //vec_set(window->_content_panel->blue, vector(UIMENU_WINDOW_WINDOW_COLOR_B, UIMENU_WINDOW_WINDOW_COLOR_G, UIMENU_WINDOW_WINDOW_COLOR_R));
-
-        
+                
         // Add title bar
         window->_title_element_bg_bmap = bmap_createblack(
             window->width - (UIMENU_WINDOW_BORDER_SIZE * 2), 
@@ -239,14 +248,7 @@ BMAP * uimenu_make_button_graphic(int width, int height, int pressed, int tab)
     bmap_fill(final, vector(UIMENU_WINDOW_WINDOW_COLOR_B * 0.75, UIMENU_WINDOW_WINDOW_COLOR_G * 0.75, UIMENU_WINDOW_WINDOW_COLOR_R * 0.75), 100);
     bmap_fill(canvas, vector(UIMENU_WINDOW_WINDOW_COLOR_B * 1.25, UIMENU_WINDOW_WINDOW_COLOR_G * 1.25, UIMENU_WINDOW_WINDOW_COLOR_R * 1.25), 100);
 
-    // if(!pressed)
-    // {
     bmap_blitpart(final, canvas, vector(pressed, pressed, 0), vector(width - 1, height - 1, 0), vector(0, 0, 0), vector(width - 1, height - 1, 0));
-    // }
-    // else
-    // {
-    //     bmap_blitpart(final, canvas, vector(1, 1, 0), vector(width - 1, height - 1, 0), vector(0, 0, 0), vector(width - 1, height - 1, 0));
-    // }
 
     bmap_fill(canvas, vector(UIMENU_WINDOW_WINDOW_COLOR_B, UIMENU_WINDOW_WINDOW_COLOR_G, UIMENU_WINDOW_WINDOW_COLOR_R), 100);
     bmap_blitpart(final, canvas, vector(1, 1, 0), vector(width - 2, height - 2 - tab, 0), vector(0, 0, 0), vector(width - 2, height - 2 - tab, 0));
@@ -340,8 +342,16 @@ void uimenu_sync_panel_with_window(uimenu_window_t * window)
 
     if(window->_is_dirty == TRUE)
     {
-        window->_panel->pos_x = window->x;
-        window->_panel->pos_y = window->y;
+        if(window->_parent == NULL)
+        {
+            window->_panel->pos_x = window->x;
+            window->_panel->pos_y = window->y;
+        }
+        else
+        {
+            window->_panel->pos_x = window->_parent->_content_panel->pos_x + window->x;
+            window->_panel->pos_y = window->_parent->_content_panel->pos_y + window->y;
+        }
 
         if(window->width > 0)
             window->_panel->size_x = window->width;
@@ -368,23 +378,27 @@ void uimenu_sync_panel_with_window(uimenu_window_t * window)
     if((window->_panel->pos_x + window->_panel->size_x) > screen_size.x)
     {
         window->x = screen_size.x - window->_panel->size_x;
-        window->_is_dirty = true;
+        // window->_is_dirty = true;
+        uimenu_window_make_dirty(window);
     }
     if(window->_panel->pos_x < 0)
     {
         window->_panel->pos_x = 0;
-        window->_is_dirty = true;
+        // window->_is_dirty = true;
+        uimenu_window_make_dirty(window);
         if(window->_is_borderless == FALSE) fixContent = true;
     }
     if((window->_panel->pos_y + window->_panel->size_y) > screen_size.y)
     {
         window->y = screen_size.y - window->_panel->size_y;
-        window->_is_dirty = true;
+        // window->_is_dirty = true;
+        uimenu_window_make_dirty(window);
     }
     if(window->_panel->pos_y < 0)
     {
         window->_panel->pos_y = 0;
-        window->_is_dirty = true;
+        // window->_is_dirty = true;
+        uimenu_window_make_dirty(window);
         if(window->_is_borderless == FALSE) fixContent = true;
     }
 
@@ -400,7 +414,8 @@ void uimenu_sync_panel_with_window(uimenu_window_t * window)
 void uimenu_window_to_top(uimenu_window_t * window)
 {    
     window->layer = uimenu_last_layer;
-    window->_is_dirty = true;
+    // window->_is_dirty = true;
+    uimenu_window_make_dirty(window);
 
     uimenu_last_layer += 100;
 }
@@ -462,6 +477,8 @@ void uimenu_window_show(uimenu_window_t * window)
             window->_content_panel->flags |= SHOW;
 
         window->_is_visible = TRUE;
+        // window->_is_dirty = TRUE;
+        uimenu_window_make_dirty(window);
     }
 }
 
@@ -477,6 +494,14 @@ void uimenu_window_hide(uimenu_window_t * window)
 
         window->_is_visible = FALSE;
     }
+}
+
+void uimenu_window_make_dirty(uimenu_window_t * window)
+{
+    if(window == NULL) return; // Fail gracefully
+    window->_is_dirty = TRUE;
+    if(window->_child != NULL)
+        uimenu_window_make_dirty(window->_child);
 }
 
 void uimenu_element_update(uimenu_element_t * element)
@@ -533,12 +558,14 @@ void uimenu_window_update(uimenu_window_t * window)
             {
                 window->x = mouse_pos.x - window->_moving_start_offset[0];
                 window->y = mouse_pos.y - window->_moving_start_offset[1];
-                window->_is_dirty = TRUE;
+                // window->_is_dirty = TRUE;
+                uimenu_window_make_dirty(window);
             }
             else if(window->_is_moving && !mouse_left)
             {
                 window->_is_moving = FALSE;
-                window->_is_dirty = TRUE;
+                // window->_is_dirty = TRUE;
+                uimenu_window_make_dirty(window);
             }
         }
         
