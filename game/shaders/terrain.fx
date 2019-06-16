@@ -14,6 +14,7 @@ Texture maploader_terrain_splatter_bmap;
 Texture maploader_terrain_street_digital_bmap;
 Texture maploader_terrain_street_analogue_bmap;
 Texture maploader_terrain_digital_fancy_bmap;
+Texture maploader_terrain_digital_wall_bmap;
 Texture shader_noise_bmap;
 
 sampler sDigital = sampler_state { Texture = <maploader_terrain_digital_bmap>; MipFilter = Anisotropic; MinFilter = Anisotropic; MagFilter = Linear; };
@@ -23,6 +24,7 @@ sampler sNoise = sampler_state { Texture = <shader_noise_bmap>; MipFilter = Anis
 sampler sStreetDigital = sampler_state { Texture = <maploader_terrain_street_digital_bmap>; MipFilter = Anisotropic; MinFilter = Anisotropic; MagFilter = Linear; };
 sampler sStreetAnalog = sampler_state { Texture = <maploader_terrain_street_analogue_bmap>; MipFilter = Anisotropic; MinFilter = Anisotropic; MagFilter = Linear; };
 sampler sDigitalFancy = sampler_state { Texture = <maploader_terrain_digital_fancy_bmap>; MipFilter = Anisotropic; MinFilter = Anisotropic; MagFilter = Linear; };
+sampler sDigitalWall = sampler_state { Texture = <maploader_terrain_digital_wall_bmap>; MipFilter = Anisotropic; MinFilter = Anisotropic; MagFilter = Linear; };
 
 float4x4 matWorld;
 float4x4 matWorldViewProj;
@@ -72,6 +74,12 @@ float4 textureNoTile( float2 x )
 
 float4 ps_terraintex3(out_terraintex3 In) : COLOR
 {
+    float3 fakenormal = normalize(cross(normalize(ddx(In.world)), normalize(ddy(In.world))));
+
+    float use_walls = step(dot(float3(0,1,0), fakenormal), 0.4);
+
+    float lighting = lerp(1.0, 0.6, use_walls);
+
     float4 attribs = tex2D(sMaskTex, In.uv);
 
     float road = attribs.r;
@@ -95,10 +103,12 @@ float4 ps_terraintex3(out_terraintex3 In) : COLOR
     float4 digital = lerp(ground_digital, road_digital, road);
     float4 analog = lerp(ground_analog, road_analog, road);
 
+    float analfactor = smoothstep(0.0, 1.0, 0.5 + 100.0 * (vegetation - 0.5 * analog.a));
+
     float4 surface = lerp(
         digital,
         analog,
-        smoothstep(0.0, 1.0, 0.5 + 100.0 * (vegetation - 0.5 * analog.a))
+        analfactor
     );
 
     float4 final = lerp(
@@ -106,6 +116,17 @@ float4 ps_terraintex3(out_terraintex3 In) : COLOR
       float4(0,0,0,0),
       clamp(-0.001 * In.world.y, 0.0, 1.0)
     );
+
+    float4 digital_wall = tex2D(sDigitalWall, float2(In.world.x + In.world.z, In.world.y) / 256.0);
+    float4 analog_wall = tex2D(sAnalog, float2(In.world.x + In.world.z, In.world.y) / 256.0);
+
+    final = lerp(
+      final,
+      lerp(digital_wall, analog_wall, analfactor),
+      use_walls
+    );
+
+    final.rgb *= lighting;
     final.a = 1.0;
     return final;
 }
