@@ -266,6 +266,7 @@ void maploader_load(char const * fileName)
                             boom = "tree03.mdl";
 
                         you = ent_create(boom, pos, NULL);
+                        reset(you, SHADOW);
                         you->material = matTrees;
                         you->red = 100;
                         you->green = 100;

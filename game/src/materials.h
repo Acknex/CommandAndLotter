@@ -162,7 +162,7 @@ void updateRenderTargetsIfNeeded()
 {
     if(AmazingRendertargetCounter == 1)
     {
-        // materials_reinit();
+        materials_reinit();
         mainmenu_resolution_update();
     }
 
@@ -171,7 +171,7 @@ void updateRenderTargetsIfNeeded()
 
 void SetupPostprocessing()
 {
-    // materials_reinit();
+    materials_reinit();
 
     on_d3d_reset = rendertargetUpdateBlubb;
 }
