@@ -469,7 +469,7 @@ function UnitControl()
             c_trace(camera.x, temp,USE_POLYGON | IGNORE_PASSENTS);
             if(you != 0){
                  if(you->group==GROUP_ENEMY_UNIT  || you->group==GROUP_NEUTRAL_UNIT  || you->group == GROUP_ENEMY_SPAWNER){
-                    SetVictimForSelectd(you);
+//                    SetVictimForSelectd(you); //will be overwritten here
                     CmdType = EFFECTS2D_TYPE_ATTACK;
                     if(unit_getType(you) == UNIT_Z){
                        CmdType = EFFECTS2D_TYPE_MINE;
@@ -495,10 +495,12 @@ function UnitControl()
             case EFFECTS2D_TYPE_ATTACK:
                 group = unit_management_taunt_attack;
                 count = UNIT_MANAGEMENT_TAINT_ATTACK_COUNT;
+                SetVictimForSelectd(you); //victim must be set after dest, as setting dest resets victim by default
                 break;
             case EFFECTS2D_TYPE_MINE:
                 group = unit_management_taunt_mine;
                 count = UNIT_MANAGEMENT_TAINT_MINE_COUNT;
+                SetVictimForSelectd(you); //victim must be set after dest, as setting dest resets victim by default
                 break;
             }
 
