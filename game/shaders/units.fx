@@ -11,6 +11,7 @@
 #include <fog>
 #include <normal>
 #include <color>
+#include <bones>
 
 Texture entSkin1;
 float fAmbient;
@@ -27,11 +28,13 @@ struct out_vertex_main // Output to the pixelshader fragment
 out_vertex_main vs_building_main(
 	float4 inPos : POSITION,
 	float3 inNormal : NORMAL,
+    int4 inIndices : BLENDINDICES,
+    float4 inWeights : BLENDWEIGHT,
 	float2 inTexCoord0 : TEXCOORD0)
 {
     out_vertex_main Out;
 
-	Out.Pos = DoTransform(inPos); // transform to screen coordinates
+    Out.Pos = DoTransform(DoBones(inPos, inIndices, inWeights)); // transform to screen coordinates
     Out.TexCoord = inTexCoord0.xy;
     Out.Normal = inNormal;
 
