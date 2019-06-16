@@ -5,6 +5,8 @@
 #include "materials.h"
 
 #define Z_VALUE 10
+#define Z_PER_DAMAGE 0.2
+#define Z_VALUE_LEFT skill[20]
 
 SOUND* z_collect_snd = "z_collect.wav";
 var z_amount = 0;
@@ -12,6 +14,20 @@ var z_amount = 0;
 var z_get()
 {
 	return z_amount;
+}
+
+
+bool z_isSufficient(var amount)
+{
+	return (amount <= z_amount);
+}
+
+bool z_pay(var amount)
+{
+	if(amount > z_amount)
+		return false;
+	z_amount -= amount;
+	return true;
 }
 
 ENTITY* z_spawn(VECTOR* pos)
@@ -33,6 +49,7 @@ void Z()
 	my->ENTITY_STATE = ENTITY_STATE_WAIT_OR_WALK;
     my->ENTITY_UNITTYPE = UNIT_Z;
     my->material = matCrystals;
+    my->Z_VALUE_LEFT = Z_VALUE;
 }
 
 void Z_Init()
@@ -78,12 +95,20 @@ void Z_Update()
 }
 
 void Z__hit(ENTITY* ptr)
-{
-	ptr->ENTITY_STATE = ENTITY_STATE_DIE;
-	ptr->ENTITY_ANIM = 100;
+{	
 	snd_play(z_collect_snd, 100, 0);
-	z_amount += Z_VALUE;
+	z_amount += minv(Z_VALUE, ptr->DAMAGE_HIT*Z_PER_DAMAGE);
+	
+	ptr->Z_VALUE_LEFT -= ptr->DAMAGE_HIT*Z_PER_DAMAGE;
     ptr->DAMAGE_HIT = 0;
+    
+    if(ptr->Z_VALUE_LEFT <= 0)
+    {	
+		ptr->ENTITY_STATE = ENTITY_STATE_DIE;
+		ptr->ENTITY_ANIM = 100;
+	}
+	else
+		ptr->ENTITY_STATE = ENTITY_STATE_WAIT_OR_WALK;
 }
 
 void Z__wait(ENTITY* ptr)

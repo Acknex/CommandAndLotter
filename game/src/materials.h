@@ -1,4 +1,5 @@
 #include "mainmenu.c"
+#include "settings.h"
 
 #ifndef MATERIALS_H
 #define MATERIALS_H
@@ -134,22 +135,25 @@ void materials_reinit()
         pp_add(NULL);
     }
 
-    UpdateRenderTargets();
+    if(settings.enable_bloom)
+    {
+        UpdateRenderTargets();
 
-    matPPFilter.skill1 = floatv(0.7);
+        matPPFilter.skill1 = floatv(0.7);
 
-    matPPBlurHorizontal.skill1 = floatv(2.0);
-    matPPBlurHorizontal.skill2 = floatv(0.0);
+        matPPBlurHorizontal.skill1 = floatv(2.0);
+        matPPBlurHorizontal.skill2 = floatv(0.0);
 
-    matPPBlurVertical.skill1 = floatv(0.0);
-    matPPBlurVertical.skill2 = floatv(2.0);
+        matPPBlurVertical.skill1 = floatv(0.0);
+        matPPBlurVertical.skill2 = floatv(2.0);
 
-    matPPCombine.skill1 = floatv(1.5);
+        matPPCombine.skill1 = floatv(1.5);
 
-    pp_add(matPPFilter);
-    pp_add(matPPBlurVertical);
-    pp_add(matPPBlurHorizontal);
-    pp_add(matPPCombine);
+        pp_add(matPPFilter);
+        pp_add(matPPBlurVertical);
+        pp_add(matPPBlurHorizontal);
+        pp_add(matPPCombine);
+    }
 }
 
 int AmazingRendertargetCounter = 0;

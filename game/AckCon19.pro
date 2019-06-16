@@ -38,6 +38,7 @@ SOURCES += \
   src/enemy_hit.c \
   src/framework.c \
   src/game.c \
+  src/ini.c \
   src/jps.c \
   src/mainmenu.c \
   src/map_loader.c \
@@ -45,6 +46,7 @@ SOURCES += \
   src/music_player.c \
   src/progressbars.c \
   src/scan.c \
+  src/settings.c \
   src/sputnik.c \
   src/stub.c \
   src/ui_game.c \
@@ -86,6 +88,7 @@ HEADERS += \
   src/framework.h \
   src/game.h \
   src/global.h \
+  src/ini.h \
   src/jps.h \
   src/mainmenu.h \
   src/map_loader.h \
@@ -94,6 +97,7 @@ HEADERS += \
   src/music_player.h \
   src/progressbars.h \
   src/scan.h \
+  src/settings.h \
   src/sputnik.h \
   src/stub.h \
   src/ui_game.h \

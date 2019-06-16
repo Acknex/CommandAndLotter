@@ -8,6 +8,7 @@
 #include "jps.h"
 #include "ui_game.h"
 #include "materials.h"
+#include "settings.h"
 
 #include <acknex.h>
 #include <windows.h>
@@ -62,10 +63,11 @@ void framework_update_settings()
 //! Initialisiert das Spiel und so
 void framework_init()
 {
-    // settings_init();
-    // settings_load();
+    settings_init();
+    settings_load();
 
     fps_min = 25; // overshoot vermeiden, v.a. wenn's ruckelt
+    fps_max = settings.max_framerate;
 
     framework_update_settings();
     // settings_register_signal(framework_update_settings);
@@ -75,9 +77,11 @@ void framework_init()
     particle_mode = 8;
     collision_mode = 2;
     preload_mode = 3; // preload a lot
-    shadow_stencil = -1;
 
-    // vec_set(sky_color, vector(1,1,1));
+    if(settings.enable_shadows)
+        shadow_stencil = 1;
+    else
+        shadow_stencil = -1;
 
     mouse_map = framework_mouse_cursor;
 
@@ -86,7 +90,7 @@ void framework_init()
     // SetupPostprocessing();
 #endif
 
-    video_set(1280, 720, 0, 2);
+    video_set(settings.res_x, settings.res_y, 0, 2);
 
     mouse_mode = 4;
 

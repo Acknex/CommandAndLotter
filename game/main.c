@@ -56,3 +56,5 @@ function main()
 #include "z.c"
 #include "effects2d.c"
 #include "ai.c"
+#include "ini.c"
+#include "settings.c"

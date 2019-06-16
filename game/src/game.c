@@ -99,6 +99,7 @@ void game_close(void)
 	ui_game_close();
 	grid_close();
     effects2d_close();
+    framework_load_level(NULL);
 }
 
 bool game_is_done(void)

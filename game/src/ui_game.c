@@ -76,7 +76,9 @@ void ui_show_radial(PANEL *rad)
 
 void ui_hide_radial(PANEL *rad)
 {
+	if(!rad) { return; }
 	PANEL *icon = ptr_for_handle(rad->skill_x);
+	
 	icon->flags &= ~SHOW;
 	rad->flags &= ~SHOW;
 }
@@ -93,22 +95,22 @@ void ui_repos_radial(PANEL *rad, int x, int y)
 PANEL* ui_create_radial_button(BMAP *initial_icon, void *ev)
 {
 	PANEL *rad = pan_create("", 2);
-	
+
 	rad->size_x = bmap_width(ui_radial_n);
 	rad->size_y = bmap_height(ui_radial_n);
-	
+
 	pan_setbutton(rad, 0, 0, 0, 0, ui_radial_o, ui_radial_n, ui_radial_o, ui_radial_n, ev, NULL, NULL);
-	
+
 	rad->scale_x = scale_factor_x;
 	rad->scale_y = scale_factor_x;
-	
+
 	PANEL *icon = pan_create("", 3);
 	icon->bmap = initial_icon;
 	icon->scale_x = scale_factor_x;
 	icon->scale_y = scale_factor_x;
 	icon->flags |= UNTOUCHABLE;
-	
-	
+
+
 	rad->skill_x = handle(icon);
 	return rad;
 }
@@ -117,15 +119,15 @@ void update_or_create_lifebar(ENTITY *ent)
 {
 	var health = unit_getHealth(ent);
 	var fac = health;
-	
+
 	VECTOR sc;
 	vec_set(sc, ent.x);
 	vec_to_screen(sc, camera);
 	vec_sub(sc, vector(15, 35, 0));
-	
+
 	var p1 = 30 * (1 - fac);
 	var p2 = 30 * fac;
-	
+
 	if(ui_life_indicator[ui_lifebar_counter])
 	{
 		pan_setwindow(ui_life_indicator[ui_lifebar_counter], 1, 0, 0, p1, 2, ui_bmap_dead_indicator, 0, 0);
@@ -137,13 +139,13 @@ void update_or_create_lifebar(ENTITY *ent)
 		pan_setwindow(ui_life_indicator[ui_lifebar_counter], 0, 0, 0, p1, 2, ui_bmap_dead_indicator, 0, 0);
 		pan_setwindow(ui_life_indicator[ui_lifebar_counter], 0, p1, 0, p2, 2, ui_bmap_life_indicator, 0, 0);
 	}
-	
+
 	ui_life_indicator[ui_lifebar_counter]->skill_x = handle(ent);
 	ui_life_indicator[ui_lifebar_counter]->pos_x = sc.x;
 	ui_life_indicator[ui_lifebar_counter]->pos_y = sc.y;
 	ui_life_indicator[ui_lifebar_counter]->alpha = 60;
 	ui_life_indicator[ui_lifebar_counter]->flags |= (SHOW | UNTOUCHABLE | TRANSLUCENT);
-	
+
 	ui_lifebar_counter++;
 }
 
@@ -152,72 +154,81 @@ void ui_game_init()
 {
 	scale_factor_x = screen_size.x / 1920;
 	scale_factor_y = screen_size.y / 1080;
-	
+
 	ui_radial_delete = ui_create_radial_button(NULL, ui_destroy_event_sputnik);
 	ui_radial_counter = pan_create("", 2);
-	ui_radial_cbabe = ui_create_radial_button(ui_icon_cbabe, NULL);
+	ui_radial_cbabe = ui_create_radial_button(ui_icon_cbabe, ui_spawn_event_sputnik);
 	ui_radial_sputnik = ui_create_radial_button(ui_icon_sputnik, ui_spawn_event_sputnik);
-	ui_radial_skull = ui_create_radial_button(ui_icon_skull, NULL);
-	ui_radial_esel = ui_create_radial_button(ui_icon_esel, NULL);
-	
+	ui_radial_skull = ui_create_radial_button(ui_icon_skull, ui_spawn_event_sputnik);
+	ui_radial_esel = ui_create_radial_button(ui_icon_esel, ui_spawn_event_sputnik);
+
 	ui_main_resources = pan_create("", 99);
 	ui_unit_meta = pan_create("", 99);
 	ui_game_menu = pan_create("", 99);
 	ui_portrait = pan_create("", 99);
 	ui_minimap = pan_create("", 99);
-	
+
 	ui_radial_counter->bmap = ui_radial_n;
 	ui_radial_counter->flags = CENTER_X | CENTER_Y | UNTOUCHABLE;
 	pan_setwindow(ui_radial_counter, 0, -5, -4, 128, 128, ui_radial_progress, 0, 0);
 	pan_setdigits(ui_radial_counter, 0, bmap_width(ui_radial_n) / 2, bmap_height(ui_radial_n) / 2 , "%.0f", ui_hud_font, 1, &a_dummy_var);
-	
+
 	pan_setbutton(ui_game_menu, 0, 0, 1, 151, ui_hide_button_p, ui_hide_button_n, ui_hide_button_o, ui_hide_button_n, ui_show_commando_groups, NULL, NULL);
-	pan_setbutton(ui_game_menu, 0, 0, 15, 134, ui_icon_blank, ui_icon_blank, ui_icon_blank, ui_icon_blank, ui_place_building, NULL, NULL);
-	pan_setbutton(ui_game_menu, 0, 0, 15, 242, ui_icon_blank, ui_icon_blank, ui_icon_blank, ui_icon_blank, ui_place_building, NULL, NULL);
-	pan_setbutton(ui_game_menu, 0, 0, 15, 350, ui_icon_blank, ui_icon_blank, ui_icon_blank, ui_icon_blank, ui_place_building, NULL, NULL);
-	pan_setbutton(ui_game_menu, 0, 0, 15, 458, ui_icon_blank, ui_icon_blank, ui_icon_blank, ui_icon_blank, ui_place_building, NULL, NULL);
+
+	pan_setbutton(ui_game_menu, 0, 4, 15, 134, ui_icon_tower_o, ui_icon_tower, ui_icon_tower_o, ui_icon_tower, ui_place_building, NULL, NULL);
+	pan_setbutton(ui_game_menu, 0, 4, 15, 242, ui_icon_farm_o, ui_icon_farm, ui_icon_farm_o, ui_icon_farm, ui_place_building, NULL, NULL);
+	pan_setbutton(ui_game_menu, 0, 4, 15, 350, ui_icon_blank_o, ui_icon_blank, ui_icon_blank_o, ui_icon_blank, ui_place_building, NULL, NULL);
+	pan_setbutton(ui_game_menu, 0, 4, 15, 458, ui_icon_bank_o, ui_icon_bank, ui_icon_bank_o, ui_icon_bank, ui_place_building, NULL, NULL);
+
+	ui_bmap_cbabe[0] = ui_face_cbabe1;
+	ui_bmap_cbabe[1] = ui_face_cbabe2;
+	ui_bmap_cbabe[2] = ui_face_cbabe3;
+
+	ui_bmap_sputnik[0] = ui_face_sputnik1;
+	ui_bmap_sputnik[1] = ui_face_sputnik2;
+	ui_bmap_sputnik[2] = ui_face_sputnik3;
+
+	ui_bmap_noise[0] = ui_face_noise1;
+	ui_bmap_noise[1] = ui_face_noise2;
+	ui_bmap_noise[2] = ui_face_noise3;
 	
-	ui_bmap_cbabe[0] = bmap_create("CbFace1.png");
-	ui_bmap_cbabe[1] = bmap_create("CbFace2.png");
-	ui_bmap_cbabe[2] = bmap_create("CbFace3.png");
+	ui_bmap_esel[0] = ui_face_esel1;
+	ui_bmap_esel[1] = ui_face_esel2;
+	ui_bmap_esel[2] = ui_face_esel3;
 	
-	ui_bmap_sputnik[0] = bmap_create("Sputnik1.png");
-	ui_bmap_sputnik[1] = bmap_create("Sputnik2.png");
-	ui_bmap_sputnik[2] = bmap_create("Sputnik3.png");
-	
-	ui_bmap_noise[0] = bmap_create("Rauschen1.png");
-	ui_bmap_noise[1] = bmap_create("Rauschen2.png");
-	ui_bmap_noise[2] = bmap_create("Rauschen3.png");
-	
+	ui_bmap_eye[0] = ui_face_eye1;
+	ui_bmap_eye[1] = ui_face_eye2;
+	ui_bmap_eye[2] = ui_face_eye3;
+
 	pan_setwindow(ui_unit_meta, 0, 0, 0, 0, 0, ui_bmap_cbabe[0], 0, 0);
-	
+
 	ui_bmap_dead_indicator = bmap_createblack(8, 8, 24);
 	ui_bmap_life_indicator = bmap_createblack(8, 8, 24);
-	
+
 	bmap_fill(ui_bmap_dead_indicator, vector(0, 0, 255), 100);
 	bmap_fill(ui_bmap_life_indicator, vector(0, 255, 0), 100);
-	
+
 	ui_unit_meta->bmap = ui_bmap_units;
 	ui_unit_meta->pos_x = 3;
-	
+
 	ui_game_menu->bmap = ui_bmap_gamemenu;
-	
+
 	ui_main_resources->bmap = ui_bmap_resources;
 	ui_main_resources->pos_x = 3;
 	ui_main_resources->pos_y = 3;
 	ui_main_resources->flags |= ARIGHT;
 	pan_setdigits(ui_main_resources, 0, bmap_width(ui_bmap_resources) - 50, 13, "%.0f", ui_hud_font, 1, &a_stupid_var );
-	
+
 }
 
 void ui_game_open()
 {
 	ui_game_menu->pos_x = screen_size.x - bmap_width(ui_bmap_gamemenu) + 100;
 	ui_game_menu->pos_y = screen_size.y * 0.15;
-	
+
 	ui_unit_meta->pos_y = screen_size.y - bmap_height(ui_bmap_units);
 	ui_main_resources->flags |= SHOW;
-	
+
 	ui_game_menu->flags |= SHOW;
 }
 
@@ -229,7 +240,7 @@ void ui_game_close()
 
 void ui_game_update()
 {
-	
+
 	int i; for(i = 0; i < ui_lifebar_counter; i++)
 	{
 		ENTITY *ent = ptr_for_handle(ui_life_indicator[i]->skill_x);
@@ -245,53 +256,61 @@ void ui_game_update()
 	scale_factor_x = screen_size.x / 1920;
 	scale_factor_y = screen_size.y / 1080;
 
-if(key_m)
-{
-	BMAP* bmp = mapGetBitmap(NULL);
-	if(bmp)
+	if(key_m)
 	{
-		int size = 4;
-		draw_quad(bmp,vector(000,0,0),NULL,NULL,vector(size,size,0),NULL,100,0);
-		int unitDrawSize = 4;
-		int currentPlayer;
-		for(currentPlayer = 0; currentPlayer < MAX_PLAYERS; currentPlayer++)
+		BMAP* bmp = mapGetBitmap(NULL);
+		if(bmp)
 		{
-			UNIT *unit = mapCurrent.unitFirst[currentPlayer];
-			while(unit)
+			int size = 4;
+			draw_quad(bmp,vector(000,0,0),NULL,NULL,vector(size,size,0),NULL,100,0);
+			int unitDrawSize = 4;
+			int currentPlayer;
+			for(currentPlayer = 0; currentPlayer < MAX_PLAYERS; currentPlayer++)
 			{
-				if(unit->isActive)
+				UNIT *unit = mapCurrent.unitFirst[currentPlayer];
+				while(unit)
 				{
-					draw_quad(NULL,vector(unit->pos2d.x*size-unitDrawSize/2,unit->pos2d.y*size-unitDrawSize/2,0),NULL,vector(4,4,0),NULL,COLOR_RED,50,0);
+					if(unit->isActive)
+					{
+						draw_quad(NULL,vector(unit->pos2d.x*size-unitDrawSize/2,unit->pos2d.y*size-unitDrawSize/2,0),NULL,vector(4,4,0),NULL,COLOR_RED,50,0);
+					}
+					unit = unit->next;
 				}
-				unit = unit->next;
 			}
 		}
 	}
-}
 	
+	if( buildingState() == -1 )
+	{
+		button_state(ui_game_menu, 2, 0);
+		button_state(ui_game_menu, 3, 0);
+		button_state(ui_game_menu, 4, 0);
+		button_state(ui_game_menu, 5, 0);
+	} 
+
 	var scale_factor_x = screen_size.x / 1920;
 	var scale_factor_y = screen_size.y / 1080;
 
-	
+
 	ui_main_resources->scale_x = scale_factor_x;
 	ui_main_resources->scale_y = scale_factor_x;
-	
+
 	ui_unit_meta->scale_x = scale_factor_x;
 	ui_unit_meta->scale_y = scale_factor_x;
-	
+
 	ui_game_menu->scale_x = scale_factor_x;
 	ui_game_menu->scale_y = scale_factor_x;
-	
+
 	ui_portrait->scale_x = scale_factor_x;
 	ui_portrait->scale_y = scale_factor_x;
-	
+
 	ui_minimap->scale_x = scale_factor_x;
 	ui_minimap->scale_y = scale_factor_x;
-	
-	
-	
+
+
+
 	ui_lifebar_counter = 0;
-	
+
 	ENTITY * ent;
 	int ui_has_ents = 0;
 	int ui_has_building = 0;
@@ -299,7 +318,7 @@ if(key_m)
 	int ui_count_esel = 0;
 	int ui_count_cbabes = 0;
 	int ui_count_skull = 0;
-	
+
 	if( !ui_command_group_status )
 	{
 		ui_game_menu->pos_x = screen_size.x - bmap_width(ui_bmap_gamemenu) * scale_factor_x + 100 * scale_factor_x;
@@ -310,14 +329,11 @@ if(key_m)
 		ui_game_menu->pos_x = screen_size.x - bmap_width(ui_bmap_gamemenu) * scale_factor_x;
 		ui_game_menu->pos_y = screen_size.y * 0.15 * scale_factor_x;
 	}
-	
+
 	ui_unit_meta->pos_y = screen_size.y - bmap_height(ui_bmap_units) * scale_factor_x - 3;
-	
-	
-	
-	
+
 	int ui_max_type = 0;
-	
+
 	SUBSYSTEM_LOOP(ent, SUBSYSTEM_SPAWNER)
 	{
 		if( ent->skill[39] )
@@ -326,30 +342,62 @@ if(key_m)
 			{
 				ui_has_building = 1;
 				ui_active_building = ent;
-				
-				if(!ent->MAXHEALTH || !ent->HEALTH)
-				{
-					ent->MAXHEALTH = 100;
-					ent->HEALTH = integer(random(100));
-				}
-				
+
 				update_or_create_lifebar(ent);
 				
-				ui_radial_sputnik->skill_y = ent;
+				switch(ent->ENTITY_UNITTYPE)
+				{
+					case UNIT_SPUTNIK:
+					ui_radial_active = ui_radial_sputnik;
+					ui_radial_sputnik->skill_y = 0;
+					break;
+					case UNIT_LERCHE:
+					ui_radial_active = ui_radial_esel;
+					ui_radial_esel->skill_y = 0;
+					break;
+					case UNIT_EYE:
+					ui_radial_active = ui_radial_skull;
+					ui_radial_skull->skill_y = 0;
+					break;
+					case UNIT_BABE:
+					ui_radial_cbabe->skill_y = 0;
+					ui_radial_active = ui_radial_cbabe;
+					break;
+				}
+				
+				ui_radial_active->skill_y = ent;
 				ui_radial_delete->skill_y = ent;
 				ui_radial_counter->skill_y = ent;
+				
 				a_dummy_var = spawner_getQueue(ent);
 			}
 		}
 	}
-	
+
 	for(ent = ent_next(NULL); ent != NULL; ent = ent_next(ent))
 	{
 		if( ent->group == GROUP_PLAYER_UNIT)
-		{ 
+		{
 			if( ent->skill[39] )
 			{
 				ui_has_ents = 1;
+				
+				switch(unit_getType(ent))
+				{
+					case UNIT_SPUTNIK:
+					ui_count_sputniks++;
+					break;
+					case UNIT_LERCHE:
+					ui_count_esel++;
+					break;
+					case UNIT_EYE:
+					ui_count_skull++;
+					break;
+					case UNIT_BABE:
+					ui_count_cbabes++;
+					break;
+				}
+				
 				if( str_cmp(ent->type, "SPUTNIK.MDL") )
 				{
 					ui_count_sputniks++;
@@ -358,11 +406,11 @@ if(key_m)
 			}
 		}
 	}
-	
+
 	if(ui_has_ents)
 	{
 		ui_unit_meta->flags |= SHOW;
-		
+
 		if( ui_count_sputniks >= ui_count_esel && ui_count_sputniks >= ui_count_cbabes && ui_count_sputniks >= ui_count_skull )
 		{
 			ui_max_type = UI_SPUTNIK;
@@ -376,75 +424,79 @@ if(key_m)
 		else if( ui_count_skull >= ui_count_esel && ui_count_skull >= ui_count_sputniks && ui_count_skull >= ui_count_cbabes )
 		{
 			ui_max_type = UI_SKULL;
-			ui_active_portrait = ui_bmap_cbabe;
+			ui_active_portrait = ui_bmap_eye;
 		}
 		else if( ui_count_esel >= ui_count_skull && ui_count_esel >= ui_count_sputniks && ui_count_esel >= ui_count_cbabes )
 		{
 			ui_max_type = UI_ESEL;
-			ui_active_portrait = ui_bmap_cbabe;
+			ui_active_portrait = ui_bmap_esel;
 		}
 	}
 	else
 	{
 		ui_unit_meta->flags &= ~SHOW;
 	}
-	
-	
-	
+
+
+
 	VECTOR screen;
-	
+
 	a_stupid_var = z_get();
-	
+
 	if( last_building != ui_active_building)
 	{
+		ui_hide_radial(ui_radial_sputnik);
+		ui_hide_radial(ui_radial_cbabe);
+		ui_hide_radial(ui_radial_skull);
+		ui_hide_radial(ui_radial_esel);
 		ui_anim_state = UI_ANIM_RESTARTED;
-		last_building = ui_active_building; 
-	} 
-	
+		last_building = ui_active_building;
+	}
+
 	if( ui_max_type != ui_selected_max_type )
 	{
 		ui_anim_unit_state = UI_ANIM_UNIT_RESTARTED;
 		ui_anim_state = UI_ANIM_OFF;
 		ui_selected_max_type = ui_max_type;
-	}		
-	
+	}
+
 	if( !ui_selected_max_type)
 	{
 		ui_anim_unit_state = UI_ANIM_UNIT_OFF;
-	} 
-	
+	}
+
 	if( ui_anim_unit_state == UI_ANIM_UNIT_RESTARTED )
 	{
-		
+
 		ui_switch_frame = 0;
 		pan_setwindow(ui_unit_meta, 1, 408, 98, 196, 186, (ui_active_portrait)[0], 0, 0);
 		ui_anim_unit_state = UI_ANIM_UNIT_PROGRESS;
 	}
-	else if( ui_anim_unit_state == UI_ANIM_UNIT_PROGRESS ) 
+	else if( ui_anim_unit_state == UI_ANIM_UNIT_PROGRESS )
 	{
 		ui_switch_frame += time_step * UI_ANIM_UNIT_SPEED;
 		ui_switch_frame %= 19;
-		if ( ui_switch_frame >= 13 && ui_switch_frame < 18)  
+		if ( ui_switch_frame >= 13 && ui_switch_frame < 18)
 		{
-			ui_active_portrait = ui_bmap_noise;	
-		} 
+			ui_active_portrait = ui_bmap_noise;
+		}
 		else if( ui_switch_frame >= 18 )
 		{
 			ui_anim_unit_state = UI_ANIM_UNIT_OFF;
 		}
-		
+
 		pan_setwindow(ui_unit_meta, 1, 408, 98, 196, 186, (ui_active_portrait)[ui_frame_order[ui_switch_frame]], 0, 0);
 	}
-	else if( ui_anim_unit_state == UI_ANIM_UNIT_ON ) 
+	else if( ui_anim_unit_state == UI_ANIM_UNIT_ON )
 	{
-		
+
 	}
 	else if ( ui_anim_unit_state == UI_ANIM_UNIT_OFF )
 	{
 		pan_setwindow(ui_unit_meta, 1, 0, 0, 0, 0, (ui_bmap_cbabe)[0], 0, 0);
 	}
-	
-	
+
+
 	if(!last_building || !ui_has_building)
 	{
 		last_building = NULL;
@@ -456,97 +508,102 @@ if(key_m)
 		vec_to_screen(screen, camera);
 	}
 	
-	if( ui_anim_state == UI_ANIM_RESTARTED )
+	if( ui_radial_active ) 
 	{
-		ui_orbit_radial(ui_radial_sputnik,screen.x, screen.y, 270, 200);
-		ui_orbit_radial(ui_radial_delete,screen.x, screen.y, 230, 200);
-		ui_orbit_radial(ui_radial_counter,screen.x, screen.y, 190, 200);
-		
-		ui_anim_unit_state = UI_ANIM_UNIT_OFF;
-		
-		ui_show_radial(ui_radial_sputnik);
-		ui_scale_radial(ui_radial_sputnik, 0.1);
-		
-		ui_show_radial(ui_radial_delete);
-		ui_scale_radial(ui_radial_delete, 0.1);
-		
-		ui_radial_counter->flags |= SHOW;
-		ui_radial_counter->scale_x = 0.1;
-		ui_radial_counter->scale_y = 0.1;
-		
-		ui_anim_state = UI_ANIM_PROGRESS;
-	} 
-	else if( ui_anim_state == UI_ANIM_PROGRESS ) 
-	{
-		ui_orbit_radial(ui_radial_sputnik,screen.x, screen.y, 270, 200);
-		ui_orbit_radial(ui_radial_delete,screen.x, screen.y, 230, 200);
-		ui_orbit_radial(ui_radial_counter,screen.x, screen.y, 190, 200);
-		
-		if( ui_scale1 <= scale_factor_x ) 
+
+		if( ui_anim_state == UI_ANIM_RESTARTED )
 		{
-			ui_scale1 += time_step * UI_ANIM_SPEED;
+			ui_orbit_radial(ui_radial_active,screen.x, screen.y, 270, 200);
+			ui_orbit_radial(ui_radial_delete,screen.x, screen.y, 230, 200);
+			ui_orbit_radial(ui_radial_counter,screen.x, screen.y, 190, 200);
+
+			ui_anim_unit_state = UI_ANIM_UNIT_OFF;
+
+			ui_show_radial(ui_radial_active);
+			ui_scale_radial(ui_radial_active, 0.1);
+
+			ui_show_radial(ui_radial_delete);
+			ui_scale_radial(ui_radial_delete, 0.1);
+
+			ui_radial_counter->flags |= SHOW;
+			ui_radial_counter->scale_x = 0.1;
+			ui_radial_counter->scale_y = 0.1;
+
+			ui_anim_state = UI_ANIM_PROGRESS;
 		}
-		if( ui_scale1 >= 0.5 * scale_factor_x )
+		else if( ui_anim_state == UI_ANIM_PROGRESS )
 		{
-			ui_scale2 += time_step * UI_ANIM_SPEED;
+			ui_orbit_radial(ui_radial_active,screen.x, screen.y, 270, 200);
+			ui_orbit_radial(ui_radial_delete,screen.x, screen.y, 230, 200);
+			ui_orbit_radial(ui_radial_counter,screen.x, screen.y, 190, 200);
+
+			if( ui_scale1 <= scale_factor_x )
+			{
+				ui_scale1 += time_step * UI_ANIM_SPEED;
+			}
+			if( ui_scale1 >= 0.5 * scale_factor_x )
+			{
+				ui_scale2 += time_step * UI_ANIM_SPEED;
+			}
+			if( ui_scale2 >= 0.5* scale_factor_x )
+			{
+				ui_scale3 += time_step * UI_ANIM_SPEED;
+			}
+
+			if (ui_scale1 >= scale_factor_x)
+			{
+				ui_scale1 = scale_factor_x;
+			}
+			if (ui_scale2 >= scale_factor_x)
+			{
+				ui_scale2 = scale_factor_x;
+			}
+			if (ui_scale3 >= scale_factor_x)
+			{
+				ui_scale3 = scale_factor_x;
+			}
+
+			ui_scale_radial(ui_radial_active, ui_scale1);
+			ui_scale_radial(ui_radial_delete, ui_scale2);
+
+			ui_radial_counter->scale_x = ui_scale3;
+			ui_radial_counter->scale_y = ui_scale3;
+
+			if( ui_scale1 == scale_factor_x && ui_scale2 == scale_factor_x && ui_scale3 == scale_factor_x)
+			{
+				ui_anim_state = UI_ANIM_ON;
+			}
 		}
-		if( ui_scale2 >= 0.5* scale_factor_x )
+		else if( ui_anim_state == UI_ANIM_ON )
 		{
-			ui_scale3 += time_step * UI_ANIM_SPEED;
+			ui_orbit_radial(ui_radial_active,screen.x, screen.y, 270, 200);
+			ui_orbit_radial(ui_radial_delete,screen.x, screen.y, 230, 200);
+			ui_orbit_radial(ui_radial_counter,screen.x, screen.y, 190, 200);
+
+			ui_scale_radial(ui_radial_active, scale_factor_x);
+			ui_scale_radial(ui_radial_delete, scale_factor_x);
+
+			ui_radial_counter->scale_x = scale_factor_x;
+			ui_radial_counter->scale_y = scale_factor_x;
+
+		}
+		else if ( ui_anim_state == UI_ANIM_OFF )
+		{
+			ui_hide_radial(ui_radial_active);
+			ui_hide_radial(ui_radial_delete);
+			ui_radial_counter->flags &= ~SHOW;
+
+			ui_scale1 = 0.1;
+			ui_scale2 = 0.1;
+			ui_scale3 = 0.1;
 		}
 		
-		if (ui_scale1 >= scale_factor_x) 
-		{
-			ui_scale1 = scale_factor_x;
-		}
-		if (ui_scale2 >= scale_factor_x) 
-		{
-			ui_scale2 = scale_factor_x;
-		}
-		if (ui_scale3 >= scale_factor_x) 
-		{
-			ui_scale3 = scale_factor_x;
-		}
-		
-		ui_scale_radial(ui_radial_sputnik, ui_scale1);
-		ui_scale_radial(ui_radial_delete, ui_scale2);
-		
-		ui_radial_counter->scale_x = ui_scale3;
-		ui_radial_counter->scale_y = ui_scale3;
-		
-		if( ui_scale1 == scale_factor_x && ui_scale2 == scale_factor_x && ui_scale3 == scale_factor_x)
-		{
-			ui_anim_state = UI_ANIM_ON;
-		} 
-	}
-	else if( ui_anim_state == UI_ANIM_ON ) 
-	{
-		ui_orbit_radial(ui_radial_sputnik,screen.x, screen.y, 270, 200);
-		ui_orbit_radial(ui_radial_delete,screen.x, screen.y, 230, 200);
-		ui_orbit_radial(ui_radial_counter,screen.x, screen.y, 190, 200);
-		
-		ui_scale_radial(ui_radial_sputnik, scale_factor_x);
-		ui_scale_radial(ui_radial_delete, scale_factor_x);
-		
-		ui_radial_counter->scale_x = scale_factor_x;
-		ui_radial_counter->scale_y = scale_factor_x;
-		
-	}
-	else if ( ui_anim_state == UI_ANIM_OFF )
-	{
-		ui_hide_radial(ui_radial_sputnik);
-		ui_hide_radial(ui_radial_delete);
-		ui_radial_counter->flags &= ~SHOW;
-		
-		ui_scale1 = 0.1;
-		ui_scale2 = 0.1;
-		ui_scale3 = 0.1;
 	}
 }
 
 var ui_game_isdone()
 {
-	
+
 }
 
 void ui_game_after_all()

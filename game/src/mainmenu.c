@@ -34,7 +34,7 @@ void mainmenu_init(void)
 	mainmenu_wndMenuOptions = uimenu_window_create( (screen_size.x / 2) - (640 / 2), (screen_size.y / 2) - (480 / 2), 640, 480, "Options");
 	uimenu_element_t * optionsExit = uimenu_make_simple_button(640 - 85, 480 - 28, 85, 32, "Abbrechen", uimenu_default_font, mainmenu_hide_options);
 	uimenu_element_t * optionsSave = uimenu_make_simple_button(640 - (85 + 85 + 5) , 480 - 28, 85, 32, "Speichern", uimenu_default_font, mainmenu_hide_options);
-	
+
 	uimenu_element_t * optionsTabGeneral = uimenu_make_simple_button(0, 0, 32, "General", uimenu_default_font, mainmenu_hide_options);
 	uimenu_element_t * optionsTabVideo = uimenu_make_simple_button(optionsTabGeneral->x + optionsTabGeneral->width + 2, 0, 32, "Video", uimenu_default_font, mainmenu_hide_options);
 	uimenu_element_t * optionsTabAudio = uimenu_make_simple_button(optionsTabVideo->x + optionsTabVideo->width + 2, 0, 32, "Audio", uimenu_default_font, mainmenu_hide_options);
@@ -49,7 +49,7 @@ void mainmenu_init(void)
 	uimenu_add_element_to_window(mainmenu_wndMenuOptions, optionsTabControls);
 
 	uimenu_window_initialize(mainmenu_wndMenuOptions);
-	
+
 	// TESTING
 	// uimenu_window_t * mainMenuWindow2 = uimenu_window_create(150, 50, 128, 32 * 5, "Menue");
 	// uimenu_element_t * btnNewGame2 = uimenu_make_button(0, 32 * 0, 128, 32, mainmenu_btn_new_game, mainmenu_btn_new_game_hi, mainmenu_btn_new_game_hi, mainmenu_set_start);
@@ -92,6 +92,7 @@ void mainmenu_set_exit(void)
 
 void mainmenu_open(void)
 {
+    mainmenu_current_response = 0;
 	music_speedup(100);
 	music_start("media/mainmenu.mp3", 0.5, 0);
 }

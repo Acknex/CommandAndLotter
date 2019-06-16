@@ -1,5 +1,5 @@
 #include "music_player.h"
-// #include "settings.h"
+#include "settings.h"
 
 #include <windows.h>
 
@@ -31,7 +31,7 @@ void music_init()
     music.volume_current = 0;
     music.volume_last = 0;
     music.crossTime = 0;
-    music.maxVol = 100; // settings.game_volume;
+    music.maxVol = settings.master_volume;
     music.musicCurrentPosition = 0;
     music.currentMusic = NULL;
 

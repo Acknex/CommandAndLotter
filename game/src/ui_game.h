@@ -30,6 +30,7 @@ PANEL *ui_radial_cbabe;
 PANEL *ui_radial_skull;
 PANEL *ui_radial_esel;
 PANEL *ui_radial_sputnik;
+PANEL *ui_radial_active;
 
 PANEL *ui_minimap;
 
@@ -51,6 +52,8 @@ BMAP *ui_bmap_life_indicator;
 BMAP *ui_bmap_cbabe[3];
 BMAP *ui_bmap_sputnik[3];
 BMAP *ui_bmap_noise[3];
+BMAP *ui_bmap_eye[3];
+BMAP *ui_bmap_esel[3];
 
 BMAP **ui_active_portrait;
 
@@ -68,6 +71,33 @@ BMAP *ui_icon_skull = "ui_H4.png";
 BMAP *ui_icon_esel = "ui_H3.png";
 
 BMAP *ui_icon_blank = "ico_s_2.png";
+BMAP *ui_icon_blank_o = "ico_s_2_o.png";
+BMAP *ui_icon_tower = "Ico_S_2Bui2.png";
+BMAP *ui_icon_tower_o = "Ico_S_2Bui2_o.png";
+BMAP *ui_icon_farm = "Ico_S_2Bui.png";
+BMAP *ui_icon_farm_o = "Ico_S_2Bui_o.png";
+BMAP *ui_icon_bank = "Ico_S_2Bui3.png";
+BMAP *ui_icon_bank_o = "Ico_S_2Bui3_o.png";
+
+BMAP *ui_face_cbabe1 = "CbFace1.png";
+BMAP *ui_face_cbabe2 = "CbFace2.png";
+BMAP *ui_face_cbabe3 = "CbFace3.png";
+
+BMAP *ui_face_sputnik1 = "Sputnik1.png";
+BMAP *ui_face_sputnik2 = "Sputnik2.png";
+BMAP *ui_face_sputnik3 = "Sputnik3.png";
+
+BMAP *ui_face_esel1 = "ESFace1.png";
+BMAP *ui_face_esel2 = "ESFace2.png";
+BMAP *ui_face_esel3 = "ESFace3.png";
+
+BMAP *ui_face_eye1 = "ui_H4.png";
+BMAP *ui_face_eye2 = "ui_H4.png";
+BMAP *ui_face_eye3 = "ui_H4.png";
+
+BMAP *ui_face_noise1 = "Rauschen1.png";
+BMAP *ui_face_noise2 = "Rauschen2.png";
+BMAP *ui_face_noise3 = "Rauschen3.png";
 
 ENTITY* last_building;
 ENTITY* main_unit;

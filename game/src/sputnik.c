@@ -16,6 +16,7 @@
 #define SPUTNIK_ANIMSTATEATK skill22
 #define SPUTNIK_DIDATTACK skill26
 #define SPUTNIK_RUNCOUNTER skill27
+#define SPUTNIK_IDLECOUNTER skill28
 
 
 #define SPUTNIK_WALKANIM "walk"
@@ -25,6 +26,7 @@
 
 #define SPUTNIK_FEET 30
 #define SPUTNIK_TARGETDIST 70
+#define SPUTNIK_MAXIDLE 20
 
 SOUND* sputnik_snd_death   = "sputnik_death.wav";
 SOUND* sputnik_snd_attack1 = "sputnik_attack1.wav";
@@ -40,6 +42,7 @@ void Sputnik()
 	my->SPUTNIK_ATTACKSPEED = 5;
 	my->SPUTNIK_ATTACKRANGE = 170;
 	my->SPUTNIK_ANIMSTATEATK = 0;
+	my->SPUTNIK_IDLECOUNTER = 0;
 	my->HEALTH = 23;
 	my->MAXHEALTH = my->HEALTH;
 	set(my, SHADOW);
@@ -74,9 +77,12 @@ void SPUTNIK__wait_or_walk(ENTITY * ptr)
 		ptr->SPUTNIK_ANIMSTATEATK = 0;
 		ptr->SPUTNIK_ANIMSTATE += len*0.425*time_step;//0.5 * ptr->SPUTNIK_RUNSPEED * time_step;
 		ent_animate(ptr, SPUTNIK_WALKANIM, ptr->SPUTNIK_ANIMSTATE, ANM_CYCLE);		
+		
+		ptr->SPUTNIK_IDLECOUNTER = 0;
 	}
 	else
 	{
+		ptr->SPUTNIK_IDLECOUNTER += time_step;
 		ptr->SPUTNIK_ANIMSTATE += 7 * time_step;
 		ent_animate(ptr, SPUTNIK_WAITANIM, ptr->SPUTNIK_ANIMSTATE, ANM_CYCLE);
 	}
@@ -91,9 +97,17 @@ void SPUTNIK__wait_or_walk(ENTITY * ptr)
 		}
 		ptr->DAMAGE_HIT = 0;
 	}
-	else if (SCAN_IsEntityNear(ptr, unit_getVictim(ptr), ptr->SPUTNIK_ATTACKRANGE))
+	else 
 	{
-		ptr->ENTITY_STATE = ENTITY_STATE_ATTACK;		
+		if(ptr->SPUTNIK_IDLECOUNTER > SPUTNIK_MAXIDLE && !unit_getVictim(ptr))
+		{
+			ptr->ENTITY_VICTIMTYPE = UNIT_Z;
+			SPUTNIK__findNextVictim(ptr);
+		}
+		if (SCAN_IsEntityNear(ptr, unit_getVictim(ptr), ptr->SPUTNIK_ATTACKRANGE))
+		{
+			ptr->ENTITY_STATE = ENTITY_STATE_ATTACK;
+		}
 	}
 }
 
@@ -168,7 +182,7 @@ void SPUTNIK__findNextVictim(ENTITY* ptr)
 		if(ptr->ENTITY_VICTIMTYPE == UNIT_Z)
 		{
 			ENTITY *zUnit, *zUnitNear = NULL;
-			var minDist = 1000;
+			var minDist = 2000;
 			SUBSYSTEM_LOOP(zUnit, SUBSYSTEM_Z)
 			{
 				VECTOR zPos;
@@ -188,7 +202,7 @@ void SPUTNIK__findNextVictim(ENTITY* ptr)
 		}
 		else
 		{
-			int count = mapGetNearbyUnitsOfTypeForPos(ptr->x, ptr->ENTITY_VICTIMTYPE, owner, 1000, 1);
+			int count = mapGetNearbyUnitsOfTypeForPos(ptr->x, ptr->ENTITY_VICTIMTYPE, owner, 2000, 1);
 			if (count > 0)
 			{
 				cprintf1("FOUND!(%d)", count);
