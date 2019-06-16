@@ -75,7 +75,7 @@ void framework_init()
     particle_mode = 8;
     collision_mode = 2;
     preload_mode = 3; // preload a lot
-    shadow_stencil = 1;
+    shadow_stencil = -1;
 
     // vec_set(sky_color, vector(1,1,1));
 
