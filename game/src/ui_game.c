@@ -3,6 +3,8 @@
 #include "spawner.h"
 #include "progressbars.h"
 #include "building.h"
+#include "jps.h"
+#include "fow.h"
 
 void ui_spawn_event_sputnik(var num, PANEL *panel)
 {
@@ -78,7 +80,7 @@ void ui_hide_radial(PANEL *rad)
 {
 	if(!rad) { return; }
 	PANEL *icon = ptr_for_handle(rad->skill_x);
-	
+
 	icon->flags &= ~SHOW;
 	rad->flags &= ~SHOW;
 }
@@ -117,8 +119,8 @@ PANEL* ui_create_radial_button(BMAP *initial_icon, void *ev)
 
 void update_or_create_lifebar(ENTITY *ent)
 {
-	if( ui_lifebar_counter >= 2000 ) { return; } 
-	
+	if( ui_lifebar_counter >= 2000 ) { return; }
+
 	var health = unit_getHealth(ent);
 	var fac = health;
 
@@ -177,10 +179,10 @@ void ui_minimap_click(PANEL *panel)
 {
 	var mpx = mouse_pos.x - panel->pos_x - (bmap_width(ui_mm) * scale_factor_x * mini_map_extra_scale_x) / 2;
 	var mpy = mouse_pos.y - panel->pos_y - (bmap_height(ui_mm) * scale_factor_x * mini_map_extra_scale_y) / 2;
-	
+
 	mpx /= (bmap_width(ui_mm) * scale_factor_x * mini_map_extra_scale_x);
 	mpy /= (bmap_height(ui_mm) * scale_factor_x * mini_map_extra_scale_y);
-	
+
 	mpx = mpx * 16000 * -1;
 	mpy = mpy * 16000 * -1;
 	topdown_camera_set_pos(vector(mpy, mpx, camera.z));
@@ -228,11 +230,11 @@ void ui_game_init()
 	ui_bmap_noise[0] = ui_face_noise1;
 	ui_bmap_noise[1] = ui_face_noise2;
 	ui_bmap_noise[2] = ui_face_noise3;
-	
+
 	ui_bmap_esel[0] = ui_face_esel1;
 	ui_bmap_esel[1] = ui_face_esel2;
 	ui_bmap_esel[2] = ui_face_esel3;
-	
+
 	ui_bmap_eye[0] = ui_face_eye1;
 	ui_bmap_eye[1] = ui_face_eye2;
 	ui_bmap_eye[2] = ui_face_eye3;
@@ -244,7 +246,7 @@ void ui_game_init()
 
 	bmap_fill(ui_bmap_dead_indicator, vector(0, 0, 255), 100);
 	bmap_fill(ui_bmap_life_indicator, vector(0, 255, 0), 100);
-	
+
 	bmap_fill(ui_bmap_red, vector(0, 0, 255), 100);
 	bmap_fill(ui_bmap_green, vector(0, 255, 0), 100);
 	bmap_fill(ui_bmap_blue, vector(255, 0, 0), 100);
@@ -275,7 +277,7 @@ void ui_game_open()
 	ui_minimap->flags |= SHOW;
 	ui_minimap->pos_x = 46;
 	ui_minimap->pos_y = screen_size.y - (bmap_height(ui_bmap_monitor) + 14)  * scale_factor_x;
-	
+
 	ui_game_menu->pos_x = screen_size.x - bmap_width(ui_bmap_gamemenu) + 100;
 	ui_game_menu->pos_y = screen_size.y * 0.15;
 
@@ -299,11 +301,11 @@ void ui_game_close()
 	ui_minimap->flags &= ~SHOW;
 	ui_radial_delete->flags &= ~SHOW;
 	ui_monitor->flags &= ~SHOW;
-	
+
 	int i; for(i = 0; i < 2000; i++)
 	{
 		if( ui_life_indicator[i] )
-		{ 
+		{
 			ui_life_indicator[i]->flags &= ~SHOW;
 		}
 	}
@@ -350,16 +352,16 @@ void ui_game_update()
 			}
 		}
 	}
-	
+
 	ui_add_camera_to_minimap();
-	
+
 	if( buildingState() == -1 )
 	{
 		button_state(ui_game_menu, 2, 0);
 		button_state(ui_game_menu, 3, 0);
 		button_state(ui_game_menu, 4, 0);
 		button_state(ui_game_menu, 5, 0);
-	} 
+	}
 
 	var scale_factor_x = screen_size.x / 1920;
 	var scale_factor_y = screen_size.y / 1080;
@@ -379,7 +381,7 @@ void ui_game_update()
 
 	ui_minimap->scale_x = scale_factor_x * mini_map_extra_scale_x;
 	ui_minimap->scale_y = scale_factor_x * mini_map_extra_scale_y;
-	
+
 	ui_monitor->scale_x = scale_factor_x;
 	ui_monitor->scale_y = scale_factor_x;
 	ui_monitor->pos_y = screen_size.y - bmap_height(ui_bmap_monitor) * scale_factor_x;
@@ -421,7 +423,7 @@ void ui_game_update()
 				ui_active_building = ent;
 
 				update_or_create_lifebar(ent);
-				
+
 				switch(ent->ENTITY_UNITTYPE)
 				{
 					case UNIT_SPUTNIK:
@@ -441,23 +443,30 @@ void ui_game_update()
 					ui_radial_active = ui_radial_cbabe;
 					break;
 				}
-				
+
 				ui_radial_active->skill_y = ent;
 				ui_radial_delete->skill_y = ent;
 				ui_radial_counter->skill_y = ent;
-				
+
 				a_dummy_var = spawner_getQueue(ent);
 			}
 		}
-		
-		if( ent->group == GROUP_ENEMY_SPAWNER )
-		{
-			ui_add_dot_to_minimap(ent, 3, ui_bmap_green, counter);
-			counter++;
-			} else {
-			ui_add_dot_to_minimap(ent, 3, ui_bmap_red, counter);
-			counter++;
-		}
+
+        TILE* tile = mapGetTileFromVector(mapGetCurrent(), &ent->x);
+        if(tile)
+        {
+            if (tile->visibility == FOW_SCOUTED)
+            {
+                if( ent->group == GROUP_ENEMY_SPAWNER )
+                {
+                    ui_add_dot_to_minimap(ent, 3, ui_bmap_green, counter);
+                    counter++;
+                } else {
+                    ui_add_dot_to_minimap(ent, 3, ui_bmap_red, counter);
+                    counter++;
+                }
+            }
+        }
 	}
 	for(ent = ent_next(NULL); ent != NULL; ent = ent_next(ent))
 	{
@@ -466,7 +475,7 @@ void ui_game_update()
 			if( ent->skill[39] )
 			{
 				ui_has_ents = 1;
-				
+
 				switch(unit_getType(ent))
 				{
 					case UNIT_SPUTNIK:
@@ -482,32 +491,45 @@ void ui_game_update()
 					ui_count_cbabes++;
 					break;
 				}
-				
+
 				if( str_cmp(ent->type, "SPUTNIK.MDL") )
 				{
 					ui_count_sputniks++;
 				}
 				update_or_create_lifebar(ent);
 			}
-			
-			ui_add_dot_to_minimap(ent, 1, ui_bmap_cyan, counter);
-			counter++;
-		} 
-		else 
-		{
-			if( ent->group == GROUP_ENEMY_UNIT && ent->ENTITY_UNITTYPE != UNIT_Z)
-			{
-				ui_add_dot_to_minimap(ent, 1, ui_bmap_red, counter);
-				counter++;
-			}
-			
 		}
+
+        TILE* tile = mapGetTileFromVector(mapGetCurrent(), &ent->x);
+        if(tile)
+        {
+            if (tile->visibility == FOW_SCOUTED)
+            {
+                if(ent->group == GROUP_PLAYER_UNIT)
+                {
+                    ui_add_dot_to_minimap(ent, 1, ui_bmap_cyan, counter);
+                    counter++;
+                }
+                else if( ent->group == GROUP_ENEMY_UNIT && ent->ENTITY_UNITTYPE != UNIT_Z)
+                {
+                    ui_add_dot_to_minimap(ent, 1, ui_bmap_red, counter);
+                    counter++;
+                }
+            }
+        }
 	}
-	
+
 	SUBSYSTEM_LOOP(ent, SUBSYSTEM_Z)
 	{
-		ui_add_dot_to_minimap(ent, 1, ui_bmap_yellow, counter);
-		counter++;
+        TILE* tile = mapGetTileFromVector(mapGetCurrent(), &ent->x);
+        if(tile)
+        {
+            if (tile->visibility == FOW_SCOUTED)
+            {
+                ui_add_dot_to_minimap(ent, 1, ui_bmap_yellow, counter);
+                counter++;
+            }
+        }
 	}
 
 	if(ui_has_ents)
@@ -569,7 +591,7 @@ void ui_game_update()
 
 	if( !ui_selected_max_type)
 	{
-		ui_anim_unit_state = UI_ANIM_UNIT_OFF; 
+		ui_anim_unit_state = UI_ANIM_UNIT_OFF;
 	}
 
 	if( ui_anim_unit_state == UI_ANIM_UNIT_RESTARTED )
@@ -596,7 +618,7 @@ void ui_game_update()
 	}
 	else if( ui_anim_unit_state == UI_ANIM_UNIT_ON )
 	{
-		
+
 	}
 	else if ( ui_anim_unit_state == UI_ANIM_UNIT_OFF )
 	{
@@ -610,7 +632,7 @@ void ui_game_update()
 			ui_minimap->scale_x = scale_factor_x * mini_map_extra_scale_x;
 			ui_minimap->scale_y = scale_factor_x * mini_map_extra_scale_y;
 			ui_minimap->flags |= SHOW;
-		} 
+		}
 		else
 		{
 			mini_map_extra_scale_x = 1;
@@ -629,8 +651,8 @@ void ui_game_update()
 		vec_set(screen, last_building.x);
 		vec_to_screen(screen, camera);
 	}
-	
-	if( ui_radial_active ) 
+
+	if( ui_radial_active )
 	{
 
 		if( ui_anim_state == UI_ANIM_RESTARTED )
@@ -707,7 +729,7 @@ void ui_game_update()
 
 			ui_radial_counter->scale_x = scale_factor_x;
 			ui_radial_counter->scale_y = scale_factor_x;
-			
+
 
 		}
 		else if ( ui_anim_state == UI_ANIM_OFF )
@@ -720,7 +742,7 @@ void ui_game_update()
 			ui_scale2 = 0.1;
 			ui_scale3 = 0.1;
 		}
-		
+
 	}
 }
 

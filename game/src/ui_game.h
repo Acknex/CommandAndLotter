@@ -33,8 +33,6 @@ PANEL *ui_radial_esel;
 PANEL *ui_radial_sputnik;
 PANEL *ui_radial_active;
 
-PANEL *ui_minimap;
-
 PANEL *ui_life_indicator[2000];
 
 PANEL *ui_portrait;
