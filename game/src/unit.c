@@ -188,8 +188,9 @@ void unit_findNextVictim(ENTITY* ptr)
 	}
 }
 
-void unit_deactivate(ENTITY* ent)
+void unit_deactivate(ENTITY* ptr)
 {
-	UnitMangement_unselect(ent);
-	jpsUnitDestroy(jpsUnitGetFromEntity(ent));
+	UnitMangement_unselect(ptr);
+	jpsUnitDestroy(jpsUnitGetFromEntity(ptr));
+	ptr->group = 0;
 }

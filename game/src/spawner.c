@@ -250,6 +250,7 @@ void SPAWNER__hit(ENTITY* ptr)
 	if (ptr->HEALTH <= 0)
 	{
 		UnitMangement_unselect(ptr);
+		ptr->group = 0;
 		ptr->ENTITY_STATE = SPAWNER_STATE_DIE;
 		ptr->ENTITY_ANIM = 0;
 		snd_play(spawner_destroy_snd, 100, 0);
