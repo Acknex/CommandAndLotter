@@ -65,7 +65,7 @@ void SPUTNIK__wait_or_walk(ENTITY * ptr)
 	vec_set(ptr->x, unit->pos3d);
 	VECTOR diff, temp;
 	vec_diff(diff, unit->pos3d, unit->prevPos3d);
-	
+
 	var len = vec_to_angle(temp, diff)/time_step;
 
 	if(len > 8) ptr->SPUTNIK_RUNCOUNTER = 4;
@@ -79,8 +79,8 @@ void SPUTNIK__wait_or_walk(ENTITY * ptr)
 		ptr->SPUTNIK_DIDATTACK = 0;
 		ptr->SPUTNIK_ANIMSTATEATK = 0;
 		ptr->SPUTNIK_ANIMSTATE += len*0.425*time_step;//0.5 * ptr->SPUTNIK_RUNSPEED * time_step;
-		ent_animate(ptr, SPUTNIK_WALKANIM, ptr->SPUTNIK_ANIMSTATE, ANM_CYCLE);		
-		
+		ent_animate(ptr, SPUTNIK_WALKANIM, ptr->SPUTNIK_ANIMSTATE, ANM_CYCLE);
+
 		ptr->SPUTNIK_IDLECOUNTER = 0;
 	}
 	else
@@ -89,7 +89,7 @@ void SPUTNIK__wait_or_walk(ENTITY * ptr)
 		ptr->SPUTNIK_ANIMSTATE += 7 * time_step;
 		ent_animate(ptr, SPUTNIK_WAITANIM, ptr->SPUTNIK_ANIMSTATE, ANM_CYCLE);
 	}
-	
+
 	//sputnik was hit
 	if (ptr->DAMAGE_HIT > 0)
 	{
@@ -97,11 +97,11 @@ void SPUTNIK__wait_or_walk(ENTITY * ptr)
 		{
 			ptr->HEALTH = maxv(0, ptr->HEALTH - ptr->DAMAGE_HIT);
 			ptr->ENTITY_STATE = ENTITY_STATE_HIT;
-			ptr->ENTITY_HITTHRESHOLD = 5;				
+			ptr->ENTITY_HITTHRESHOLD = 5;
 		}
 		ptr->DAMAGE_HIT = 0;
 	}
-	else 
+	else
 	{
 		//selected victim is near - attack
 		if (SCAN_IsEntityNear(ptr, unit_getVictim(ptr), ptr->SPUTNIK_ATTACKRANGE))
@@ -124,41 +124,46 @@ void SPUTNIK_Update()
 	{
 		if(ptr->ENTITY_STATE != ENTITY_STATE_WAIT_OR_WALK)
 			ptr->SPUTNIK_IDLECOUNTER = 0;
-		
+
+        if(ptr->HEALTH <= 0)
+        {
+            ptr->SELCTED_SKILL = 0; // unselect dead units
+        }
+
 		jpsAllowMovementForEntity(ptr, false);
-		
-		switch(ptr->ENTITY_STATE)    	
+
+		switch(ptr->ENTITY_STATE)
 		{
 			case ENTITY_STATE_WAIT_OR_WALK:
 			{
 				SPUTNIK__wait_or_walk(ptr);
 				break;
 			}
-			
+
 			case ENTITY_STATE_ATTACK:
 			{
 				SPUTNIK__attack(ptr);
 				break;
 			}
-			
+
 			case ENTITY_STATE_DIE:
 			{
 				SPUTNIK__die(ptr);
 				break;
 			}
-			
+
 			case ENTITY_STATE_HIT:
 			{
 				SPUTNIK__hit(ptr);
 				break;
 			}
-			
+
 			default:
 			{
 				break;
 			}
-		}	
-		
+		}
+
 		if (ptr->ENTITY_STATE != ENTITY_STATE_DIE && ptr->ENTITY_STATE != ENTITY_STATE_DEAD)
 		{
 			UNIT* unit = jpsUnitGetFromEntity(ptr);
@@ -168,21 +173,21 @@ void SPUTNIK_Update()
 				if(tile)
 				{
                     if(!tile->value) ptr->z = maploader_get_height(ptr->x) - ptr->min_z - SPUTNIK_FEET;
-				}	
+				}
 			}
 		}
-	}	
+	}
 }
 
 void SPUTNIK__hit(ENTITY* ptr)
 {
-	ptr->ENTITY_HITTHRESHOLD -= time_step;		
+	ptr->ENTITY_HITTHRESHOLD -= time_step;
 	if (ptr->HEALTH <= 0)
 	{
 		ptr->ENTITY_STATE = ENTITY_STATE_DIE;
 		ptr->SPUTNIK_ANIMSTATE = 0;
 		snd_play(sputnik_snd_death, 100, 0);
-		set(ptr, PASSABLE);		
+		set(ptr, PASSABLE);
 		jpsUnitDestroy(jpsUnitGetFromEntity(ptr));
 	}
 	else if (ptr->ENTITY_HITTHRESHOLD <= 0)
@@ -217,7 +222,7 @@ void SPUTNIK__attack(ENTITY* ptr)
 	ptr->SPUTNIK_ANIMSTATEATK = minv(ptr->SPUTNIK_ANIMSTATEATK, 100);
 	ptr->SPUTNIK_ANIMSTATE = 0;
 	ent_animate(ptr, SPUTNIK_ATTACKANIM, ptr->SPUTNIK_ANIMSTATEATK, 0);
-	
+
 	if (ptr->SPUTNIK_ANIMSTATEATK > 50)
 	{
 		if (ptr->SPUTNIK_DIDATTACK == 0)
@@ -226,7 +231,7 @@ void SPUTNIK__attack(ENTITY* ptr)
 			if (SCAN_IsEntityNear(ptr, victim, ptr->SPUTNIK_ATTACKRANGE))
 			{
 				unit_setDamage(victim, ptr->ENTITY_DAMAGE);
-			}			
+			}
 		}
 		ptr->SPUTNIK_DIDATTACK = 1;
 	}

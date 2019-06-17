@@ -102,7 +102,7 @@ ENTITY* spawner_spawn(int unittype, VECTOR* pos, var angle, var owner)
 		}
 
 		ent->material = building_material;
-		
+
 		if(wireframe != NULL)
 		{
 			wireframe->material = building_wireframe_material;
@@ -196,6 +196,10 @@ void SPAWNER_Update()
 		{
 			SPAWNER__hitcheck(ptr);
 		}
+        else
+        {
+            ptr->SELCTED_SKILL = 0; // unselect dead spawners
+        }
 
 		if (ptr->DAMAGE_HIT > 0)
       {
