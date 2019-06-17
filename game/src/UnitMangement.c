@@ -550,3 +550,8 @@ void UnitMangement_close(){
     if(unit_management_current_taunt_sound != 0)
         snd_stop(unit_management_current_taunt_sound);
 }
+
+void UnitMangement_unselect(ENTITY* ent)
+{
+	if (ent) ent->SELCTED_SKILL = 0;
+}

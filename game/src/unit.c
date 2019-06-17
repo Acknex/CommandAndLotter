@@ -1,4 +1,6 @@
 #include "sputnik.h"
+#include "jps.h"
+#include "unitmangement.h"
 
 var unit_setTarget(ENTITY* ent, VECTOR* pos)
 {
@@ -186,3 +188,8 @@ void unit_findNextVictim(ENTITY* ptr)
 	}
 }
 
+void unit_deactivate(ENTITY* ent)
+{
+	UnitMangement_unselect(ent);
+	jpsUnitDestroy(jpsUnitGetFromEntity(ent));
+}

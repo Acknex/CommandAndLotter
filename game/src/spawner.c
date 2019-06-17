@@ -4,6 +4,7 @@
 #include "map_loader.h"
 #include "unit.h"
 #include "fow.h"
+#include "unitmangement.h"
 
 #define SPAWNER_QUEUE skill21
 #define SPAWNER_PROGRESS skill22
@@ -45,6 +46,7 @@
 #define SPAWNER_LOS 2000
 
 SOUND* spawner_spawn_snd = "factory.wav";
+SOUND* spawner_destroy_snd = "factory_destroyed.wav";
 
 MATERIAL * building_wireframe_material =
 {
@@ -196,14 +198,10 @@ void SPAWNER_Update()
 		{
 			SPAWNER__hitcheck(ptr);
 		}
-        else
-        {
-            ptr->SELCTED_SKILL = 0; // unselect dead spawners
-        }
 
 		if (ptr->DAMAGE_HIT > 0)
-      {
-      	SPAWNER__hit(ptr);
+		{
+			SPAWNER__hit(ptr);
 		}
 
 		switch(ptr->ENTITY_STATE)
@@ -251,9 +249,10 @@ void SPAWNER__hit(ENTITY* ptr)
 
 	if (ptr->HEALTH <= 0)
 	{
+		UnitMangement_unselect(ptr);
 		ptr->ENTITY_STATE = SPAWNER_STATE_DIE;
 		ptr->ENTITY_ANIM = 0;
-		snd_play(sputnik_snd_death, 100, 0);
+		snd_play(spawner_destroy_snd, 100, 0);
 	}
 }
 
