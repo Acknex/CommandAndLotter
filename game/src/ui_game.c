@@ -5,13 +5,14 @@
 #include "building.h"
 #include "jps.h"
 #include "fow.h"
+#include "global.h"
 
 void ui_spawn_event_sputnik(var num, PANEL *panel)
 {
 	ENTITY *ent = panel->skill_y;
 	if (!ent) { return; } // NOOOO
 	spawner_produce(ent);
-	ent->skill[39] = 1;
+	ent->SELCTED_SKILL = 1;
 }
 
 void ui_destroy_event_sputnik(var num, PANEL *panel)
@@ -319,7 +320,7 @@ void ui_game_update()
 		ENTITY *ent = ptr_for_handle(ui_life_indicator[i]->skill_x);
 		if(ent)
 		{
-			if( !ent->skill[39] )
+			if( !ent->SELCTED_SKILL )
 			{
 				ui_life_indicator[i]->flags &= ~SHOW;
 			}
@@ -415,7 +416,7 @@ void ui_game_update()
 	int counter = 1;
 	SUBSYSTEM_LOOP(ent, SUBSYSTEM_SPAWNER)
 	{
-		if( ent->skill[39] )
+		if( ent->SELCTED_SKILL && ent->HEALTH > 0 )
 		{
 			if( ent->group == GROUP_PLAYER_SPAWNER )
 			{
@@ -472,7 +473,7 @@ void ui_game_update()
 	{
 		if( ent->group == GROUP_PLAYER_UNIT)
 		{
-			if( ent->skill[39] )
+			if( ent->SELCTED_SKILL )
 			{
 				ui_has_ents = 1;
 
