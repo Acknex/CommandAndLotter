@@ -53,7 +53,6 @@ FONT * uimenu_default_font = "Arial#16";
 #define UIMENU_SKILL_TEXT 0
 #define UIMENU_SKILL_FONT 1
 #define UIMENU_SKILL_COLOR 2
-#define UIMENU_SKILL_PRESSED 5
 
 typedef struct uimenu_element_t
 {
@@ -64,7 +63,10 @@ typedef struct uimenu_element_t
     BMAP * bmap;    
     BMAP * bmap_active;
     BMAP * bmap_hover;    
-    void * callback;
+    void * evt_on_click;  
+    void * evt_on_cancel;  
+    void * evt_on_enter;  
+    void * evt_on_leave;
     int element_index;
     var * var_pointer;
     
@@ -77,7 +79,9 @@ typedef struct uimenu_element_t
     void * _child; // uimenu_window_t
     int _is_initialized;
     int _is_dirty;
-    
+    int _is_pressed;
+    int _is_hover;
+
 } uimenu_element_t;
 
 typedef struct uimenu_window_t
@@ -131,10 +135,10 @@ void uimenu_add_element_to_window(uimenu_window_t * window, uimenu_element_t * e
 void uimenu_slave_window_to_window(uimenu_window_t * master, uimenu_window_t * slave);
 
 uimenu_element_t * uimenu_make_text(var x, var y, var width, var height, char * text, COLOR * colorBGR, FONT * font);
-uimenu_element_t * uimenu_make_button(var x, var y, var width, var height, BMAP * bmap, BMAP * bmapHover, BMAP * bmapActive, void * callback);
-uimenu_element_t * uimenu_make_button(var x, var y, BMAP * bmap, BMAP * bmapHover, BMAP * bmapActive, void * callback);
-uimenu_element_t * uimenu_make_simple_button(var x, var y, var width, var height, char * text, FONT * font, void * callback);
-uimenu_element_t * uimenu_make_simple_button(var x, var y, var height, char * text, FONT * font, void * callback);
+uimenu_element_t * uimenu_make_button(var x, var y, var width, var height, BMAP * bmap, BMAP * bmapHover, BMAP * bmapActive, void * evt_on_click);
+uimenu_element_t * uimenu_make_button(var x, var y, BMAP * bmap, BMAP * bmapHover, BMAP * bmapActive, void * evt_on_click);
+uimenu_element_t * uimenu_make_simple_button(var x, var y, var width, var height, char * text, FONT * font, void * evt_on_click);
+uimenu_element_t * uimenu_make_simple_button(var x, var y, var height, char * text, FONT * font, void * evt_on_click);
 uimenu_element_t * uimenu_make_image(var x, var y, var width, var height, BMAP * bmap);
 
 void uimenu_window_initialize(uimenu_window_t * window);

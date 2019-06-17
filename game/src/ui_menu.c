@@ -74,7 +74,10 @@ uimenu_element_t * uimenu_element_create(int type, var x, var y, var width, var 
     element->bmap = NULL;
     element->bmap_active = NULL;
     element->bmap_hover = NULL;
-    element->callback = NULL;
+    element->evt_on_click = NULL;
+    element->evt_on_cancel = NULL;
+    element->evt_on_enter = NULL;
+    element->evt_on_leave = NULL;
     
     element->_next = NULL;
     element->_related = NULL;
@@ -133,24 +136,24 @@ uimenu_element_t * uimenu_make_text(var x, var y, var width, var height, char * 
     return element;
 }
 
-uimenu_element_t * uimenu_make_button(var x, var y, var width, var height, BMAP * bmap, BMAP * bmapHover, BMAP * bmapActive, void * callback)
+uimenu_element_t * uimenu_make_button(var x, var y, var width, var height, BMAP * bmap, BMAP * bmapHover, BMAP * bmapActive, void * evt_on_click)
 {
     uimenu_element_t * element = uimenu_element_create(UIMENU_TYPE_BUTTON, x, y, width, height);
     
     element->bmap = bmap;
     element->bmap_active = bmapActive;
     element->bmap_hover = bmapHover;
-    element->callback = callback;
+    element->evt_on_click = evt_on_click;
 
     return element;
 }
 
-uimenu_element_t * uimenu_make_button(var x, var y, BMAP * bmap, BMAP * bmapHover, BMAP * bmapActive, void * callback)
+uimenu_element_t * uimenu_make_button(var x, var y, BMAP * bmap, BMAP * bmapHover, BMAP * bmapActive, void * evt_on_click)
 {
-    return uimenu_make_button(x, y, bmap_width(bmap), bmap_height(bmap), bmap, bmapHover, bmapActive, callback);
+    return uimenu_make_button(x, y, bmap_width(bmap), bmap_height(bmap), bmap, bmapHover, bmapActive, evt_on_click);
 }
 
-uimenu_element_t * uimenu_make_simple_button(var x, var y, var width, var height, char * text, FONT * font, void * callback)
+uimenu_element_t * uimenu_make_simple_button(var x, var y, var width, var height, char * text, FONT * font, void * evt_on_click)
 {
     FONT * finalFont = font;
     if(font == NULL)
@@ -160,12 +163,12 @@ uimenu_element_t * uimenu_make_simple_button(var x, var y, var width, var height
     var stringWidth = str_width(text, finalFont);
 
     element->_related = uimenu_make_text(x + (width / 2) - (stringWidth / 2) , y + 5, width, height, text, vector(0, 0, 0), finalFont);
-    element->callback = callback;
+    element->evt_on_click = evt_on_click;
 
     return element;    
 }
 
-uimenu_element_t * uimenu_make_simple_button(var x, var y, var height, char * text, FONT * font, void * callback)
+uimenu_element_t * uimenu_make_simple_button(var x, var y, var height, char * text, FONT * font, void * evt_on_click)
 {
     FONT * finalFont = font;
     if(font == NULL)
@@ -176,7 +179,7 @@ uimenu_element_t * uimenu_make_simple_button(var x, var y, var height, char * te
     uimenu_element_t * element = uimenu_element_create(UIMENU_TYPE_TEXTBUTTON, x, y, stringWidth, height);
 
     element->_related = uimenu_make_text(x + 10, y + 5, stringWidth, height, text, vector(0, 0, 0), finalFont);
-    element->callback = callback;
+    element->evt_on_click = evt_on_click;
 
     return element;    
 }
@@ -509,7 +512,9 @@ void uimenu__element_initialize(uimenu_window_t * window, uimenu_element_t * ele
                 element->bmap, // bmapOff
                 element->bmap_hover, // bmapHover
                 element->bmap, // bmapHoverOff
-                element->callback, NULL, NULL);
+                element->evt_on_click, // fncClick
+                element->evt_on_leave,  //fncLeave
+                element->evt_on_enter); //fncOver
                 break;
 
             case UIMENU_TYPE_TEXT:
@@ -703,31 +708,73 @@ void uimenu__element_update(uimenu_element_t * element)
 {
     if(element == NULL) return; // Fail gracefully
 
-    if(element->type == UIMENU_TYPE_TEXTBUTTON)
+    if(element->type != UIMENU_TYPE_BUTTON)
     {
         if(uimenu__is_cursor_in_element(element))
         {
-            if(mouse_left)
+            if(element->evt_on_click != NULL)
             {
-                element->skill[UIMENU_SKILL_PRESSED] = TRUE;
-            }
-            else if(element->skill[UIMENU_SKILL_PRESSED] == TRUE && !mouse_left)
-            {
-                element->skill[UIMENU_SKILL_PRESSED] = FALSE;
-                
-                // Callback click event
-                function callback();
-                callback = element->callback;
-                if(callback != NULL)
+                if(mouse_left)
                 {
-                    callback();
+                    element->_is_pressed = TRUE;
+                }
+                else if(element->_is_pressed == TRUE && !mouse_left)
+                {
+                    element->_is_pressed = FALSE;
+                    
+                    // Callback click event
+                    function callback_evt_on_click();
+                    callback_evt_on_click = element->evt_on_click;
+                    if(callback_evt_on_click != NULL)
+                    {
+                        callback_evt_on_click();
+                    }
+                }
+            }
+
+            if(element->evt_on_enter != NULL && element->_is_hover == FALSE)
+            {
+                element->_is_hover = TRUE;
+                
+                // Callback enter event
+                function callback_evt_on_enter();
+                callback_evt_on_enter = element->evt_on_enter;
+                if(callback_evt_on_enter != NULL)
+                {
+                    callback_evt_on_enter();
                 }
             }
         }
-        else if(element->skill[UIMENU_SKILL_PRESSED] == TRUE)
+        else 
         {
-            // Don't trigger if mouse moves outside
-            element->skill[UIMENU_SKILL_PRESSED] = FALSE;
+            if(element->_is_pressed == TRUE)
+            {
+                // Don't trigger if mouse moves outside
+                element->_is_pressed = FALSE;
+                if(element->evt_on_cancel != NULL)
+                {
+                    // Callback cancel event
+                    function callback_evt_on_cancel();
+                    callback_evt_on_cancel = element->evt_on_cancel;
+                    if(callback_evt_on_cancel != NULL)
+                    {
+                        callback_evt_on_cancel();
+                    }
+                }
+            }        
+
+            if(element->evt_on_leave != NULL && element->_is_hover == TRUE)
+            {
+                element->_is_hover = FALSE;
+                
+                // Callback leave event
+                function callback_evt_on_leave();
+                callback_evt_on_leave = element->evt_on_leave;
+                if(callback_evt_on_leave != NULL)
+                {
+                    callback_evt_on_leave();
+                }
+            }
         }
     }
 

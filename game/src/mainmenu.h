@@ -4,7 +4,11 @@
 #include "global.h"
 
 int mainmenu_current_response = 0;
+var mainmenu_buzz_wait_time = 2;
+var mainmenu_buzz_handle;
+
 uimenu_window_t * mainmenu_wndMenuBackground;
+uimenu_window_t * mainmenu_wndMenuBackgroundBright;
 uimenu_window_t * mainmenu_wndMenuMain;
 uimenu_element_t * mainmenu_btnNewGame;
 uimenu_element_t * mainmenu_btnOptions;
@@ -16,12 +20,15 @@ uimenu_window_t * mainmenu_wndMenuOptionsVideo;
 uimenu_window_t * mainmenu_wndMenuOptionsAudio;
 uimenu_window_t * mainmenu_wndMenuOptionsControls;
 
+SOUND *mainmenu_buzz = "bzzt.wav";
+
 BMAP * mainmenu_btn_new_game = "NewGame.png";
 BMAP * mainmenu_btn_options = "Options.png";
 BMAP * mainmenu_btn_credits = "Credits.png";
 BMAP * mainmenu_btn_exit = "exit.png";
 
-BMAP * mainmenu_background = "MenueBackground_fc.png";
+BMAP * mainmenu_background_bright = "MenueBackground_fc.png";
+BMAP * mainmenu_background = "MenueBackground_fc2.png";
 
 #define MAINMENU_RESPONSE_KEEP      0
 #define MAINMENU_RESPONSE_STARTGAME 1

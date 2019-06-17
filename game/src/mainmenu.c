@@ -7,6 +7,8 @@ void mainmenu_init(void)
 	// Main Menu
 	mainmenu_wndMenuBackground = uimenu_window_create_borderless(0, 0, 1920, 1080);
 	mainmenu_wndMenuBackground->_forced_background = mainmenu_background;
+	mainmenu_wndMenuBackgroundBright = uimenu_window_create_borderless(0, 0, 1920, 1080);
+	mainmenu_wndMenuBackgroundBright->_forced_background = mainmenu_background_bright;
 
 	mainmenu_wndMenuMain = uimenu_window_create_borderless(0, 0, 1920, 1080);
 
@@ -23,10 +25,9 @@ void mainmenu_init(void)
 
 	uimenu_window_initialize(mainmenu_wndMenuMain);
 	uimenu_window_initialize(mainmenu_wndMenuBackground);
+	uimenu_window_initialize(mainmenu_wndMenuBackgroundBright);
 
-	mainmenu_wndMenuMain->_content_panel->scale_x = mainmenu_wndMenuBackground->_content_panel->scale_x = screen_size.x  / 1920;
-	mainmenu_wndMenuMain->_content_panel->scale_y = mainmenu_wndMenuBackground->_content_panel->scale_y = screen_size.y  / 1080;
-
+	mainmenu_resolution_update();
 
 	// Options Menu
 	mainmenu_wndMenuOptions = uimenu_window_create( (screen_size.x / 2) - (640 / 2), (screen_size.y / 2) - (480 / 2), 640, 480, "Options");
@@ -56,6 +57,10 @@ void mainmenu_init(void)
 	uimenu_slave_window_to_window(mainmenu_wndMenuOptions, mainmenu_wndMenuOptionsGeneral);
 
 	uimenu_window_initialize(mainmenu_wndMenuOptionsGeneral);
+
+	// hacks
+	mainmenu_wndMenuBackgroundBright->_panel->flags |= TRANSLUCENT;
+	mainmenu_wndMenuMain->_panel->flags |= TRANSLUCENT;
 }
 
 
@@ -127,14 +132,29 @@ void mainmenu_open(void)
 	music_start("media/mainmenu.mp3", 0.5, 0);
 	uimenu_window_show(mainmenu_wndMenuMain);
 	uimenu_window_show(mainmenu_wndMenuBackground);
+	uimenu_window_show(mainmenu_wndMenuBackgroundBright);
 }
 
 void mainmenu_update(void)
 {
 	if(mainmenu_wndMenuMain != NULL)
 	{
-		if(total_secs % 2)
-			mainmenu_wndMenuMain->_panel->alpha = 25 + random(75);
+		if(total_secs == mainmenu_buzz_wait_time)
+		{
+			var alpha = 25 + random(75);
+			mainmenu_wndMenuMain->_panel->alpha = alpha;
+			mainmenu_wndMenuBackgroundBright->_panel->alpha = alpha;
+			mainmenu_buzz_handle = snd_play(mainmenu_buzz, alpha, 0);
+			snd_tune(mainmenu_buzz_handle, alpha, 100 - (alpha / 10), 0);
+			mainmenu_wndMenuMain->_content_panel->scale_x = mainmenu_wndMenuBackground->_content_panel->scale_x * (1 + (random(1) / 100));
+			mainmenu_wndMenuMain->_content_panel->scale_y = mainmenu_wndMenuBackground->_content_panel->scale_y * (1 + (random(1) / 100));
+		}
+
+		if(total_secs > mainmenu_buzz_wait_time)
+		{
+			mainmenu_buzz_wait_time = total_secs + integer(random(8));
+			mainmenu_resolution_update();
+		}
 	}
 }
 
@@ -142,14 +162,22 @@ void mainmenu_resolution_update(void)
 {
 	if(mainmenu_wndMenuMain != NULL)
 	{
-		mainmenu_wndMenuMain->_content_panel->scale_x = mainmenu_wndMenuBackground->_content_panel->scale_x = screen_size.x  / 1920;
-		mainmenu_wndMenuMain->_content_panel->scale_y = mainmenu_wndMenuBackground->_content_panel->scale_y = screen_size.y  / 1080;
+		mainmenu_wndMenuMain->_content_panel->scale_x =
+		mainmenu_wndMenuBackground->_content_panel->scale_x = 
+		mainmenu_wndMenuBackgroundBright->_content_panel->scale_x = 
+		screen_size.x  / 1920;
+
+		mainmenu_wndMenuMain->_content_panel->scale_y = 
+		mainmenu_wndMenuBackground->_content_panel->scale_y = 
+		mainmenu_wndMenuBackgroundBright->_content_panel->scale_y = 
+		screen_size.y  / 1080;
 	}
 }
 
 void mainmenu_close(void)
 {
 	uimenu_window_destroy(mainmenu_wndMenuBackground);
+	uimenu_window_destroy(mainmenu_wndMenuBackgroundBright);
 	uimenu_window_destroy(mainmenu_wndMenuMain);
 }
 
