@@ -5,16 +5,16 @@ h2;An AckCon 2019 Production
 s;8;
 h3;AckCon Staff
 s;4;
-l;Felix "MasterQ32" Queiﬂner
-r;Framework
-r;Level Loader
-r;Credits
-s;2
 l;Robert "firoball" J‰ger
 r;Enemy AI
 r;Build Script
 r;Final Release Fixes
 s;2
+l;Henrik "hen-woll" Wollmann
+r;2D & 3D Assets
+r;Texturing
+r;Animation
+r;UI & Menue
 l;Nils "slin" Daumann
 r;Shader Master
 r;Effects
@@ -26,11 +26,11 @@ s;2
 l;Michael "xwcg" Schwarz
 r;Main Menu
 s;2
-l;Henrik "hen-woll" Wollmann
-r;2D & 3D Assets
-r;Texturing
-r;Animation
-r;UI & Menue
+s;2
+l;Felix "MasterQ32" Queiﬂner
+r;Framework
+r;Level Loader
+r;Credits
 s;2
 l;Andreas "lemming" Holm
 r;Buildings
@@ -53,17 +53,18 @@ r;Unit Selection
 s;2
 l;Patrick "JenGS" Jendral
 r;Game UI
+r;Minimap
 s;2
 l;Korbinian "KorbiFraser" Kaulfuﬂ
-r;???
+r;Moral Support
 s;4
 
 s;4;
 h3;Special Thanks To
 s;4;
-x;Kanal 21;Providing the location
-s;1;
 x;Roman "Uncle Roman" Neumann;ALL THE PIZZA!
+s;1;
+x;Kanal 21;Providing the location
 s;1;
 s;8
 c;All donkey-larks were harmed during the production of this game.

@@ -11,5 +11,6 @@
 void fow_open();
 void fow_update();
 void fov_uncover(VECTOR *pos, var range);
+void fow_close(void);
 
 #endif
