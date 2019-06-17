@@ -11,6 +11,7 @@ var CamFPS;
 #include "unit.h"
 #include "jps.h"
 #include "effects2d.h"
+#include "spawner.h"
 
 #ifdef DebugMode
     var test1; //f?r debugzwecke
@@ -433,11 +434,16 @@ function UnitControl()
                 if(you != 0){
                          if(you->group==GROUP_PLAYER_UNIT || you->group==GROUP_PLAYER_SPAWNER || you->group==GROUP_ENEMY_UNIT || you->group==GROUP_ENEMY_SPAWNER){
 
-                            MAP* map = mapGetCurrent();
-                            TILE *tile = mapGetTileFromVector(map, target.x);
-                            if(tile){
-                                if(tile->visibility == FOW_SCOUTED){
-                                    SelectUnit(you);
+                             // only select units that are alive. everything
+                             // else doesn't make sense
+                            if(you->HEALTH > 0)
+                            {
+                                MAP* map = mapGetCurrent();
+                                TILE *tile = mapGetTileFromVector(map, target.x);
+                                if(tile){
+                                    if(tile->visibility == FOW_SCOUTED){
+                                        SelectUnit(you);
+                                    }
                                 }
                             }
                         }
