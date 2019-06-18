@@ -325,12 +325,9 @@ function UnitControl()
                              // else doesn't make sense
                             if(you->HEALTH > 0)
                             {
-                                MAP* map = mapGetCurrent();
-                                TILE *tile = mapGetTileFromVector(map, target.x);
-                                if(tile){
-                                    if(tile->visibility == FOW_SCOUTED){
-                                        SelectUnit(you);
-                                    }
+                                if(fow_isPosVisible(target.x))
+                                {
+                                    SelectUnit(you);   
                                 }
                             }
                         }
