@@ -140,13 +140,13 @@ int unit_getType(ENTITY* ent)
 	return -1;
 }
 
-void unit_findNextVictim(ENTITY* ptr, var unittype)
+ENTITY* unit_findNextVictim(ENTITY* ptr, var unittype)
 {
 	ptr->ENTITY_VICTIMTYPE = unittype;
-	unit_findNextVictim(ptr);	
+	return unit_findNextVictim(ptr);	
 }
 
-void unit_findNextVictim(ENTITY* ptr)
+ENTITY* unit_findNextVictim(ENTITY* ptr)
 {
 	/* following requirements have to be met for auto-picking of next victim
 	   1) no victim active
@@ -176,16 +176,19 @@ void unit_findNextVictim(ENTITY* ptr)
 				owner = UNIT_ENEMY;
 			else
 				owner = UNIT_PLAYER;
-		
+		//error("searching");
 			if (mapGetNearbyUnitsOfTypeForPos(ptr->x, ptr->ENTITY_VICTIMTYPE, owner, 2000, 1) > 0)
 			{
 				ent = jpsGetEntityFromUnitArray(0);
 				//set new target and victim
+				//error(str_for_num(NULL,ent->HEALTH));
 				unit_setTarget(ptr, &ent->x);
 				unit_setVictim(ptr, ent);
+				return ent;
 			}
 		}
 	}
+	return NULL;
 }
 
 void unit_deactivate(ENTITY* ptr)

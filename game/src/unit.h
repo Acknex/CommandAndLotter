@@ -18,8 +18,8 @@ ENTITY* unit_getVictim(ENTITY* ent);
 var unit_getHealth(ENTITY* ent);
 void unit_setDamage(ENTITY* ent, var damage);
 int unit_getType(ENTITY* ent);
-void unit_findNextVictim(ENTITY* ptr);
-void unit_findNextVictim(ENTITY* ptr, var unittype);
+ENTITY* unit_findNextVictim(ENTITY* ptr);
+ENTITY* unit_findNextVictim(ENTITY* ptr, var unittype);
 void unit_deactivate(ENTITY* ent);
 
 

@@ -113,6 +113,17 @@ void SPUTNIK__wait_or_walk(ENTITY * ptr)
 		{
 			unit_findNextVictim(ptr, UNIT_Z);
 		}
+		
+		//victim is selected but is not alive anymore --> pick new one
+		if (unit_getVictim(ptr) == NULL && ptr->ENTITY_VICTIMTYPE != UNIT_INVALID)
+		{
+			if (!unit_findNextVictim(ptr))
+			{
+				//nothing in range
+				ptr->ENTITY_VICTIMTYPE = UNIT_INVALID;
+			}
+		}
+
 	}
 }
 
@@ -237,8 +248,8 @@ void SPUTNIK__attack(ENTITY* ptr)
 
 	if (ptr->SPUTNIK_ANIMSTATEATK >= 100)
 	{
+		//unit_findNextVictim(ptr);
 		ptr->SPUTNIK_ANIMSTATEATK = 0;
-		unit_findNextVictim(ptr);
 		ptr->ENTITY_STATE = ENTITY_STATE_WAIT_OR_WALK;
 	}
 
