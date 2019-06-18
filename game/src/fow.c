@@ -202,6 +202,8 @@ bool fow_isPosVisible(VECTOR *pos)
 {
 	MAP *map = mapGetCurrent();
 	TILE *tile = mapGetTileFromVector(map, pos);
+	if(!tile)
+		return false;
 	return fow_isVisible(tile);
 }
 
@@ -248,8 +250,7 @@ void fow_update()
 	{
 		for(i = 0; i< mapSize; ++i)
 		{
-			TILE *tile = &((map->tiles)[i]);
-			tile->visibility = FOW_SCOUTED;
+			fov_uncoverTile(&((map->tiles)[i]));
 		}
 	}
 
