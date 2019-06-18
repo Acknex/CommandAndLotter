@@ -46,7 +46,7 @@ ENTITY* z_findNear(VECTOR* pos, var maxdist)
 		{
 			TILE *tile = mapGetTileFromVector(map, &zUnit->x);
 
-			if(tile->visibility == FOW_SCOUTED) 
+			if(fow_isVisible(tile)) 
 			{
 				zUnitNear = zUnit;
 				minDist = vec_length(&zPos);

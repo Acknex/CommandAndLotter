@@ -456,7 +456,7 @@ void ui_game_update()
         TILE* tile = mapGetTileFromVector(mapGetCurrent(), &ent->x);
         if(tile)
         {
-            if (tile->visibility == FOW_SCOUTED)
+            if (fow_isVisible(tile))
             {
                 if( ent->group == GROUP_ENEMY_SPAWNER )
                 {
@@ -504,7 +504,7 @@ void ui_game_update()
         TILE* tile = mapGetTileFromVector(mapGetCurrent(), &ent->x);
         if(tile)
         {
-            if (tile->visibility == FOW_SCOUTED)
+            if (fow_isVisible(tile))
             {
                 if(ent->group == GROUP_PLAYER_UNIT)
                 {
@@ -525,7 +525,7 @@ void ui_game_update()
         TILE* tile = mapGetTileFromVector(mapGetCurrent(), &ent->x);
         if(tile)
         {
-            if (tile->visibility == FOW_SCOUTED)
+            if (fow_isVisible(tile))
             {
                 ui_add_dot_to_minimap(ent, 1, ui_bmap_yellow, counter);
                 counter++;
