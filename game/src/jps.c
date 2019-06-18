@@ -787,7 +787,8 @@ int mapGetNearbyUnitsOfTypeForPos(VECTOR *vpos, int typeID, int owner, var maxDi
 			TILE* tile = mapTileGet(map, i, j);
 			if(tile)
 			{
-				if (tile->visibility == FOW_SCOUTED)
+				if (fow_isVisible(tile))
+				//if (tile->visibility == FOW_SCOUTED)
 				{
 					int k;
 					for(k = 0; k < tile->numUnits[currentPlayer]; k++)
