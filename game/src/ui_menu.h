@@ -4,7 +4,8 @@
 
 int uimenu_last_layer = 0;
 int uimenu_window_id = 0;
-FONT * uimenu_default_font = "Arial#16";
+FONT * uimenu_default_font = "Arial#14";
+FONT * uimenu_default_font_bold = "Arial#14b";
 
 #define UIMENU_TYPE_TEXT        1
 #define UIMENU_TYPE_IMAGE       2
@@ -18,7 +19,8 @@ FONT * uimenu_default_font = "Arial#16";
 #define UIMENU_TYPE_TEXTINPUT   10
 #define UIMENU_TYPE_NUMINPUT    11
 
-#define UIMENU_WINDOW_TITLE_BAR_SIZE    32
+#define UIMENU_BUTTON_HEIGHT            23
+#define UIMENU_WINDOW_TITLE_BAR_SIZE    22
 #define UIMENU_WINDOW_BORDER_SIZE       4
 #define UIMENU_WINDOW_CONTENT_PADDING   8
 
@@ -33,6 +35,10 @@ FONT * uimenu_default_font = "Arial#16";
 #define UIMENU_WINDOW_FIELD_COLOR_R    255
 #define UIMENU_WINDOW_FIELD_COLOR_G    255
 #define UIMENU_WINDOW_FIELD_COLOR_B    255
+
+#define UIMENU_WINDOW_FIELD_TEXT_COLOR_R    0
+#define UIMENU_WINDOW_FIELD_TEXT_COLOR_G    0
+#define UIMENU_WINDOW_FIELD_TEXT_COLOR_B    0
 
 #define UIMENU_WINDOW_TITLEBAR_COLOR_R    0
 #define UIMENU_WINDOW_TITLEBAR_COLOR_G    0
@@ -53,6 +59,9 @@ FONT * uimenu_default_font = "Arial#16";
 #define UIMENU_SKILL_TEXT 0
 #define UIMENU_SKILL_FONT 1
 #define UIMENU_SKILL_COLOR 2
+#define UIMENU_SKILL_VALUE 5
+#define UIMENU_SKILL_ITEMS 6
+#define UIMENU_SKILL_NUM_ITEMS 7
 
 typedef struct uimenu_element_t
 {
@@ -67,9 +76,10 @@ typedef struct uimenu_element_t
     void * evt_on_cancel;  
     void * evt_on_enter;  
     void * evt_on_leave;
+    void * evt_on_select;  
     int element_index;
     var * var_pointer;
-    
+
     var skill[10]; // Properties
 
     // Private
@@ -139,7 +149,9 @@ uimenu_element_t * uimenu_make_button(var x, var y, var width, var height, BMAP 
 uimenu_element_t * uimenu_make_button(var x, var y, BMAP * bmap, BMAP * bmapHover, BMAP * bmapActive, void * evt_on_click);
 uimenu_element_t * uimenu_make_simple_button(var x, var y, var width, var height, char * text, FONT * font, void * evt_on_click);
 uimenu_element_t * uimenu_make_simple_button(var x, var y, var height, char * text, FONT * font, void * evt_on_click);
+//uimenu_element_t * uimenu_make_simple_button(var x, var y, char * text, FONT * font, void * evt_on_click);
 uimenu_element_t * uimenu_make_image(var x, var y, var width, var height, BMAP * bmap);
+uimenu_element_t * uimenu_make_dropdown(var x, var y, var width, var height, var * currentValue, uimenu_listitem_t * items, int numItems);
 
 void uimenu_window_initialize(uimenu_window_t * window);
 void uimenu_window_to_top(uimenu_window_t * window);

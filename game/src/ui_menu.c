@@ -162,7 +162,7 @@ uimenu_element_t * uimenu_make_simple_button(var x, var y, var width, var height
     uimenu_element_t * element = uimenu_element_create(UIMENU_TYPE_TEXTBUTTON, x, y, width, height);
     var stringWidth = str_width(text, finalFont);
 
-    element->_related = uimenu_make_text(x + (width / 2) - (stringWidth / 2) , y + 5, width, height, text, vector(0, 0, 0), finalFont);
+    element->_related = uimenu_make_text(x + (width / 2) - (stringWidth / 2) , y + 3, width, height, text, vector(0, 0, 0), finalFont);
     element->evt_on_click = evt_on_click;
 
     return element;    
@@ -178,7 +178,7 @@ uimenu_element_t * uimenu_make_simple_button(var x, var y, var height, char * te
 
     uimenu_element_t * element = uimenu_element_create(UIMENU_TYPE_TEXTBUTTON, x, y, stringWidth, height);
 
-    element->_related = uimenu_make_text(x + 10, y + 5, stringWidth, height, text, vector(0, 0, 0), finalFont);
+    element->_related = uimenu_make_text(x + 10, y + 3, stringWidth, height, text, vector(0, 0, 0), finalFont);
     element->evt_on_click = evt_on_click;
 
     return element;    
@@ -189,6 +189,29 @@ uimenu_element_t * uimenu_make_image(var x, var y, var width, var height, BMAP *
     uimenu_element_t * element = uimenu_element_create(UIMENU_TYPE_IMAGE, x, y, width, height);
     
     element->bmap = bmap;
+
+    return element;
+}
+
+uimenu_element_t * uimenu_make_dropdown(var x, var y, var width, var height, char * nothingSelectedText, var currentValue, uimenu_listitem_t * items, int numItems, void * evt_on_select)
+{
+    uimenu_element_t * element = uimenu_element_create(UIMENU_TYPE_DROPDOWN, x, y, width, height);
+
+    element->skill[UIMENU_SKILL_TEXT] = str_create(nothingSelectedText);
+    element->skill[UIMENU_SKILL_VALUE] = currentValue;
+    element->skill[UIMENU_SKILL_ITEMS] = items;
+    element->skill[UIMENU_SKILL_NUM_ITEMS] = numItems;
+
+    element->evt_on_select = evt_on_select;
+
+    element->_related = uimenu_make_text(
+        x + 10, 
+        y + 5, 
+        width - 20, 
+        height, 
+        nothingSelectedText,
+        vector(UIMENU_WINDOW_FIELD_TEXT_COLOR_B, UIMENU_WINDOW_FIELD_TEXT_COLOR_G, UIMENU_WINDOW_FIELD_TEXT_COLOR_R), 
+        uimenu_default_font);
 
     return element;
 }
@@ -445,8 +468,8 @@ void uimenu__window_initialize(uimenu_window_t * window)
         window->_title_element_index = pan_setstring(window->_panel, 
             0, 
             UIMENU_WINDOW_BORDER_SIZE * 2, // x
-            UIMENU_WINDOW_BORDER_SIZE * 2, // y
-            uimenu_default_font, 
+            UIMENU_WINDOW_BORDER_SIZE + 1, // y
+            uimenu_default_font_bold, 
             str_create(window->title));
         pan_setcolor(window->_panel, 
             1,

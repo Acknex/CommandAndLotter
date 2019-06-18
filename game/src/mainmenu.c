@@ -31,12 +31,12 @@ void mainmenu_init(void)
 
 	// Options Menu
 	mainmenu_wndMenuOptions = uimenu_window_create( (screen_size.x / 2) - (640 / 2), (screen_size.y / 2) - (480 / 2), 640, 480, "Options");
-	uimenu_element_t * optionsExit = uimenu_make_simple_button(640 - 85, 480 - 28, 85, 32, "OK", uimenu_default_font, mainmenu_hide_options);
+	uimenu_element_t * optionsExit = uimenu_make_simple_button(640 - 90, 480 - 23, 85, UIMENU_BUTTON_HEIGHT, "OK", uimenu_default_font, mainmenu_hide_options);
 
-	uimenu_element_t * optionsTabGeneral = uimenu_make_simple_button(0, 0, 32, "General", uimenu_default_font, mainmenu_show_options_general);
-	uimenu_element_t * optionsTabVideo = uimenu_make_simple_button(optionsTabGeneral->x + optionsTabGeneral->width + 2, 0, 32, "Video", uimenu_default_font, mainmenu_show_options_video);
-	uimenu_element_t * optionsTabAudio = uimenu_make_simple_button(optionsTabVideo->x + optionsTabVideo->width + 2, 0, 32, "Audio", uimenu_default_font, mainmenu_show_options_audio);
-	uimenu_element_t * optionsTabControls = uimenu_make_simple_button(optionsTabAudio->x + optionsTabAudio->width + 2, 0, 32, "Controls", uimenu_default_font, mainmenu_show_options_controls);
+	uimenu_element_t * optionsTabGeneral = uimenu_make_simple_button(0, 0, UIMENU_BUTTON_HEIGHT, "General", uimenu_default_font, mainmenu_show_options_general);
+	uimenu_element_t * optionsTabVideo = uimenu_make_simple_button(optionsTabGeneral->x + optionsTabGeneral->width + 2, 0, UIMENU_BUTTON_HEIGHT, "Video", uimenu_default_font, mainmenu_show_options_video);
+	uimenu_element_t * optionsTabAudio = uimenu_make_simple_button(optionsTabVideo->x + optionsTabVideo->width + 2, 0, UIMENU_BUTTON_HEIGHT, "Audio", uimenu_default_font, mainmenu_show_options_audio);
+	uimenu_element_t * optionsTabControls = uimenu_make_simple_button(optionsTabAudio->x + optionsTabAudio->width + 2, 0, UIMENU_BUTTON_HEIGHT, "Controls", uimenu_default_font, mainmenu_show_options_controls);
 
 	uimenu_add_element_to_window(mainmenu_wndMenuOptions, optionsExit);
 
@@ -139,21 +139,24 @@ void mainmenu_update(void)
 {
 	if(mainmenu_wndMenuMain != NULL)
 	{
-		if(total_secs == mainmenu_buzz_wait_time)
+		if(mainmenu_wndMenuMain->_is_visible)
 		{
-			var alpha = 25 + random(75);
-			mainmenu_wndMenuMain->_panel->alpha = alpha;
-			mainmenu_wndMenuBackgroundBright->_panel->alpha = alpha;
-			mainmenu_buzz_handle = snd_play(mainmenu_buzz, alpha, 0);
-			snd_tune(mainmenu_buzz_handle, alpha, 100 - (alpha / 10), 0);
-			mainmenu_wndMenuMain->_content_panel->scale_x = mainmenu_wndMenuBackground->_content_panel->scale_x * (1 + (random(1) / 100));
-			mainmenu_wndMenuMain->_content_panel->scale_y = mainmenu_wndMenuBackground->_content_panel->scale_y * (1 + (random(1) / 100));
-		}
+			if(total_secs == mainmenu_buzz_wait_time)
+			{
+				var alpha = 25 + random(75);
+				mainmenu_wndMenuMain->_panel->alpha = alpha;
+				mainmenu_wndMenuBackgroundBright->_panel->alpha = alpha;
+				mainmenu_buzz_handle = snd_play(mainmenu_buzz, alpha, 0);
+				snd_tune(mainmenu_buzz_handle, alpha, 100 - (alpha / 10), 0);
+				mainmenu_wndMenuMain->_content_panel->scale_x = mainmenu_wndMenuBackground->_content_panel->scale_x * (1 + (random(1) / 100));
+				mainmenu_wndMenuMain->_content_panel->scale_y = mainmenu_wndMenuBackground->_content_panel->scale_y * (1 + (random(1) / 100));
+			}
 
-		if(total_secs > mainmenu_buzz_wait_time)
-		{
-			mainmenu_buzz_wait_time = total_secs + integer(random(8));
-			mainmenu_resolution_update();
+			if(total_secs > mainmenu_buzz_wait_time)
+			{
+				mainmenu_buzz_wait_time = total_secs + integer(random(8));
+				mainmenu_resolution_update();
+			}
 		}
 	}
 }
