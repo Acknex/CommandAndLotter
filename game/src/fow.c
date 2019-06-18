@@ -292,5 +292,7 @@ void fow_update()
 
 void fow_close()
 {
-    fow_killparticles = true;
+	fow_killparticles = true;
+	if(fow_borderCells)
+		sys_free(fow_borderCells);
 }
