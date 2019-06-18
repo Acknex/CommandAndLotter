@@ -11,24 +11,24 @@
 #define Z_SIZE skill11
 
 SOUND* z_collect_snd = "z_collect.wav";
-var z_amount;
+var z_amount[2];
 
-var z_get()
+var z_get(var owner)
 {
-	return z_amount;
+	return z_amount[clamp(owner,0,1)];
 }
 
 
-bool z_isSufficient(var amount)
+bool z_isSufficient(var amount, var owner)
 {
-	return (amount <= z_amount);
+	return (amount <= z_amount[clamp(owner,0,1)]);
 }
 
-bool z_pay(var amount)
+bool z_pay(var amount, var owner)
 {
-	if(amount > z_amount)
+	if(amount > z_amount[clamp(owner,0,1)])
 		return false;
-	z_amount -= amount;
+	z_amount[clamp(owner,0,1)] -= amount;
 	return true;
 }
 
@@ -80,7 +80,8 @@ void Z()
 
 void Z_Init()
 {
-	z_amount = 1000;
+	z_amount[0] = 50;
+	z_amount[1] = 50;
 }
 
 void Z_Update()
@@ -122,7 +123,8 @@ void Z_Update()
 
 void Z__hit(ENTITY* ptr)
 {
-	z_amount += minv(Z_VALUE, ptr->DAMAGE_HIT*Z_PER_DAMAGE);
+	ENTITY* attacker = ptr_for_handle(ptr->DAMAGE_ENT);
+	z_amount[attacker->OWNER] += minv(Z_VALUE, ptr->DAMAGE_HIT*Z_PER_DAMAGE);
 	
 	ptr->Z_VALUE_LEFT -= ptr->DAMAGE_HIT*Z_PER_DAMAGE;
 	ptr->DAMAGE_HIT = 0;

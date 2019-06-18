@@ -91,7 +91,7 @@ void buildingPlacement_placeConstruction()
 		case BUILDING_BANK:
 		//case ..
 		if(!buildingPlacement_previewModel) error("buildingPlacement_placeConstruction: !buildingPlacement_previewModel !!!");
-		spawner_spawn(buildingPlacement_selection, &buildingPlacement_previewModel->x, buildingPlacement_previewModel->pan, SPAWNER_PLAYER);
+		spawner_spawn(buildingPlacement_selection, &buildingPlacement_previewModel->x, buildingPlacement_previewModel->pan, PLAYER_ID_PLAYER);
 		//case nichtspawnergebaeude
 		break;
 		default:

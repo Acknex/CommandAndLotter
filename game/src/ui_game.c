@@ -571,7 +571,7 @@ void ui_game_update()
 
 	VECTOR screen;
 
-	a_stupid_var = z_get();
+	a_stupid_var = z_get(PLAYER_ID_PLAYER);
 
 	if( last_building != ui_active_building)
 	{

@@ -33,7 +33,7 @@ void ai_spawn_building(int buildingType)
 	cprintf3("\n ai_spawn_building(%d) at frame %d: tile(%p)", buildingType, (int)total_frames, tile);
 	if(tile)
 	{
-		aiSystemInstance->entBuildings[buildingType][aiSystemInstance->buildingCount[buildingType]++] = spawner_spawn(0, mapGetVectorFromTile(map, NULL, tile), random(360), SPAWNER_ENEMY);
+		aiSystemInstance->entBuildings[buildingType][aiSystemInstance->buildingCount[buildingType]++] = spawner_spawn(0, mapGetVectorFromTile(map, NULL, tile), random(360), PLAYER_ID_AI);
 	}
 }
 

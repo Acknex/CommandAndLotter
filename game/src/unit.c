@@ -98,8 +98,8 @@ ENTITY* unit_spawn(int unittype, VECTOR* pos, VECTOR* targetPos, var owner)
 	
 	if (ent != NULL)
 	{
-		
-		if (owner == UNIT_ENEMY)
+		ent->OWNER = owner;
+		if (owner == PLAYER_ID_AI)
 		{
 			ent->group = GROUP_ENEMY_UNIT;
 			ent->SK_ENTITY_JPS_POINTER_TO_UNIT_STRUCT = jpsUnitCreate(PLAYER_ID_AI, unittype, ent);
@@ -123,11 +123,12 @@ var unit_getHealth(ENTITY* ent)
 	return ent->HEALTH / ent->MAXHEALTH;
 }
 
-void unit_setDamage(ENTITY* ent, var damage)
+void unit_setDamage(ENTITY* ent, ENTITY* attacker)
 {
-	if (ent != NULL)
+	if (ent != NULL && attacker != NULL)
 	{
-		ent->DAMAGE_HIT = damage;
+		ent->DAMAGE_HIT = attacker->ENTITY_DAMAGE;
+		ent->DAMAGE_ENT = handle(attacker);
 	}
 }
 
@@ -170,14 +171,8 @@ ENTITY* unit_findNextVictim(ENTITY* ptr)
 		}
 		else
 		{
-			//meh.
-			var owner;
-			if (ptr->group == GROUP_ENEMY_UNIT)	
-				owner = UNIT_ENEMY;
-			else
-				owner = UNIT_PLAYER;
 		//error("searching");
-			if (mapGetNearbyUnitsOfTypeForPos(ptr->x, ptr->ENTITY_VICTIMTYPE, owner, 2000, 1) > 0)
+			if (mapGetNearbyUnitsOfTypeForPos(ptr->x, ptr->ENTITY_VICTIMTYPE, ptr->OWNER, 2000, 1) > 0)
 			{
 				ent = jpsGetEntityFromUnitArray(0);
 				//set new target and victim

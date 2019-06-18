@@ -29,11 +29,11 @@ void stub_init()
 	on_p = producesputnik;
 	on_k = getz;
 	on_f = attack;
-	fancysputnik = unit_spawn(0, vector(0,0,500), UNIT_PLAYER);
-	evilsputnik = unit_spawn(0, vector(-1500,0,500), UNIT_ENEMY);
-	unit_spawn(0, vector(-1800,0,500), UNIT_ENEMY);
-	unit_spawn(0, vector(-2100,0,500), UNIT_ENEMY);
-	fancytower = spawner_spawn(0, vector(100,1000,500), 0, SPAWNER_PLAYER);
+	fancysputnik = unit_spawn(0, vector(0,0,500), PLAYER_ID_PLAYER);
+	evilsputnik = unit_spawn(0, vector(-1500,0,500), PLAYER_ID_AI);
+	unit_spawn(0, vector(-1800,0,500), PLAYER_ID_AI);
+	unit_spawn(0, vector(-2100,0,500), PLAYER_ID_AI);
+	fancytower = spawner_spawn(0, vector(100,1000,500), 0, PLAYER_ID_PLAYER);
 	fancyz = z_spawn(vector(3000, 0, 500));
 }
 

@@ -774,8 +774,11 @@ int mapGetNearbyUnitsOfTypeForPos(VECTOR *vpos, int typeID, int owner, var maxDi
 	int ownerMin = 0;
 	int ownerMax = 1;
 	int currentPlayer;
-	if(owner == UNIT_PLAYER) currentPlayer = 1; 
-	if(owner == UNIT_ENEMY) currentPlayer = 0; 
+	
+	//@superku please check. are array index and player/AI defines twisted?
+	if(owner == PLAYER_ID_PLAYER) currentPlayer = 1; 
+	if(owner == PLAYER_ID_AI) currentPlayer = 0; 
+	
 	int i,j;
 	for(i = sourceTile->pos[0]-range; i <= sourceTile->pos[0]+range; i++)
 	{

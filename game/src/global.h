@@ -27,9 +27,11 @@ typedef int bool;
 
 
 
+#define DAMAGE_ENT skill50
 #define DAMAGE_HIT skill51
 #define MAXHEALTH skill52
 #define HEALTH skill53
+#define OWNER skill54
 #define ENTITY_STATE skill55
 #define ENTITY_ANIM skill56
 #define ENTITY_VICTIM skill57

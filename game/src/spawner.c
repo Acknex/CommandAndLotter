@@ -92,7 +92,8 @@ ENTITY* spawner_spawn(int unittype, VECTOR* pos, var angle, var owner)
 		mapJPSUpdate(mapGetCurrent());
 
 		ent->ENTITY_UNITTYPE = unittype;
-		if (owner == SPAWNER_ENEMY)
+		ent->OWNER = owner;
+		if (owner == PLAYER_ID_AI)
 		{
 			ent->group = GROUP_ENEMY_SPAWNER;
 		}
@@ -123,9 +124,9 @@ var spawner_produce(ENTITY* ent)
 	{
 		if (ent->group == GROUP_ENEMY_SPAWNER || ent->group == GROUP_PLAYER_SPAWNER)
 		{
-			if(z_isSufficient(spawner_unit_cost[ent->ENTITY_UNITTYPE]))
+			if(z_isSufficient(spawner_unit_cost[ent->ENTITY_UNITTYPE], ent->OWNER))
 			{
-				z_pay(spawner_unit_cost[ent->ENTITY_UNITTYPE]);
+				z_pay(spawner_unit_cost[ent->ENTITY_UNITTYPE], ent->OWNER);
 				ent->SPAWNER_QUEUE++;
 			}
 			return ent->SPAWNER_QUEUE;
@@ -325,20 +326,13 @@ void SPAWNER__produce(ENTITY* ptr)
 	{
 		ptr->SPAWNER_BUILDTIMER = SPAWNER_BUILDTIME;
 		ptr->SPAWNER_QUEUE--;
-
-		//meh.
-		var owner;
-		if (ptr->group == GROUP_ENEMY_SPAWNER)
-			owner = UNIT_ENEMY;
-		else
-			owner = UNIT_PLAYER;
 		ptr->SPAWNER_SPAWNANGLE += 137.5;
 		ptr->SPAWNER_SPAWNANGLE %= 360;
 		VECTOR* targetPos = vector(400,0,0);
 		VECTOR* angle = vector(ang(ptr->SPAWNER_SPAWNANGLE), 0, 0);
 		vec_rotate(targetPos, angle);
 		vec_add(targetPos, ptr->x);
-		unit_spawn(ptr->ENTITY_UNITTYPE, ptr->x, targetPos, owner);
+		unit_spawn(ptr->ENTITY_UNITTYPE, ptr->x, targetPos, ptr->OWNER);
 	}
 	if (ptr->SPAWNER_QUEUE == 0)
 	{

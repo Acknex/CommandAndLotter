@@ -40,7 +40,7 @@ void Sputnik()
 	my->SPUTNIK_RUNSPEED = 30;
 	my->SPUTNIK_TURNSPEED = 50;
 	my->SPUTNIK_ATTACKSPEED = 5;
-	my->SPUTNIK_ATTACKRANGE = 170;
+	my->SPUTNIK_ATTACKRANGE = 200;
 	my->SPUTNIK_ANIMSTATEATK = 0;
 	my->SPUTNIK_IDLECOUNTER = 0;
 	my->HEALTH = 23;
@@ -236,7 +236,9 @@ void SPUTNIK__attack(ENTITY* ptr)
 			ENTITY* victim = unit_getVictim(ptr);
 			if (SCAN_IsEntityNear(ptr, victim, ptr->SPUTNIK_ATTACKRANGE))
 			{
-				unit_setDamage(victim, ptr->ENTITY_DAMAGE);
+				//DEBUG
+				if (victim == ptr) error ("attacking myself :O");
+				unit_setDamage(victim, ptr);
 			}
 		}
 		ptr->SPUTNIK_DIDATTACK = 1;
