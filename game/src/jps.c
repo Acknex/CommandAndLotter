@@ -973,6 +973,7 @@ int sphereBoxCollision(VECTOR* spherePos2D, VECTOR* vSpeed, float sphereRadius, 
 		VECTOR delta;
 		vec_diff(delta, spherePos2D, pbox);
 		float len = vec_length(delta);
+		if(len < 0.025) vec_sub(delta,vSpeed);
 		if(len < sphereRadius)
 		{
 			/*VECTOR psphere;
