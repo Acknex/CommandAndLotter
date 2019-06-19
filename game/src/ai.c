@@ -42,22 +42,9 @@ void ai_spawn_unit(int unitType)
 	int buildingType = 0; // buildingType == unitType? <-- yes.
 	if(aiSystemInstance->buildingCount[buildingType] <= 0) return;
 	ENTITY* ptr = aiSystemInstance->entBuildings[buildingType][(int)random(aiSystemInstance->buildingCount[buildingType])];
-	//why not use spawner functionality instead of copying..?
-	/*
-	ptr->SPAWNER_SPAWNANGLE += 137.5;
-	ptr->SPAWNER_SPAWNANGLE %= 360;
-	VECTOR* targetPos = vector(256+random(800),0,0);
-	VECTOR* angle = vector(ang(ptr->SPAWNER_SPAWNANGLE), 0, 0);
-	vec_rotate(targetPos, angle);
-	//vec_add(targetPos, ptr->x);
-	
-	unit_spawn(unitType, ptr->x, targetPos, 1);
-	*/
-	
-	//TODO: someone coded payment into spawner.c directly, so do direct access for AI for now
-	//payment system needs extension for AI or needs to be stripped from spawner.c
-	//spawner_produce(ptr);
-	ptr->SPAWNER_QUEUE++;
+
+//todo: AI logic should check z amount before just trying to produce new units	
+	spawner_produce(ptr);
 }
 
 void ai_update()

@@ -25,8 +25,7 @@
 #define SPUTNIK_DIEANIM "Die"
 
 #define SPUTNIK_FEET 30
-#define SPUTNIK_TARGETDIST 70
-#define SPUTNIK_MAXIDLE 20
+#define SPUTNIK_MAXIDLE 32
 
 SOUND* sputnik_snd_death   = "sputnik_death.wav";
 SOUND* sputnik_snd_attack1 = "sputnik_attack1.wav";
