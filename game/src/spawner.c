@@ -312,8 +312,8 @@ void SPAWNER__active(ENTITY* ptr)
 	}
 	else
 	{
-		ptr->SPAWNER_ANIMSTATE = cycle(ptr->SPAWNER_ANIMSTATE + 7 * time_step, 0, 100);
-		ent_animate(ptr, SPUTNIK_WAITANIM, ptr->SPUTNIK_ANIMSTATE, ANM_CYCLE);
+		ent_animate(ptr, SPAWNER_ACTIVEANIM, ptr->SPAWNER_ANIMSTATE, ANM_CYCLE);
+		ptr->SPAWNER_ANIMSTATE = cycle(ptr->SPAWNER_ANIMSTATE + time_step, 0, 100);
 	}
 }
 
