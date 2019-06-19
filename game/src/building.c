@@ -28,8 +28,10 @@ void buildingPlacement_init()
 	buildingPlacement_assets[2] = "eye_tree_you.mdl";
 	buildingPlacement_constructionAssets[2] = "eye_tree_you_wireframe.mdl";
 
-	buildingPlacement_assets[3] = "bank_of_zorro.mdl";
-	buildingPlacement_constructionAssets[3] = "bank_of_zorro_wireframe.mdl";
+//	buildingPlacement_assets[3] = "bank_of_zorro.mdl";
+//	buildingPlacement_constructionAssets[3] = "bank_of_zorro_wireframe.mdl";
+	buildingPlacement_assets[3] = "the_tower.mdl";
+	buildingPlacement_constructionAssets[3] = "the_tower_wireframe.mdl";
 }
 
 void buildingPlacement_open()

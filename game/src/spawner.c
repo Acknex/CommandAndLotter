@@ -80,8 +80,10 @@ ENTITY* spawner_spawn(int unittype, VECTOR* pos, var angle, var owner)
             wireframe = ent_create("eye_tree_you_wireframe.mdl", pos, NULL);
             break;
         case UNIT_BABE:
-            ent = ent_create("bank_of_zorro.mdl", pos, Spawner);
-            wireframe = ent_create("bank_of_zorro_wireframe.mdl", pos, NULL);
+            //ent = ent_create("bank_of_zorro.mdl", pos, Spawner);
+            //wireframe = ent_create("bank_of_zorro_wireframe.mdl", pos, NULL);
+            ent = ent_create("the_tower.mdl", pos, Spawner);
+            wireframe = ent_create("the_tower_wireframe.mdl", pos, NULL);
             break;
 	}
 
