@@ -2,6 +2,22 @@
 #include "jps.h"
 #include "unitmangement.h"
 
+#define UNIT_TABLESIZE 25 // UNIT_CLASSES*UNIT_CLASSES Lite-C is stupid. Really.
+var unit__dmgtable[UNIT_TABLESIZE] = {
+   /*S L E C Z*/
+/*S*/7,9,2,2,1,
+/*L*/2,5,7,7,1,
+/*E*/9,5,3,3,1,
+/*C*/2,5,7,7,1,
+/*Z*/0,0,0,0,0
+};
+/*
+(CBABE)Maschinengewehrinfanterie: ++Infanterie  00Fahrzeug  --Panzer
+(EYE)Raketeninfanterie:           --Infanterie  00Fahrzeug  ++Panzer
+(LERCHE)Fahrzeug:                 ++Infanterie  00Fahrzeug  --Panzer
+(SPUTNIK)Panzer:                  --Infanterie  ++Fahrzeug  ++Panzer
+*/
+
 var unit_setTarget(ENTITY* ent, VECTOR* pos)
 {
 	VECTOR target2D;
@@ -123,13 +139,17 @@ var unit_getHealth(ENTITY* ent)
 	return ent->HEALTH / ent->MAXHEALTH;
 }
 
-void unit_setDamage(ENTITY* ent, ENTITY* attacker)
+var unit_setDamage(ENTITY* victim, ENTITY* attacker)
 {
-	if (ent != NULL && attacker != NULL)
+	if (victim != NULL && attacker != NULL)
 	{
-		ent->DAMAGE_HIT = attacker->ENTITY_DAMAGE;
-		ent->DAMAGE_ENT = handle(attacker);
+		var index = UNIT_CLASSES * clamp(attacker->ENTITY_UNITTYPE,0,UNIT_CLASSES-1) + clamp(victim->ENTITY_UNITTYPE,0,UNIT_CLASSES-1);
+		victim->DAMAGE_HIT = unit__dmgtable[index];
+		victim->DAMAGE_ENT = handle(attacker);
+		
+		return unit__dmgtable[index];
 	}
+	return 0;
 }
 
 int unit_getType(ENTITY* ent)

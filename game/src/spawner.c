@@ -10,6 +10,7 @@
 #define SPAWNER_PROGRESS skill22
 #define SPAWNER_BUILDTIMER skill23
 #define SPAWNER_DIETIMER skill24
+#define SPAWNER_ANIMSTATE skill25
 #define SPAWNER_HITTHRESHOLD skill27
 #define SPAWNER_FIREPARTICLES skill28
 #define SPAWNER_DEBRISPARTICLES skill29
@@ -23,7 +24,7 @@
 #define SPAWNER_BASEZ skill72
 
 
-#define SPAWNER_ACTIVEANIM "stand"
+#define SPAWNER_ACTIVEANIM "Stand"
 #define SPAWNER_PRODUCEANIM "produce"
 #define SPAWNER_DIEANIM "Die"
 
@@ -117,7 +118,6 @@ ENTITY* spawner_spawn(int unittype, VECTOR* pos, var angle, var owner)
 	return ent;
 }
 
-//TODO: zloty interface currently is for player only, needs to support enemy as well
 var spawner_produce(ENTITY* ent)
 {
 	if (ent != NULL)
@@ -312,7 +312,8 @@ void SPAWNER__active(ENTITY* ptr)
 	}
 	else
 	{
-		//idle
+		ptr->SPAWNER_ANIMSTATE = cycle(ptr->SPAWNER_ANIMSTATE + 7 * time_step, 0, 100);
+		ent_animate(ptr, SPUTNIK_WAITANIM, ptr->SPUTNIK_ANIMSTATE, ANM_CYCLE);
 	}
 }
 
@@ -338,6 +339,7 @@ void SPAWNER__produce(ENTITY* ptr)
 	{
 		ptr->SPAWNER_BUILDTIMER = SPAWNER_BUILDTIME;
 		ptr->ENTITY_STATE = SPAWNER_STATE_ACTIVE;
+		ptr->SPAWNER_ANIMSTATE = 0;
 	}
 }
 

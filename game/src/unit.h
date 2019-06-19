@@ -16,7 +16,7 @@ ENTITY* unit_spawn(int unittype, VECTOR* pos, VECTOR* targetPos, var owner);
 VECTOR* unit_getTarget(ENTITY* ent);
 ENTITY* unit_getVictim(ENTITY* ent);
 var unit_getHealth(ENTITY* ent);
-void unit_setDamage(ENTITY* ent, ENTITY* attacker);
+var unit_setDamage(ENTITY* victim, ENTITY* attacker);
 int unit_getType(ENTITY* ent);
 ENTITY* unit_findNextVictim(ENTITY* ptr);
 ENTITY* unit_findNextVictim(ENTITY* ptr, var unittype);
