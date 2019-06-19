@@ -111,7 +111,7 @@ ENTITY* spawner_spawn(int unittype, VECTOR* pos, var angle, var owner)
 		{
 			wireframe->material = building_wireframe_material;
 			reset(wireframe, SHADOW);
-			ent->SPAWNER_WIREFRAME = wireframe;
+			ent->SPAWNER_WIREFRAME = handle(wireframe);
 		}
 	}
 
@@ -285,7 +285,8 @@ void SPAWNER__construct(ENTITY* ptr)
 	ptr->skill46 = floatv(ptr->z);
 	ptr->skill47 = floatv(ptr->y);
 
-	ENTITY *wireframe = ptr->SPAWNER_WIREFRAME;
+	ENTITY *wireframe = ptr_for_handle(ptr->SPAWNER_WIREFRAME);
+	wireframe->z = ptr->z;
 	if(wireframe != NULL)
 	{
 		wireframe->skill41 = floatv(percentage);
