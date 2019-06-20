@@ -166,7 +166,7 @@ function MarkUnits()
 
     ENTITY * ent;
     for(ent = ent_next(NULL); ent != NULL; ent = ent_next(ent)){
-        if(ent->group==GROUP_PLAYER_UNIT && ent->HEALTH > 0){
+        if(ent->group==GROUP_PLAYER_UNIT){
             var isInside = 1;
             for(i = 0; i < 4 && isInside; i++){
                 isInside = CheckIsLeftFrom(Posis[i],Posis[(i+1)%4],ent.x);
@@ -320,15 +320,9 @@ function UnitControl()
                 c_trace(camera.x, temp,USE_POLYGON | IGNORE_PASSENTS | IGNORE_SPRITES);
                 if(you != 0){
                          if(you->group==GROUP_PLAYER_UNIT || you->group==GROUP_PLAYER_SPAWNER || you->group==GROUP_ENEMY_UNIT || you->group==GROUP_ENEMY_SPAWNER){
-
-                             // only select units that are alive. everything
-                             // else doesn't make sense
-                            if(you->HEALTH > 0)
+                            if(fow_isPosVisible(target.x))
                             {
-                                if(fow_isPosVisible(target.x))
-                                {
-                                    SelectUnit(you);   
-                                }
+                                SelectUnit(you);
                             }
                         }
                  }
