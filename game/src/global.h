@@ -22,8 +22,9 @@ typedef int bool;
 #define UNIT_LERCHE   1
 #define UNIT_EYE      2
 #define UNIT_BABE     3
-#define UNIT_Z        4
-#define UNIT_CLASSES  5
+#define UNIT_SKULL    4
+#define UNIT_Z        5
+#define UNIT_CLASSES  6
 
 
 

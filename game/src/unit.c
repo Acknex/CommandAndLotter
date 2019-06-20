@@ -2,20 +2,23 @@
 #include "jps.h"
 #include "unitmangement.h"
 
-#define UNIT_TABLESIZE 25 // UNIT_CLASSES*UNIT_CLASSES Lite-C is stupid. Really.
+#define UNIT_TABLESIZE 36 // UNIT_CLASSES*UNIT_CLASSES Lite-C is stupid. Really.
 var unit__dmgtable[UNIT_TABLESIZE] = {
-   /*S L E C Z*/
-/*S*/7,9,2,2,1,
-/*L*/2,5,7,7,1,
-/*E*/9,5,3,3,1,
-/*C*/2,5,7,7,1,
-/*Z*/0,0,0,0,0
+   /*S L E C K Z*/
+/*S*/7,9,2,2,5,1,
+/*L*/2,5,7,7,5,1,
+/*E*/9,5,3,3,5,1,
+/*C*/2,5,7,7,5,1,
+/*K*/0,0,0,0,0,0,
+/*Z*/0,0,0,0,0,0
 };
 /*
 (CBABE)Maschinengewehrinfanterie: ++Infanterie  00Fahrzeug  --Panzer
 (EYE)Raketeninfanterie:           --Infanterie  00Fahrzeug  ++Panzer
 (LERCHE)Fahrzeug:                 ++Infanterie  00Fahrzeug  --Panzer
 (SPUTNIK)Panzer:                  --Infanterie  ++Fahrzeug  ++Panzer
+(SKULL): kein Angriff
+(Z): kein Angriff, 1 HP
 */
 
 var unit_setTarget(ENTITY* ent, VECTOR* pos)

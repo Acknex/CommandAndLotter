@@ -436,6 +436,7 @@ void ui_game_update()
 					ui_radial_esel->skill_y = 0;
 					break;
 					case UNIT_EYE:
+					case UNIT_SKULL: //TODO: add me properly
 					ui_radial_active = ui_radial_skull;
 					ui_radial_skull->skill_y = 0;
 					break;
