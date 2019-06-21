@@ -177,11 +177,11 @@ void SKULL_Update()
 				vec_rotate(velocity, ptr->pan);
 				if (ptr->ENTITY_STATE == ENTITY_STATE_HIT)
 				{
-					effect(SKULL__smokeEffect, 6*time_step, contact.x, velocity);
+					effect(SKULL__smokeEffect, 3*time_step, contact.x, velocity);
 				}
 				else
 				{
-					effect(SKULL__fireEffect, 6*time_step, contact.x, velocity);
+					effect(SKULL__fireEffect, 3*time_step, contact.x, velocity);
 				}
 			}
 		}
@@ -219,32 +219,35 @@ void SKULL__attack(ENTITY* ptr)
 		}
 	}
 	
-	ANG_turnToPos(ptr, unit_getTarget(ptr), ptr->SKULL_TURNSPEED, 5);
+	ANG_turnToPos(ptr, unit_getTarget(ptr), ptr->SKULL_TURNSPEED, 0);
 
 	ent_animate(ptr, SKULL_WALKANIM, 0, 0);
 	ptr->ENTITY_ANIM += time_step/16;
-	if(ptr->ENTITY_ANIM > 0.05)
+	if(ptr->ENTITY_ANIM > 0.5)
 	{
-		int i;
-		for(i = 0; i < 5; i++)
-		{	
-			VECTOR velocity;
-			vec_set(velocity, &player->x);
-			vec_sub(velocity, &ptr->x);
-			velocity.z = 5;
-			vec_normalize(velocity, 80);
-			vec_rotate(velocity, vector(random(10)-5, random(10)-5, 0));
-			effect(SKULL__shootEffect, 1, &ptr->x, velocity);
+		ENTITY* victim = unit_getVictim(ptr);
+		if (victim != NULL)
+		{
+			int i;
+			for(i = 0; i < 5; i++)
+			{	
+				VECTOR velocity;
+				vec_set(velocity, &victim->x);
+				vec_sub(velocity, &ptr->x);
+				velocity.z = 5;
+				vec_normalize(velocity, 80);
+				vec_rotate(velocity, vector(random(10)-5, random(10)-5, 0));
+				effect(SKULL__shootEffect, 1, &ptr->x, velocity);
+			}
 		}
 		ptr->SKULL_ANIMSTATEATK += 1;
-		ptr->ENTITY_ANIM -= 0.05;
+		ptr->ENTITY_ANIM -= 0.5;
 
 		//do single attack
 		if (ptr->SKULL_ANIMSTATEATK > 3)
 		{
 			if (ptr->SKULL_DIDATTACK == 0)
 			{
-				ENTITY* victim = unit_getVictim(ptr);
 				if (SCAN_IsEntityNear(ptr, victim, ptr->SKULL_ATTACKRANGE))
 				{
 					//DEBUG
@@ -302,7 +305,7 @@ void SKULL__fireEffect(PARTICLE *p)
 	p.blue = 0;
 	p.alpha = 100;
 	p.lifespan = 50;
-	p.size = 50;
+	p.size = 30;
 	p.vel_z = 20 + random(30);
 	p.gravity = -20.0;
 	p.skill_a = 20.0; // fade factor
@@ -317,7 +320,7 @@ void SKULL__smokeEffect(PARTICLE *p)
 	p.blue = 70;
 	p.alpha = 100;
 	p.lifespan = 50;
-	p.size = 50;
+	p.size = 30;
 	p.vel_z = 20 + random(30);
 	p.gravity = -20.0;
 	p.skill_a = 20.0; // fade factor
@@ -326,7 +329,7 @@ void SKULL__smokeEffect(PARTICLE *p)
 
 void SKULL__shootParticle(PARTICLE *p)
 {
-	p.size += 50*time_step;
+	p.size += 30*time_step;
 	p.alpha -= p.skill_a*time_step;
 	if(p.alpha <= 0) p.lifespan = 0;
 }
@@ -335,11 +338,11 @@ void SKULL__shootEffect(PARTICLE *p)
 {
 	set(p, MOVE | BRIGHT | TRANSLUCENT);
 	p.red = 255;
-	p.green = 0;
+	p.green = 150;
 	p.blue = 0;
 	p.alpha = 100;
 	p.lifespan = 100;
-	p.size = 100;
+	p.size = 40;
 	p.skill_a = 20.0; // fade factor
 	p.event = SKULL__fireParticle;
 }
