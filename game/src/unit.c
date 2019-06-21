@@ -21,6 +21,8 @@ var unit__dmgtable[UNIT_TABLESIZE] = {
 (Z): kein Angriff, 1 HP
 */
 
+var unit__health[UNIT_CLASSES] = {23,23,23,23,10,1};
+
 var unit_setTarget(ENTITY* ent, VECTOR* pos)
 {
 	VECTOR target2D;
@@ -111,6 +113,10 @@ ENTITY* unit_spawn(int unittype, VECTOR* pos, VECTOR* targetPos, var owner)
 			ent = ent_create("cbabe.mdl", pos, Sputnik);
 			break;
 		
+		case UNIT_SKULL:
+			ent = ent_create("whiskas.mdl", pos, Skull);
+			break;
+		
 		default:
 			break;
 	}
@@ -118,6 +124,7 @@ ENTITY* unit_spawn(int unittype, VECTOR* pos, VECTOR* targetPos, var owner)
 	if (ent != NULL)
 	{
 		ent->OWNER = owner;
+		unit_initHealth(ent);
 		if (owner == PLAYER_ID_AI)
 		{
 			ent->group = GROUP_ENEMY_UNIT;
@@ -142,6 +149,38 @@ var unit_getHealth(ENTITY* ent)
 	return ent->HEALTH / ent->MAXHEALTH;
 }
 
+var unit_initHealth(ENTITY* ent)
+{
+	if (ent != NULL)
+	{
+		ent->HEALTH = unit__health[clamp(ent->ENTITY_UNITTYPE,0,UNIT_CLASSES-1)];
+		ent->MAXHEALTH = ent->HEALTH;
+		return ent->HEALTH;
+	}
+	return 0;
+}
+
+var unit_checkHit(ENTITY* ent)
+{
+	var ret = 0;
+	if (ent != NULL)
+	{
+		if (ent->DAMAGE_HIT > 0)
+		{
+			//don't count hits while unit is already being hit
+			if (ent->ENTITY_STATE != ENTITY_STATE_HIT)
+			{
+				ent->HEALTH = maxv(0, ent->HEALTH - ent->DAMAGE_HIT);
+				//deactivate directly in order to avoid single frame gap
+				if (ent->HEALTH <= 0)
+					unit_deactivate(ent);
+				ret = 1;
+			}
+			ent->DAMAGE_HIT = 0;
+		}
+	}
+	return ret;
+}
 var unit_setDamage(ENTITY* victim, ENTITY* attacker)
 {
 	if (victim != NULL && attacker != NULL)

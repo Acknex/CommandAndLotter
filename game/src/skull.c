@@ -1,6 +1,6 @@
 #include "global.h"
 #include "framework.h"
-#include "sputnik.h"
+#include "skull.h"
 #include "scan.h"
 #include "ang.h"
 #include "unit.h"
@@ -33,9 +33,9 @@ SOUND* sputnik_snd_attack2 = "sputnik_attack2.wav";
 SOUND* sputnik_snd_attack3 = "sputnik_attack3.wav";
 
 
-void Sputnik()
+void Skull()
 {
-	framework_setup(my, SUBSYSTEM_UNIT_SPUTNIK);
+	framework_setup(my, SUBSYSTEM_UNIT_SKULL);
 	my->SPUTNIK_RUNSPEED = 30;
 	my->SPUTNIK_TURNSPEED = 50;
 	my->SPUTNIK_ATTACKSPEED = 5;
@@ -48,12 +48,12 @@ void Sputnik()
 	my->ENTITY_STATE = ENTITY_STATE_WAIT_OR_WALK;
 }
 
-void SPUTNIK_Init()
+void SKULL_Init()
 {
 }
 
 
-void SPUTNIK__wait_or_walk(ENTITY * ptr)
+void SKULL__wait_or_walk(ENTITY * ptr)
 {
 	UNIT* unit = jpsAllowMovementForEntity(ptr, true);
 	if(!unit) return;
@@ -86,7 +86,7 @@ void SPUTNIK__wait_or_walk(ENTITY * ptr)
 		ent_animate(ptr, SPUTNIK_WAITANIM, ptr->SPUTNIK_ANIMSTATE, ANM_CYCLE);
 	}
 
-	//sputnik was hit?
+	//skull was hit?
 	if (unit_checkHit(ptr))
 	{
 		ptr->ENTITY_STATE = ENTITY_STATE_HIT;
@@ -94,35 +94,20 @@ void SPUTNIK__wait_or_walk(ENTITY * ptr)
 	}	
 	else
 	{
-		//selected victim is near - attack
-		if (SCAN_IsEntityNear(ptr, unit_getVictim(ptr), ptr->SPUTNIK_ATTACKRANGE))
-		{
-			ptr->ENTITY_STATE = ENTITY_STATE_ATTACK;
-		}
 		//nothing to do? go mining
 		if(ptr->SPUTNIK_IDLECOUNTER > SPUTNIK_MAXIDLE && !unit_getVictim(ptr))
 		{
 			unit_findNextVictim(ptr, UNIT_Z);
 		}
 		
-		//victim is selected but is not alive anymore --> pick new one
-		if (unit_getVictim(ptr) == NULL && ptr->ENTITY_VICTIMTYPE != UNIT_INVALID)
-		{
-			if (!unit_findNextVictim(ptr))
-			{
-				//nothing in range
-				ptr->ENTITY_VICTIMTYPE = UNIT_INVALID;
-			}
-		}
-
 	}
 }
 
 
-void SPUTNIK_Update()
+void SKULL_Update()
 {
 	ENTITY * ptr;
-	SUBSYSTEM_LOOP(ptr, SUBSYSTEM_UNIT_SPUTNIK)
+	SUBSYSTEM_LOOP(ptr, SUBSYSTEM_UNIT_SKULL)
 	{
 		if(ptr->ENTITY_STATE != ENTITY_STATE_WAIT_OR_WALK)
 			ptr->SPUTNIK_IDLECOUNTER = 0;
@@ -133,25 +118,25 @@ void SPUTNIK_Update()
 		{
 			case ENTITY_STATE_WAIT_OR_WALK:
 			{
-				SPUTNIK__wait_or_walk(ptr);
+				SKULL__wait_or_walk(ptr);
 				break;
 			}
 
 			case ENTITY_STATE_ATTACK:
 			{
-				SPUTNIK__attack(ptr);
+				SKULL__attack(ptr);
 				break;
 			}
 
 			case ENTITY_STATE_DIE:
 			{
-				SPUTNIK__die(ptr);
+				SKULL__die(ptr);
 				break;
 			}
 
 			case ENTITY_STATE_HIT:
 			{
-				SPUTNIK__hit(ptr);
+				SKULL__hit(ptr);
 				break;
 			}
 
@@ -176,7 +161,7 @@ void SPUTNIK_Update()
 	}
 }
 
-void SPUTNIK__hit(ENTITY* ptr)
+void SKULL__hit(ENTITY* ptr)
 {
 	ptr->ENTITY_HITTHRESHOLD -= time_step;
 	if (ptr->HEALTH <= 0)
@@ -199,7 +184,7 @@ void SPUTNIK__hit(ENTITY* ptr)
 	}
 }
 
-void SPUTNIK__attack(ENTITY* ptr)
+void SKULL__attack(ENTITY* ptr)
 {
 	ANG_turnToPos(ptr, unit_getTarget(ptr), ptr->SPUTNIK_TURNSPEED, 5);
 	if (ptr->SPUTNIK_ANIMSTATEATK == 0)
@@ -247,7 +232,7 @@ void SPUTNIK__attack(ENTITY* ptr)
 
 }
 
-void SPUTNIK__die(ENTITY* ptr)
+void SKULL__die(ENTITY* ptr)
 {
 	ptr->SPUTNIK_ANIMSTATE += 5 * time_step;
 	ent_animate(ptr, SPUTNIK_DIEANIM, ptr->SPUTNIK_ANIMSTATE, 0);

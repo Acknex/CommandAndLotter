@@ -36,7 +36,6 @@ typedef int bool;
 #define ENTITY_STATE skill55
 #define ENTITY_ANIM skill56
 #define ENTITY_VICTIM skill57
-#define ENTITY_DAMAGE skill58
 #define ENTITY_HITTHRESHOLD skill59
 #define ENTITY_UNITTYPE skill60
 #define ENTITY_VICTIMTYPE skill61
@@ -67,7 +66,7 @@ typedef int bool;
 #define SUBSYSTEM_UNIT_EYE          101
 #define SUBSYSTEM_UNIT_SKULL        102
 #define SUBSYSTEM_UNIT_LERCHE       103
-#define SUBSYSTEM_UNIT_SPHERE       104
+#define SUBSYSTEM_UNIT_CBABE        104
 #define SUBSYSTEM_TERRAIN_SYSTEM    105
 #define SUBSYSTEM_UNIT_MANAGEMENT   106
 #define SUBSYSTEM_Z                 107
