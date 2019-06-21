@@ -183,7 +183,7 @@ void SPUTNIK__hit(ENTITY* ptr)
 	{
 		ptr->ENTITY_STATE = ENTITY_STATE_DIE;
 		ptr->SPUTNIK_ANIMSTATE = 0;
-		snd_play(sputnik_snd_death, 100, 0);
+		ent_playsound(ptr,sputnik_snd_death, 10000);
 		set(ptr, PASSABLE);
 	}
 	else if (ptr->ENTITY_HITTHRESHOLD <= 0)
@@ -208,9 +208,9 @@ void SPUTNIK__attack(ENTITY* ptr)
 		{
 			switch(integer(random(2)))
 			{
-				case 0: snd_play(sputnik_snd_attack1, 30+random(10), 0); break;
-				case 1: snd_play(sputnik_snd_attack2, 30+random(10), 0); break;
-				case 2: snd_play(sputnik_snd_attack3, 30+random(10), 0); break;
+				case 0: ent_playsound(ptr,sputnik_snd_attack1, 7000); break;
+				case 1: ent_playsound(ptr,sputnik_snd_attack2, 7000); break;
+				case 2: ent_playsound(ptr,sputnik_snd_attack3, 7000); break;
 			}
 		}
 	}

@@ -7,44 +7,36 @@
 #include "map_loader.h"
 
 
-#define SPUTNIK_RUNSPEED skill1
-#define SPUTNIK_TURNSPEED skill2
-#define SPUTNIK_ATTACKSPEED skill3
-#define SPUTNIK_ATTACKRANGE skill4
-
-#define SPUTNIK_ANIMSTATE skill21
-#define SPUTNIK_ANIMSTATEATK skill22
-#define SPUTNIK_DIDATTACK skill26
-#define SPUTNIK_RUNCOUNTER skill27
-#define SPUTNIK_IDLECOUNTER skill28
+#define SKULL_TURNSPEED skill2
+#define SKULL_ATTACKRANGE skill4
+#define SKULL_ANIMSTATEATK skill22
+#define SKULL_DIDATTACK skill26
+#define SKULL_RUNCOUNTER skill27
+#define SKULL_IDLECOUNTER skill28
 
 
-#define SPUTNIK_WALKANIM "walk"
-#define SPUTNIK_WAITANIM "stand"
-#define SPUTNIK_ATTACKANIM "AttackA"
-#define SPUTNIK_DIEANIM "Die"
+#define SKULL_WALKANIM "stand"
+#define SKULL_WAITANIM "stand"
+#define SKULL_HITANIM "stand"
 
-#define SPUTNIK_FEET 30
-#define SPUTNIK_MAXIDLE 32
+#define SKULL_FEET -20
+#define SKULL_MAXIDLE 16
 
-SOUND* sputnik_snd_death   = "sputnik_death.wav";
-SOUND* sputnik_snd_attack1 = "sputnik_attack1.wav";
-SOUND* sputnik_snd_attack2 = "sputnik_attack2.wav";
-SOUND* sputnik_snd_attack3 = "sputnik_attack3.wav";
-
+SOUND* skull_snd_death  = "skull_death.wav";
+SOUND* skull_snd_attack = "skull_shoot.wav";
+SOUND* skull_snd_hit1   = "skull_hit1.wav";
+SOUND* skull_snd_hit2   = "skull_hit2.wav";
 
 void Skull()
 {
 	framework_setup(my, SUBSYSTEM_UNIT_SKULL);
-	my->SPUTNIK_RUNSPEED = 30;
-	my->SPUTNIK_TURNSPEED = 50;
-	my->SPUTNIK_ATTACKSPEED = 5;
-	my->SPUTNIK_ATTACKRANGE = 200;
-	my->SPUTNIK_ANIMSTATEATK = 0;
-	my->SPUTNIK_IDLECOUNTER = 0;
-    reset(my, SHADOW);
+	my->SKULL_TURNSPEED = 50;
+	my->SKULL_ATTACKRANGE = 200;
+	my->SKULL_ANIMSTATEATK = 0;
+	my->SKULL_IDLECOUNTER = 0;
+	reset(my, SHADOW);
 	c_setminmax(me);
-	my->min_z += SPUTNIK_FEET;
+	my->min_z += SKULL_FEET;
 	my->ENTITY_STATE = ENTITY_STATE_WAIT_OR_WALK;
 }
 
@@ -64,26 +56,25 @@ void SKULL__wait_or_walk(ENTITY * ptr)
 
 	var len = vec_to_angle(temp, diff)/time_step;
 
-	if(len > 8) ptr->SPUTNIK_RUNCOUNTER = 4;
-	//if(unit->isMoving) ptr->SPUTNIK_RUNCOUNTER = 12;
+	if(len > 8) ptr->SKULL_RUNCOUNTER = 4;
 
-	if(ptr->SPUTNIK_RUNCOUNTER > 0)
+	if(ptr->SKULL_RUNCOUNTER > 0)
 	{
-		ptr->SPUTNIK_RUNCOUNTER = maxv(ptr->SPUTNIK_RUNCOUNTER-time_step,0);
+		ptr->SKULL_RUNCOUNTER = maxv(ptr->SKULL_RUNCOUNTER-time_step,0);
 		if(len > 8) ptr->pan += ang(temp.x-ptr->pan)*0.5*time_step;
 
-		ptr->SPUTNIK_DIDATTACK = 0;
-		ptr->SPUTNIK_ANIMSTATEATK = 0;
-		ptr->SPUTNIK_ANIMSTATE += len*0.425*time_step;//0.5 * ptr->SPUTNIK_RUNSPEED * time_step;
-		ent_animate(ptr, SPUTNIK_WALKANIM, ptr->SPUTNIK_ANIMSTATE, ANM_CYCLE);
+		ptr->SKULL_DIDATTACK = 0;
+		ptr->SKULL_ANIMSTATEATK = 0;
+		ptr->ENTITY_ANIM += len*0.425*time_step;
+		ent_animate(ptr, SKULL_WALKANIM, ptr->ENTITY_ANIM, ANM_CYCLE);
 
-		ptr->SPUTNIK_IDLECOUNTER = 0;
+		ptr->SKULL_IDLECOUNTER = 0;
 	}
 	else
 	{
-		ptr->SPUTNIK_IDLECOUNTER += time_step;
-		ptr->SPUTNIK_ANIMSTATE += 7 * time_step;
-		ent_animate(ptr, SPUTNIK_WAITANIM, ptr->SPUTNIK_ANIMSTATE, ANM_CYCLE);
+		ptr->SKULL_IDLECOUNTER += time_step;
+		ptr->ENTITY_ANIM += 7 * time_step;
+		ent_animate(ptr, SKULL_WAITANIM, ptr->ENTITY_ANIM, ANM_CYCLE);
 	}
 
 	//skull was hit?
@@ -91,11 +82,22 @@ void SKULL__wait_or_walk(ENTITY * ptr)
 	{
 		ptr->ENTITY_STATE = ENTITY_STATE_HIT;
 		ptr->ENTITY_HITTHRESHOLD = 5;
+		switch(integer(random(1)))
+		{
+			case 0: ent_playsound(ptr,skull_snd_hit1, 7000); break;
+			case 1: ent_playsound(ptr,skull_snd_hit2, 7000); break;
+		}
 	}	
 	else
 	{
+		//selected victim is near - attack
+		if (SCAN_IsEntityNear(ptr, unit_getVictim(ptr), ptr->SKULL_ATTACKRANGE))
+		{
+			ptr->ENTITY_STATE = ENTITY_STATE_ATTACK;
+			ptr->ENTITY_ANIM = 0;
+		}
 		//nothing to do? go mining
-		if(ptr->SPUTNIK_IDLECOUNTER > SPUTNIK_MAXIDLE && !unit_getVictim(ptr))
+		if(ptr->SKULL_IDLECOUNTER > SKULL_MAXIDLE && !unit_getVictim(ptr))
 		{
 			unit_findNextVictim(ptr, UNIT_Z);
 		}
@@ -110,7 +112,7 @@ void SKULL_Update()
 	SUBSYSTEM_LOOP(ptr, SUBSYSTEM_UNIT_SKULL)
 	{
 		if(ptr->ENTITY_STATE != ENTITY_STATE_WAIT_OR_WALK)
-			ptr->SPUTNIK_IDLECOUNTER = 0;
+			ptr->SKULL_IDLECOUNTER = 0;
 
 		jpsAllowMovementForEntity(ptr, false);
 
@@ -147,14 +149,39 @@ void SKULL_Update()
 		}
 
 		if (ptr->ENTITY_STATE != ENTITY_STATE_DIE && ptr->ENTITY_STATE != ENTITY_STATE_DEAD)
-		{
+		{			
 			UNIT* unit = jpsUnitGetFromEntity(ptr);
 			if(unit)
 			{
 				TILE* tile = unit->tile;
 				if(tile)
 				{
-                    if(!tile->value) ptr->z = maploader_get_height(ptr->x) - ptr->min_z - SPUTNIK_FEET;
+                    if(!tile->value) ptr->z = maploader_get_height(ptr->x) - ptr->min_z - SKULL_FEET;
+				}
+			}
+
+			int vertices[] = {73, 200, 67, 201, 68};
+			CONTACT contact;
+			int i;
+			for(i = 0; i < 5; i++)
+			{
+				ent_getvertex(ptr, &contact, vertices[i]);
+				vec_scale(contact.x, ptr->scale_x);
+				vec_rotate(contact.x, ptr->pan);
+				vec_add(contact.x, ptr->x);
+				
+				VECTOR velocity;
+				vec_set(velocity, nullvector);
+				velocity.x = -20 - random(20);
+				velocity.z = 20 + random(30);
+				vec_rotate(velocity, ptr->pan);
+				if (ptr->ENTITY_STATE == ENTITY_STATE_HIT)
+				{
+					effect(SKULL__smokeEffect, 6*time_step, contact.x, velocity);
+				}
+				else
+				{
+					effect(SKULL__fireEffect, 6*time_step, contact.x, velocity);
 				}
 			}
 		}
@@ -167,8 +194,8 @@ void SKULL__hit(ENTITY* ptr)
 	if (ptr->HEALTH <= 0)
 	{
 		ptr->ENTITY_STATE = ENTITY_STATE_DIE;
-		ptr->SPUTNIK_ANIMSTATE = 0;
-		snd_play(sputnik_snd_death, 100, 0);
+		ptr->ENTITY_ANIM = 0;
+		ent_playsound(ptr,skull_snd_death, 10000);
 		set(ptr, PASSABLE);
 	}
 	else if (ptr->ENTITY_HITTHRESHOLD <= 0)
@@ -177,68 +204,165 @@ void SKULL__hit(ENTITY* ptr)
 	}
 	else
 	{
-		var percent = (1 - (ptr->ENTITY_HITTHRESHOLD/5)) * 56;
-		if (percent > 28)
-		percent = 56-percent;
-		ent_animate(ptr, SPUTNIK_ATTACKANIM, percent, 0);
+		//freeze animation
+		ent_animate(ptr, SKULL_HITANIM, 100, 0);
 	}
 }
 
 void SKULL__attack(ENTITY* ptr)
 {
-	ANG_turnToPos(ptr, unit_getTarget(ptr), ptr->SPUTNIK_TURNSPEED, 5);
-	if (ptr->SPUTNIK_ANIMSTATEATK == 0)
+	if (ptr->ENTITY_ANIM == 0)
 	{
 		if (num_sounds < 6)
 		{
-			switch(integer(random(2)))
-			{
-				case 0: snd_play(sputnik_snd_attack1, 30+random(10), 0); break;
-				case 1: snd_play(sputnik_snd_attack2, 30+random(10), 0); break;
-				case 2: snd_play(sputnik_snd_attack3, 30+random(10), 0); break;
-			}
+			ent_playsound(ptr,skull_snd_attack, 7000);
 		}
 	}
-	ptr->SPUTNIK_ANIMSTATEATK += ptr->SPUTNIK_ATTACKSPEED * time_step;
-	ptr->SPUTNIK_ANIMSTATEATK = minv(ptr->SPUTNIK_ANIMSTATEATK, 100);
-	ptr->SPUTNIK_ANIMSTATE = 0;
-	ent_animate(ptr, SPUTNIK_ATTACKANIM, ptr->SPUTNIK_ANIMSTATEATK, 0);
+	
+	ANG_turnToPos(ptr, unit_getTarget(ptr), ptr->SKULL_TURNSPEED, 5);
 
-	if (ptr->SPUTNIK_ANIMSTATEATK > 50)
+	ent_animate(ptr, SKULL_WALKANIM, 0, 0);
+	ptr->ENTITY_ANIM += time_step/16;
+	if(ptr->ENTITY_ANIM > 0.05)
 	{
-		if (ptr->SPUTNIK_DIDATTACK == 0)
+		int i;
+		for(i = 0; i < 5; i++)
+		{	
+			VECTOR velocity;
+			vec_set(velocity, &player->x);
+			vec_sub(velocity, &ptr->x);
+			velocity.z = 5;
+			vec_normalize(velocity, 80);
+			vec_rotate(velocity, vector(random(10)-5, random(10)-5, 0));
+			effect(SKULL__shootEffect, 1, &ptr->x, velocity);
+		}
+		ptr->SKULL_ANIMSTATEATK += 1;
+		ptr->ENTITY_ANIM -= 0.05;
+
+		//do single attack
+		if (ptr->SKULL_ANIMSTATEATK > 3)
 		{
-			ENTITY* victim = unit_getVictim(ptr);
-			if (SCAN_IsEntityNear(ptr, victim, ptr->SPUTNIK_ATTACKRANGE))
+			if (ptr->SKULL_DIDATTACK == 0)
 			{
-				//DEBUG
-				if (victim == ptr) error ("attacking myself :O");
-				unit_setDamage(victim, ptr);
+				ENTITY* victim = unit_getVictim(ptr);
+				if (SCAN_IsEntityNear(ptr, victim, ptr->SKULL_ATTACKRANGE))
+				{
+					//DEBUG
+					if (victim == ptr) error ("attacking myself :O");
+					unit_setDamage(victim, ptr);
+				}
 			}
+			ptr->SKULL_DIDATTACK = 1;
 		}
-		ptr->SPUTNIK_DIDATTACK = 1;
-	}
-	else
-	{
-		ptr->SPUTNIK_DIDATTACK = 0;
-	}
+		else
+		{
+			ptr->SKULL_DIDATTACK = 0;
+		}
 
-	if (ptr->SPUTNIK_ANIMSTATEATK >= 100)
-	{
-		//unit_findNextVictim(ptr);
-		ptr->SPUTNIK_ANIMSTATEATK = 0;
-		ptr->ENTITY_STATE = ENTITY_STATE_WAIT_OR_WALK;
-	}
+		//finish attack
+		if(ptr->SKULL_ANIMSTATEATK > 5)
+		{
+			ptr->SKULL_ANIMSTATEATK = 0;
+			ptr->ENTITY_STATE = ENTITY_STATE_WAIT_OR_WALK;
+		}
+	}	
 
 }
 
 void SKULL__die(ENTITY* ptr)
 {
-	ptr->SPUTNIK_ANIMSTATE += 5 * time_step;
-	ent_animate(ptr, SPUTNIK_DIEANIM, ptr->SPUTNIK_ANIMSTATE, 0);
+	ptr->ENTITY_ANIM = minv(ptr->ENTITY_ANIM + 4*time_step, 100);
+	var animState = (100 - ptr->ENTITY_ANIM ) / 100;	
+	vec_set(&ptr->scale_x, vector(animState, animState, animState));
+	VECTOR* pos = vector(ptr->x+random(10)-5, ptr->y+random(10)-5, ptr->z+random(10)-5);
+	VECTOR* vel = vector(-5-random(10), -2-random(4), 2+random(4));
+	effect(PARTICLE_smoke, 6*time_step, pos, vel);
+
 	/* transitions */
-	if(ptr->SPUTNIK_ANIMSTATE >= 90)
+	if(animState <= 0)
 	{
+		reset(ptr, SHADOW);
+		ptr->ENTITY_ANIM = 0;
 		ptr->ENTITY_STATE = ENTITY_STATE_DEAD;
 	}
+}
+
+void SKULL__fireParticle(PARTICLE *p)
+{
+	p.size -= time_step;
+	p.alpha -= p.skill_a*time_step*2;
+	if(p.alpha <= 0) p.lifespan = 0;
+}
+
+void SKULL__fireEffect(PARTICLE *p)
+{
+	set(p, MOVE | BRIGHT | TRANSLUCENT);
+	p.red = 255;
+	p.green = 0;
+	p.blue = 0;
+	p.alpha = 100;
+	p.lifespan = 50;
+	p.size = 50;
+	p.vel_z = 20 + random(30);
+	p.gravity = -20.0;
+	p.skill_a = 20.0; // fade factor
+	p.event = SKULL__fireParticle;
+}
+
+void SKULL__smokeEffect(PARTICLE *p)
+{
+	set(p, MOVE | TRANSLUCENT);
+	p.red = 70;
+	p.green = 70;
+	p.blue = 70;
+	p.alpha = 100;
+	p.lifespan = 50;
+	p.size = 50;
+	p.vel_z = 20 + random(30);
+	p.gravity = -20.0;
+	p.skill_a = 20.0; // fade factor
+	p.event = SKULL__fireParticle;
+}
+
+void SKULL__shootParticle(PARTICLE *p)
+{
+	p.size += 50*time_step;
+	p.alpha -= p.skill_a*time_step;
+	if(p.alpha <= 0) p.lifespan = 0;
+}
+
+void SKULL__shootEffect(PARTICLE *p)
+{
+	set(p, MOVE | BRIGHT | TRANSLUCENT);
+	p.red = 255;
+	p.green = 0;
+	p.blue = 0;
+	p.alpha = 100;
+	p.lifespan = 100;
+	p.size = 100;
+	p.skill_a = 20.0; // fade factor
+	p.event = SKULL__fireParticle;
+}
+
+void smoke_fade_p(PARTICLE* p)
+{
+	p.alpha -= p.skill_a*time_step;
+	if (p.alpha <= 0) p.lifespan = 0;
+	
+	p.size = minv(p.skill_b, p.size+time_step*3);
+}
+
+BMAP* bmp_smoke = "rauch2.tga";
+
+void PARTICLE_smoke(PARTICLE* p)
+{
+	p.skill_a = 3;
+	p.bmap = bmp_smoke;
+	p.lifespan = 1200+random(600);
+	p.skill_b = 100 + random(50);
+	p.size = 20;
+	p.alpha = 80;
+	vec_scale(p.vel_x, 0.4);
+	set(p, TRANSLUCENT | MOVE);
+	p.event = smoke_fade_p;
 }
