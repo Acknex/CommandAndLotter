@@ -42,13 +42,10 @@ void Sputnik()
 	my->SPUTNIK_ATTACKRANGE = 200;
 	my->SPUTNIK_ANIMSTATEATK = 0;
 	my->SPUTNIK_IDLECOUNTER = 0;
-	my->HEALTH = 23;
-	my->MAXHEALTH = my->HEALTH;
     reset(my, SHADOW);
 	c_setminmax(me);
 	my->min_z += SPUTNIK_FEET;
 	my->ENTITY_STATE = ENTITY_STATE_WAIT_OR_WALK;
-	my->ENTITY_DAMAGE = 5;
 }
 
 void SPUTNIK_Init()
@@ -89,17 +86,12 @@ void SPUTNIK__wait_or_walk(ENTITY * ptr)
 		ent_animate(ptr, SPUTNIK_WAITANIM, ptr->SPUTNIK_ANIMSTATE, ANM_CYCLE);
 	}
 
-	//sputnik was hit
-	if (ptr->DAMAGE_HIT > 0)
+	//sputnik was hit?
+	if (unit_checkHit(ptr))
 	{
-		if (ptr->ENTITY_STATE != ENTITY_STATE_HIT)
-		{
-			ptr->HEALTH = maxv(0, ptr->HEALTH - ptr->DAMAGE_HIT);
-			ptr->ENTITY_STATE = ENTITY_STATE_HIT;
-			ptr->ENTITY_HITTHRESHOLD = 5;
-		}
-		ptr->DAMAGE_HIT = 0;
-	}
+		ptr->ENTITY_STATE = ENTITY_STATE_HIT;
+		ptr->ENTITY_HITTHRESHOLD = 5;
+	}	
 	else
 	{
 		//selected victim is near - attack
@@ -191,9 +183,8 @@ void SPUTNIK__hit(ENTITY* ptr)
 	{
 		ptr->ENTITY_STATE = ENTITY_STATE_DIE;
 		ptr->SPUTNIK_ANIMSTATE = 0;
-		snd_play(sputnik_snd_death, 100, 0);
+		ent_playsound(ptr,sputnik_snd_death, 10000);
 		set(ptr, PASSABLE);
-		unit_deactivate(ptr);
 	}
 	else if (ptr->ENTITY_HITTHRESHOLD <= 0)
 	{
@@ -217,9 +208,9 @@ void SPUTNIK__attack(ENTITY* ptr)
 		{
 			switch(integer(random(2)))
 			{
-				case 0: snd_play(sputnik_snd_attack1, 30+random(10), 0); break;
-				case 1: snd_play(sputnik_snd_attack2, 30+random(10), 0); break;
-				case 2: snd_play(sputnik_snd_attack3, 30+random(10), 0); break;
+				case 0: ent_playsound(ptr,sputnik_snd_attack1, 7000); break;
+				case 1: ent_playsound(ptr,sputnik_snd_attack2, 7000); break;
+				case 2: ent_playsound(ptr,sputnik_snd_attack3, 7000); break;
 			}
 		}
 	}

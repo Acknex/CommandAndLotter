@@ -2,21 +2,26 @@
 #include "jps.h"
 #include "UnitMangement.h"
 
-#define UNIT_TABLESIZE 25 // UNIT_CLASSES*UNIT_CLASSES Lite-C is stupid. Really.
+#define UNIT_TABLESIZE 36 // UNIT_CLASSES*UNIT_CLASSES Lite-C is stupid. Really.
 var unit__dmgtable[UNIT_TABLESIZE] = {
-   /*S L E C Z*/
-/*S*/7,9,2,2,1,
-/*L*/2,5,7,7,1,
-/*E*/9,5,3,3,1,
-/*C*/2,5,7,7,1,
-/*Z*/0,0,0,0,0
+   /*S L E C K Z*/
+/*S*/7,9,2,2,5,1,
+/*L*/2,5,7,7,5,1,
+/*E*/9,5,3,3,5,1,
+/*C*/2,5,7,7,5,1,
+/*K*/0,0,0,0,0,2,
+/*Z*/0,0,0,0,0,0
 };
 /*
 (CBABE)Maschinengewehrinfanterie: ++Infanterie  00Fahrzeug  --Panzer
 (EYE)Raketeninfanterie:           --Infanterie  00Fahrzeug  ++Panzer
 (LERCHE)Fahrzeug:                 ++Infanterie  00Fahrzeug  --Panzer
 (SPUTNIK)Panzer:                  --Infanterie  ++Fahrzeug  ++Panzer
+(SKULL): kein Angriff
+(Z): kein Angriff, 1 HP
 */
+
+var unit__health[UNIT_CLASSES] = {23,23,23,23,10,1};
 
 var unit_setTarget(ENTITY* ent, VECTOR* pos)
 {
@@ -108,6 +113,10 @@ ENTITY* unit_spawn(int unittype, VECTOR* pos, VECTOR* targetPos, var owner)
 			ent = ent_create("cbabe.mdl", pos, Sputnik);
 			break;
 		
+		case UNIT_SKULL:
+			ent = ent_create("whiskas.mdl", pos, Skull);
+			break;
+		
 		default:
 			break;
 	}
@@ -115,6 +124,7 @@ ENTITY* unit_spawn(int unittype, VECTOR* pos, VECTOR* targetPos, var owner)
 	if (ent != NULL)
 	{
 		ent->OWNER = owner;
+		unit_initHealth(ent);
 		if (owner == PLAYER_ID_AI)
 		{
 			ent->group = GROUP_ENEMY_UNIT;
@@ -139,6 +149,38 @@ var unit_getHealth(ENTITY* ent)
 	return ent->HEALTH / ent->MAXHEALTH;
 }
 
+var unit_initHealth(ENTITY* ent)
+{
+	if (ent != NULL)
+	{
+		ent->HEALTH = unit__health[clamp(ent->ENTITY_UNITTYPE,0,UNIT_CLASSES-1)];
+		ent->MAXHEALTH = ent->HEALTH;
+		return ent->HEALTH;
+	}
+	return 0;
+}
+
+var unit_checkHit(ENTITY* ent)
+{
+	var ret = 0;
+	if (ent != NULL)
+	{
+		if (ent->DAMAGE_HIT > 0)
+		{
+			//don't count hits while unit is already being hit
+			if (ent->ENTITY_STATE != ENTITY_STATE_HIT)
+			{
+				ent->HEALTH = maxv(0, ent->HEALTH - ent->DAMAGE_HIT);
+				//deactivate directly in order to avoid single frame gap
+				if (ent->HEALTH <= 0)
+					unit_deactivate(ent);
+				ret = 1;
+			}
+			ent->DAMAGE_HIT = 0;
+		}
+	}
+	return ret;
+}
 var unit_setDamage(ENTITY* victim, ENTITY* attacker)
 {
 	if (victim != NULL && attacker != NULL)

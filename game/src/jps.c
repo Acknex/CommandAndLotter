@@ -650,6 +650,12 @@ void presetsInit()
 	unitPreset->maxHP = 100;
 	unitPreset->radius = 0.175;
 	
+		UNIT_PRESET* unitPreset = &unitPresets[4];
+	unitPreset->ID = 0;
+	unitPreset->maxSpeed = 0.135;
+	unitPreset->maxHP = 100;
+	unitPreset->radius = 0.175;
+	
 }
 
 VECTOR* mapGetVectorFromTile(MAP* map, VECTOR* v, TILE* tile)

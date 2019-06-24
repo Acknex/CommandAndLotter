@@ -5,6 +5,7 @@
 #include "grid.h"
 #include "camera.h"
 #include "sputnik.h"
+#include "skull.h"
 #include "spawner.h"
 #include "stub.h"
 #include <acknex.h>
@@ -61,6 +62,7 @@ void game_open(void)
     //SetupPostprocessing();
 
 	SPUTNIK_Init();
+	SKULL_Init();
 	SPAWNER_Init();
 	Z_Init();
 	stub_init(); //hook debug shit here
@@ -84,6 +86,7 @@ void game_update(void)
     ai_update();
 	jpsGameUpdate(mapGetCurrent());
 	SPUTNIK_Update();
+	SKULL_Update();
 	SPAWNER_Update();
 	Z_Update();
 	stub_update(); //hook debug shit here

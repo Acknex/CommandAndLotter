@@ -6,7 +6,7 @@
 #include "jps.h"
 
 #define Z_VALUE 10
-#define Z_PER_DAMAGE 0.2
+#define Z_PER_DAMAGE 0.5//0.2
 #define Z_VALUE_LEFT skill[20]
 #define Z_SIZE skill11
 

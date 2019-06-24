@@ -62,7 +62,7 @@
 	typedef struct _JPSPATH JPSPATH; // PATH might be an acknex keyword
 
 
-	#define MAX_PRESETS 5
+	#define MAX_PRESETS UNIT_CLASSES
 	struct _UNIT_PRESET
 	{
 		int ID;
