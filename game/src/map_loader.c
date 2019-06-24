@@ -283,15 +283,29 @@ void maploader_load(char const * fileName)
     }
     maploader.terrain.clipfactor = 2;
 
-//    int i; for(i = -15; i <= 15; i++)
-//    {
-//        you = ent_create(
-//            "StrasseGerade.mdl",
-//            vector(580 * i, 0, 0),
-//            NULL
-//        );
-//        you.z = maploader_get_height(you.x);
-//    }
+    VECTOR from[2], to[2];
+    vec_set(from[0], vector(2218, 1100, 600)); vec_set(to[0], vector(2506, -1111, 600));
+    vec_set(from[1], vector(-2506, 1100, 600)); vec_set(to[1], vector(-2218, -1111, 600));
+
+    int i; for(i = 0; i < 2; i++)
+    {
+        VECTOR pos, dir;
+        vec_set(pos, from[i]);
+        vec_diff(dir, to[i], from[i]);
+        vec_normalize(dir, 580);
+
+        while(vec_dist(pos, from[i]) < vec_dist(to[i], from[i]))
+        {
+            you = ent_create(
+                "StrasseGerade.mdl",
+                pos,
+                NULL
+            );
+            vec_to_angle(you->pan, dir);
+            vec_add(pos, dir);
+            // you.z = maploader_get_height(you.x);
+        }
+    }
 
     collision_mode = 1;
 
