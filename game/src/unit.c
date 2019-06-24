@@ -1,6 +1,6 @@
 #include "sputnik.h"
 #include "jps.h"
-#include "unitmangement.h"
+#include "UnitMangement.h"
 
 #define UNIT_TABLESIZE 25 // UNIT_CLASSES*UNIT_CLASSES Lite-C is stupid. Really.
 var unit__dmgtable[UNIT_TABLESIZE] = {
