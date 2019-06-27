@@ -31,7 +31,7 @@ void FogEvent(PARTICLE *p)
 	MAP *map = mapGetCurrent();
 	TILE *tile = mapGetTileFromVector(map, vector(p->skill_a, p->skill_b, 0));
 
-    if(fow_isVisible(tile)) 
+    if(fow_isVisible(tile))
 	{
 		p->alpha -= 10*time_step;
 		if(p->alpha <= 0)
@@ -130,7 +130,7 @@ void fow_open()
     fow_killparticles = false;
 #ifdef USE_FOW
 	MAP *map = mapGetCurrent();
-	
+
 	fow_borderCells = sys_malloc(sizeof(TILE*)*map->size[0]*map->size[1]);
 	fow_borderCells_IDX = 0;
 
@@ -159,7 +159,7 @@ void fow_setBorder(TILE *tile)
 		return;
 	if(tile->visibility & FOW_BORDER)
 		return;
-	
+
 	tile->visibility |= FOW_BORDER;´
 	fow_borderCells[fow_borderCells_IDX] = tile;
 	fow_borderCells_IDX++;
@@ -180,13 +180,13 @@ void fov_uncoverTile(TILE *tile)
 				break;
 			}
 	}
-	
+
 	tile->visibility &= ~(FOW_HIDDEN | FOW_BORDER);
-	
+
 	MAP *map = mapGetCurrent();
 	int x = tile->pos[0];
 	int y = tile->pos[1];
-	
+
 	fow_setBorder(mapTileGet(map, x+1, y));
 	fow_setBorder(mapTileGet(map, x-1, y));
 	fow_setBorder(mapTileGet(map, x, y+1));
@@ -222,6 +222,9 @@ void fov_uncover(VECTOR *pos, var range)
 			TILE *otherTile = mapTileGet(map, i, j);
 			if(!otherTile)
 				continue;
+
+            if(fow_isVisible(otherTile))
+                continue;
 
 			VECTOR otherPos;
 			mapGetVectorFromTile(map, &otherPos, otherTile);
@@ -271,17 +274,17 @@ void fow_update()
 	{
 		TILE *tile = fow_borderCells[i];
 		if(!fow_isVisible(tile))
-			if(fow_isTileInLOS(map, tile, FOW_SIGHT_RANGE, PLAYER_ID_PLAYER)) 
+			if(fow_isTileInLOS(map, tile, FOW_SIGHT_RANGE, PLAYER_ID_PLAYER))
 				fov_uncoverTile(tile);
 	}
 
-/*	
+/*
 	for(i = fow_loadbalancingIDX; i< mapSize; i = i+fow_loadbalancingFactor)
 	{
 		TILE *tile = &((map->tiles)[i]);
 		if(!fow_isVisible(tile))
 			if(tile->visibility & FOW_BORDER)
-				if(fow_isTileInLOS(map, tile, FOW_SIGHT_RANGE, PLAYER_ID_PLAYER)) 
+				if(fow_isTileInLOS(map, tile, FOW_SIGHT_RANGE, PLAYER_ID_PLAYER))
 					fov_uncoverTile(tile);
 	}
 	*/

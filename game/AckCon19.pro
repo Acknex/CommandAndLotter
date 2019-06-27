@@ -47,6 +47,7 @@ SOURCES += \
   src/progressbars.c \
   src/scan.c \
   src/settings.c \
+  src/skull.c \
   src/sputnik.c \
   src/stub.c \
   src/ui_game.c \
@@ -98,6 +99,7 @@ HEADERS += \
   src/progressbars.h \
   src/scan.h \
   src/settings.h \
+  src/skull.h \
   src/sputnik.h \
   src/stub.h \
   src/ui_game.h \
