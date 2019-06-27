@@ -95,31 +95,47 @@ ENTITY* unit_spawn(int unittype, VECTOR* pos, var owner)
 ENTITY* unit_spawn(int unittype, VECTOR* pos, VECTOR* targetPos, var owner)
 {
 	ENTITY* ent = NULL;
-	switch (unittype)
-	{
-		case UNIT_SPUTNIK:
-			ent = ent_create("sputnik.mdl", pos, Sputnik);
-			break;
+    switch (unittype)
+    {
+    case UNIT_SPUTNIK:
+        if(owner== PLAYER_ID_PLAYER)
+            ent = ent_create("sputnik.mdl", pos, Sputnik);
+        else
+            ent = ent_create("evilSputnik.mdl", pos, Sputnik);
+        break;
 
-		case UNIT_LERCHE:
-			ent = ent_create("cEselslerche.mdl", pos, Sputnik);
-			break;
+    case UNIT_LERCHE:
+        if(owner== PLAYER_ID_PLAYER)
+            ent = ent_create("cEselslerche.mdl", pos, Sputnik);
+        else
+            ent = ent_create("cEselslerche.mdl", pos, Sputnik);
+        break;
 
-		case UNIT_EYE:
-			ent = ent_create("eye.mdl", pos, Sputnik);
-			break;
+    case UNIT_EYE:
 
-		case UNIT_BABE:
-			ent = ent_create("cbabe.mdl", pos, Sputnik);
-			break;
+        if(owner== PLAYER_ID_PLAYER)
+            ent = ent_create("eye.mdl", pos, Sputnik);
+        else
+            ent = ent_create("eye.mdl", pos, Sputnik);
+        break;
 
-		case UNIT_SKULL:
-			ent = ent_create("whiskas.mdl", pos, Skull);
-			break;
+    case UNIT_BABE:
+        if(owner== PLAYER_ID_PLAYER)
+            ent = ent_create("cbabe.mdl", pos, Sputnik);
+        else
+            ent = ent_create("cbabe.mdl", pos, Sputnik);
+        break;
 
-		default:
-			break;
-	}
+    case UNIT_SKULL:
+        if(owner== PLAYER_ID_PLAYER)
+            ent = ent_create("whiskas_G.mdl", pos, Skull);
+        else
+            ent = ent_create("whiskas.mdl", pos, Skull);
+        break;
+
+    default:
+        break;
+    }
 
 	if (ent != NULL)
 	{
