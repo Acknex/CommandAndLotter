@@ -7,6 +7,8 @@
 #include "fow.h"
 #include "global.h"
 
+#define UI_MMAP_SCALE 2
+
 void ui_spawn_event_sputnik(var num, PANEL *panel)
 {
 	ENTITY *ent = panel->skill_y;
@@ -156,24 +158,24 @@ void update_or_create_lifebar(ENTITY *ent)
 
 void ui_add_dot_to_minimap(ENTITY *ent, int size, BMAP *dot, int counter)
 {
-	var px = (16000 - abs(ent->y + 8000)) / 16000;
-	var py = (16000 - abs(ent->x + 8000)) / 16000;
-	var t1 = pan_setwindow(ui_minimap, counter, px * bmap_width(ui_mm), py * bmap_height(ui_mm), size, size, dot, 0, 0);
-	if(!t1)
-	{
-		pan_setwindow(ui_minimap, 0, px * bmap_width(ui_mm) * scale_factor_x * mini_map_extra_scale_x, py * bmap_height(ui_mm) * scale_factor_x * mini_map_extra_scale_y, size, size, dot, 0, 0);
-	}
+//	var px = (16000 - abs(ent->y + 8000)) / 16000;
+//	var py = (16000 - abs(ent->x + 8000)) / 16000;
+//	var t1 = pan_setwindow(ui_minimap, counter, px * bmap_width(ui_mm), py * bmap_height(ui_mm), size, size, dot, 0, 0);
+//	if(!t1)
+//	{
+//		pan_setwindow(ui_minimap, 0, px * bmap_width(ui_mm) * scale_factor_x * mini_map_extra_scale_x, py * bmap_height(ui_mm) * scale_factor_x * mini_map_extra_scale_y, size, size, dot, 0, 0);
+//	}
 }
 
 void ui_add_camera_to_minimap()
 {
-	var px = (16000 - abs(camera->y + 8000)) / 16000;
-	var py = (16000 - abs(camera->x + 8000)) / 16000;
-	var t1 = pan_setneedle(ui_minimap, 1, px * bmap_width(ui_mm), py * bmap_height(ui_mm), ui_bmap_camera, 8, 16, 0, 0, 360, camera.pan );
-	if(!t1)
-	{
-		pan_setneedle(ui_minimap, 0, px * bmap_width(ui_mm) * scale_factor_x * mini_map_extra_scale_x, py * bmap_height(ui_mm) * scale_factor_x * mini_map_extra_scale_y, ui_bmap_camera, 8, 16, 0, 0, 360, camera.pan );
-	}
+//	var px = (16000 - abs(camera->y + 8000)) / 16000;
+//	var py = (16000 - abs(camera->x + 8000)) / 16000;
+//	var t1 = pan_setneedle(ui_minimap, 1, px * bmap_width(ui_mm), py * bmap_height(ui_mm), ui_bmap_camera, 8, 16, 0, 0, 360, camera.pan );
+//	if(!t1)
+//	{
+//		pan_setneedle(ui_minimap, 0, px * bmap_width(ui_mm) * scale_factor_x * mini_map_extra_scale_x, py * bmap_height(ui_mm) * scale_factor_x * mini_map_extra_scale_y, ui_bmap_camera, 8, 16, 0, 0, 360, camera.pan );
+//	}
 }
 
 void ui_minimap_click(PANEL *panel)
@@ -240,6 +242,15 @@ void ui_game_init()
 	ui_bmap_eye[1] = ui_face_eye2;
 	ui_bmap_eye[2] = ui_face_eye3;
 
+    ui_bmap_skull[0] = ui_face_skull1;
+    ui_bmap_skull[1] = ui_face_skull2;
+    ui_bmap_skull[2] = ui_face_skull3;
+    ui_bmap_skull[3] = ui_face_skull4;
+    ui_bmap_skull[4] = ui_face_skull5;
+    ui_bmap_skull[5] = ui_face_skull6;
+    ui_bmap_skull[6] = ui_face_skull7;
+    ui_bmap_skull[7] = ui_face_skull8;
+
 	pan_setwindow(ui_unit_meta, 0, 0, 0, 0, 0, ui_bmap_cbabe[0], 0, 0);
 
 	ui_bmap_dead_indicator = bmap_createblack(8, 8, 24);
@@ -267,13 +278,23 @@ void ui_game_init()
 	pan_setdigits(ui_main_resources, 0, bmap_width(ui_bmap_resources) - 50, 13, "%.0f", ui_hud_font, 1, &a_stupid_var );
 
 	ui_monitor->bmap = ui_bmap_monitor;
-	ui_minimap->bmap = ui_mm;
-	ui_minimap->event = ui_minimap_click;
 
+	ui_minimap->event = ui_minimap_click;
 }
 
 void ui_game_open()
 {
+    MAP * map = mapGetCurrent();
+    if(map == NULL)
+        error("ui_game_open must be called after jps init!");
+
+    if(ui_mm != NULL)
+        error("doppelter aufruf von ui_game_open");
+    ui_mm = bmap_createblack(UI_MMAP_SCALE * map->size[0], UI_MMAP_SCALE * map->size[1], 8888);
+    if(ui_mm == NULL)
+        error("konnte ui_mm nicht erstellen!");
+    ui_minimap->bmap = ui_mm;
+
 	ui_monitor->flags |= SHOW;
 	ui_minimap->flags |= SHOW;
 	ui_minimap->pos_x = 46;
@@ -310,6 +331,9 @@ void ui_game_close()
 			ui_life_indicator[i]->flags &= ~SHOW;
 		}
 	}
+
+    ptr_remove(ui_mm);
+    ui_mm = NULL;
 }
 
 void ui_game_update()
@@ -354,7 +378,7 @@ void ui_game_update()
 		}
 	}
 
-	ui_add_camera_to_minimap();
+	// ui_add_camera_to_minimap();
 
 	if( buildingState() == -1 )
 	{
@@ -386,7 +410,8 @@ void ui_game_update()
 	ui_monitor->scale_x = scale_factor_x;
 	ui_monitor->scale_y = scale_factor_x;
 	ui_monitor->pos_y = screen_size.y - bmap_height(ui_bmap_monitor) * scale_factor_x;
-	ui_minimap->pos_x = floor(46 * scale_factor_x + 0.5);
+
+    ui_minimap->pos_x = floor(46 * scale_factor_x + 0.5);
 	ui_minimap->pos_y = screen_size.y - bmap_height(ui_mm) * scale_factor_x - 12 * scale_factor_x;// + 18;// * scale_factor_x;
 
 	ui_lifebar_counter = 0;
@@ -397,7 +422,8 @@ void ui_game_update()
 	int ui_count_sputniks = 0;
 	int ui_count_esel = 0;
 	int ui_count_cbabes = 0;
-	int ui_count_skull = 0;
+	int ui_count_eye = 0;
+    int ui_count_skull = 0;
 
 	if( !ui_command_group_status )
 	{
@@ -487,11 +513,14 @@ void ui_game_update()
 					ui_count_esel++;
 					break;
 					case UNIT_EYE:
-					ui_count_skull++;
+					ui_count_eye++;
 					break;
 					case UNIT_BABE:
 					ui_count_cbabes++;
 					break;
+                case UNIT_SKULL:
+                ui_count_skull++;
+                break;
 				}
 
 				if( str_cmp(ent->type, "SPUTNIK.MDL") )
@@ -540,26 +569,33 @@ void ui_game_update()
 		ui_monitor->flags &= ~SHOW;
 		ui_minimap->flags &= ~SHOW;
 
-		if( ui_count_sputniks >= ui_count_esel && ui_count_sputniks >= ui_count_cbabes && ui_count_sputniks >= ui_count_skull )
-		{
-			ui_max_type = UI_SPUTNIK;
-			ui_active_portrait = ui_bmap_sputnik;
-		}
-		else if( ui_count_cbabes >= ui_count_esel && ui_count_cbabes >= ui_count_sputniks && ui_count_sputniks >= ui_count_skull )
-		{
-			ui_max_type = UI_CBABE;
-			ui_active_portrait = ui_bmap_cbabe;
-		}
-		else if( ui_count_skull >= ui_count_esel && ui_count_skull >= ui_count_sputniks && ui_count_skull >= ui_count_cbabes )
-		{
-			ui_max_type = UI_SKULL;
-			ui_active_portrait = ui_bmap_eye;
-		}
-		else if( ui_count_esel >= ui_count_skull && ui_count_esel >= ui_count_sputniks && ui_count_esel >= ui_count_cbabes )
-		{
-			ui_max_type = UI_ESEL;
-			ui_active_portrait = ui_bmap_esel;
-		}
+
+        int mask = 0;
+        if(ui_count_sputniks > 0) mask |= 1;
+        if(ui_count_cbabes > 0)   mask |= 2;
+        if(ui_count_eye > 0)      mask |= 4;
+        if(ui_count_esel > 0)     mask |= 8;
+        if(ui_count_skull > 0)    mask |= 16;
+
+        int i; for(i = 0; i < 5; i++)
+        {
+            if((mask & (1 << i)) == 0)
+                continue;
+            ui_max_type = i + 1;
+            break;
+        }
+
+        if(mask != 0)
+        {
+            switch(ui_max_type)
+            {
+            case UI_SPUTNIK: ui_active_portrait = ui_bmap_sputnik; break;
+            case UI_CBABE:   ui_active_portrait = ui_bmap_cbabe; break;
+            case UI_EYE:     ui_active_portrait = ui_bmap_eye; break;
+            case UI_ESEL:    ui_active_portrait = ui_bmap_esel; break;
+            case UI_SKULL:   ui_active_portrait = ui_bmap_skull; break;
+            }
+        }
 	}
 	else
 	{
@@ -746,6 +782,70 @@ void ui_game_update()
 		}
 
 	}
+
+    // render minimap
+    {
+        var fmt = bmap_lock(ui_mm, 0);
+
+        MAP * map = mapGetCurrent();
+        if(map == NULL) error("ui_game_update requires a map!");
+
+        var col_fogged = pixel_for_vec(vector(  0,   0,   0), 100, fmt);
+        var col_wall   = pixel_for_vec(vector( 64,  64,  96), 100, fmt);
+        var col_ground = pixel_for_vec(vector(128, 128, 128), 100, fmt);
+
+        var col_player[2];
+        col_player[PLAYER_ID_PLAYER]  = pixel_for_vec(PLAYER_COLOR_PLAYER, 100, fmt);
+        col_player[PLAYER_ID_AI]      = pixel_for_vec(PLAYER_COLOR_AI, 100, fmt);
+
+        int y; for(y = 0; y < map->size[1]; y++)
+        {
+            int x; for(x = 0; x < map->size[0]; x++)
+            {
+                TILE * tile = mapTileGet(map, x, y);
+                var col = col_fogged;
+                if(fow_isVisible(tile))
+                {
+                    if(tile->value)
+                        col = col_wall;
+                    else
+                        col = col_ground;
+                }
+
+                int dy; for(dy = 0; dy < UI_MMAP_SCALE; dy++)
+                {
+                    int dx; for(dx = 0; dx < UI_MMAP_SCALE; dx++)
+                    {
+                        pixel_to_bmap(ui_mm, UI_MMAP_SCALE * x + dx, UI_MMAP_SCALE * y + dy, col);
+                    }
+                }
+            }
+        }
+
+        int currentPlayer;
+        for(currentPlayer = 0; currentPlayer < MAX_PLAYERS; currentPlayer++)
+        {
+            UNIT * unit = map.unitFirst[currentPlayer];
+            while(unit)
+            {
+                if(unit->isActive && unit->tile)
+                {
+                    if(fow_isVisible(unit->tile))
+                    {
+                        pixel_to_bmap(ui_mm, UI_MMAP_SCALE * unit->pos2d.x+0, UI_MMAP_SCALE * unit->pos2d.y+0, col_player[currentPlayer]);
+                        pixel_to_bmap(ui_mm, UI_MMAP_SCALE * unit->pos2d.x+1, UI_MMAP_SCALE * unit->pos2d.y+0, col_player[currentPlayer]);
+                        pixel_to_bmap(ui_mm, UI_MMAP_SCALE * unit->pos2d.x+0, UI_MMAP_SCALE * unit->pos2d.y+1, col_player[currentPlayer]);
+                        pixel_to_bmap(ui_mm, UI_MMAP_SCALE * unit->pos2d.x+1, UI_MMAP_SCALE * unit->pos2d.y+1, col_player[currentPlayer]);
+                    }
+                }
+                unit = unit->next;
+            }
+        }
+
+        // TODO: Add camera here
+
+        bmap_unlock(ui_mm);
+    }
 }
 
 var ui_game_isdone()

@@ -63,8 +63,8 @@ MATERIAL * building_material =
 
 ENTITY* spawner_spawn(int unittype, VECTOR* pos, var angle, var owner)
 {
-	ENTITY* ent;
-   ENTITY *wireframe;
+	ENTITY * ent;
+    ENTITY * wireframe;
 	switch (unittype)
 	{
         case UNIT_SPUTNIK:

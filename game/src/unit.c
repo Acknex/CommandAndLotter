@@ -28,9 +28,9 @@ var unit_setTarget(ENTITY* ent, VECTOR* pos)
 	VECTOR target2D;
 	MAP* map = mapGetCurrent();
 	mapGetVector2DFromVector3D(map, target2D, pos);
-	
+
 	//cprintf2("\n unit_setTarget(%p): group(%d)", ent, ent->group);
-	
+
 	if (ent != NULL)
 	{
 		if (ent->group == GROUP_PLAYER_UNIT || ent->group == GROUP_ENEMY_UNIT)
@@ -42,7 +42,7 @@ var unit_setTarget(ENTITY* ent, VECTOR* pos)
 		}
 	}
 	return 0;
-	
+
 }
 
 VECTOR* unit_getTarget(ENTITY* ent)
@@ -66,7 +66,7 @@ var unit_setVictim(ENTITY* ent, ENTITY* victim)
 				}
 			}
 			ent->ENTITY_VICTIMTYPE = UNIT_INVALID;
-			ent->ENTITY_VICTIM = NULL;	
+			ent->ENTITY_VICTIM = NULL;
 		}
 	}
 	return 0;
@@ -100,27 +100,27 @@ ENTITY* unit_spawn(int unittype, VECTOR* pos, VECTOR* targetPos, var owner)
 		case UNIT_SPUTNIK:
 			ent = ent_create("sputnik.mdl", pos, Sputnik);
 			break;
-		
+
 		case UNIT_LERCHE:
 			ent = ent_create("cEselslerche.mdl", pos, Sputnik);
 			break;
-		
+
 		case UNIT_EYE:
 			ent = ent_create("eye.mdl", pos, Sputnik);
 			break;
-		
+
 		case UNIT_BABE:
 			ent = ent_create("cbabe.mdl", pos, Sputnik);
 			break;
-		
+
 		case UNIT_SKULL:
 			ent = ent_create("whiskas.mdl", pos, Skull);
 			break;
-		
+
 		default:
 			break;
 	}
-	
+
 	if (ent != NULL)
 	{
 		ent->OWNER = owner;
@@ -132,7 +132,7 @@ ENTITY* unit_spawn(int unittype, VECTOR* pos, VECTOR* targetPos, var owner)
 		}
 		else
 		{
-			ent->group = GROUP_PLAYER_UNIT;		
+			ent->group = GROUP_PLAYER_UNIT;
 			ent->SK_ENTITY_JPS_POINTER_TO_UNIT_STRUCT = jpsUnitCreate(PLAYER_ID_PLAYER, unittype, ent);
 		}
 
@@ -140,7 +140,7 @@ ENTITY* unit_spawn(int unittype, VECTOR* pos, VECTOR* targetPos, var owner)
 		unit_setTarget(ent, targetPos);
 		unit_setVictim(ent,NULL);
 	}
-	
+
 	return ent;
 }
 
@@ -188,7 +188,7 @@ var unit_setDamage(ENTITY* victim, ENTITY* attacker)
 		var index = UNIT_CLASSES * clamp(attacker->ENTITY_UNITTYPE,0,UNIT_CLASSES-1) + clamp(victim->ENTITY_UNITTYPE,0,UNIT_CLASSES-1);
 		victim->DAMAGE_HIT = unit__dmgtable[index];
 		victim->DAMAGE_ENT = handle(attacker);
-		
+
 		return unit__dmgtable[index];
 	}
 	return 0;
@@ -198,7 +198,7 @@ int unit_getType(ENTITY* ent)
 {
 	if (ent != NULL)
 	{
-		return ent->ENTITY_UNITTYPE;	
+		return ent->ENTITY_UNITTYPE;
 	}
 	return -1;
 }
@@ -206,7 +206,7 @@ int unit_getType(ENTITY* ent)
 ENTITY* unit_findNextVictim(ENTITY* ptr, var unittype)
 {
 	ptr->ENTITY_VICTIMTYPE = unittype;
-	return unit_findNextVictim(ptr);	
+	return unit_findNextVictim(ptr);
 }
 
 ENTITY* unit_findNextVictim(ENTITY* ptr)
@@ -214,10 +214,10 @@ ENTITY* unit_findNextVictim(ENTITY* ptr)
 	/* following requirements have to be met for auto-picking of next victim
 	   1) no victim active
 	   2) unit type of last victim is still valid
-	   
+
 	   if unit type of last victim is cleared, no new victim is searched
 	 */
-	
+
 	if (unit_getVictim(ptr) == NULL && ptr->ENTITY_VICTIMTYPE != UNIT_INVALID)
 	{
 		cprintf0("\n unit__findNextVictim: TRYFIND...");

@@ -285,7 +285,7 @@ void maploader_load(char const * fileName)
 
     VECTOR from[2], to[2];
     vec_set(from[0], vector(2218, 1100, 600)); vec_set(to[0], vector(2506, -1111, 600));
-    vec_set(from[1], vector(-2506, 1100, 600)); vec_set(to[1], vector(-2218, -1111, 600));
+    vec_set(from[1], vector(-2506, 11002, 600)); vec_set(to[1], vector(-2218, -1111, 600));
 
     int i; for(i = 0; i < 2; i++)
     {

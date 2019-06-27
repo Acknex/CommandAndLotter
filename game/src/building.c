@@ -66,7 +66,7 @@ void buildingPlacement_beginConstruction(int selection)
 	{
 		buildingPlacement_endConstruction();
 	}
-	
+
 	buildingPlacement_selection = selection;
 	buildingPlacement_previewModel = ent_create(buildingPlacement_constructionAssets[selection], nullvector, NULL);
 	buildingPlacement_previewModel->flags |= TRANSLUCENT;
@@ -106,16 +106,15 @@ void buildingPlacement_update()
 {
 	if(buildingPlacement_selection == BUILDING_NONE && !mouse_left)
 	{
-		if(key_1)
-		buildingPlacement_beginConstruction(BUILDING_PRESS);
-		if(key_2)
-		buildingPlacement_beginConstruction(BUILDING_FARM);
-		if(key_3)
-		buildingPlacement_beginConstruction(BUILDING_TREE);
-		if(key_4)
-		buildingPlacement_beginConstruction(BUILDING_TOWER);
-		if(key_5)
-		buildingPlacement_beginConstruction(BUILDING_BANK);
+        if(key_any)
+        {
+            // key pad 1 ... 5
+            if(key_lastpressed == 79) buildingPlacement_beginConstruction(BUILDING_PRESS);
+            if(key_lastpressed == 80) buildingPlacement_beginConstruction(BUILDING_FARM);
+            if(key_lastpressed == 81) buildingPlacement_beginConstruction(BUILDING_TREE);
+            if(key_lastpressed == 75) buildingPlacement_beginConstruction(BUILDING_TOWER);
+            if(key_lastpressed == 76) buildingPlacement_beginConstruction(BUILDING_BANK);
+        }
 	}
 
 	if(buildingPlacement_selection != BUILDING_NONE)
