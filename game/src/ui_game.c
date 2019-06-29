@@ -387,6 +387,7 @@ void ui_game_update()
 		button_state(ui_game_menu, 3, 0);
 		button_state(ui_game_menu, 4, 0);
 		button_state(ui_game_menu, 5, 0);
+		button_state(ui_game_menu, 6, 0);
 	}
 
 	var scale_factor_x = screen_size.x / 1920;

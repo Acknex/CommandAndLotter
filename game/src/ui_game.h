@@ -162,5 +162,4 @@ void ui_game_update();
 var ui_game_isdone();
 void ui_game_after_all();
 
-
 #endif
