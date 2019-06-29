@@ -25,6 +25,7 @@ PANEL *ui_main_resources;
 PANEL *ui_unit_meta;
 PANEL *ui_game_menu;
 PANEL *ui_monitor;
+PANEL *ui_open_game_menu;
 
 PANEL *ui_radial_delete;
 PANEL *ui_radial_counter;
@@ -78,6 +79,9 @@ BMAP *ui_icon_sputnik = "ui_H1.png";
 BMAP *ui_icon_skull = "ui_H4.png";
 BMAP *ui_icon_esel = "ui_H3.png";
 
+BMAP *ui_icon_hammer = "ico_hammer_n.png";
+BMAP *ui_icon_hammer_o = "ico_hammer_o.png";
+BMAP *ui_icon_build = "Ico_2.png";
 BMAP *ui_icon_tree = "build_menu_tree_n.png";
 BMAP *ui_icon_tree_o = "build_menu_tree_o.png";
 BMAP *ui_icon_press = "build_menu_press_n.png";
@@ -101,9 +105,9 @@ BMAP *ui_face_esel1 = "ESFace1.png";
 BMAP *ui_face_esel2 = "ESFace2.png";
 BMAP *ui_face_esel3 = "ESFace3.png";
 
-BMAP *ui_face_eye1 = "ui_H4.png";
-BMAP *ui_face_eye2 = "ui_H4.png";
-BMAP *ui_face_eye3 = "ui_H4.png";
+BMAP *ui_face_eye1 = "IrisSet2.png";
+BMAP *ui_face_eye2 = "IrisSet3.png";
+BMAP *ui_face_eye3 = "IrisSet4.png";
 
 BMAP *ui_face_skull1 = "WkFace1.png";
 BMAP *ui_face_skull2 = "WkFace2.png";
@@ -141,8 +145,8 @@ var a_dummy_var = 0;
 int ui_frame_order[19] = {0, 1, 0, 1, 2, 1, 0, 1, 1, 2, 0, 2, 0, 0, 1, 2, 0, 1, 2};
 int ui_selected_max_type = 0;
 int ui_command_group_status = 0;
+var ui_command_group_process = 0;
 int ui_lifebar_counter = 0;
-
 
 var scale_factor_x = 1;
 var scale_factor_y = 1;

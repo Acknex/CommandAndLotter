@@ -32,7 +32,26 @@ void ui_place_building(var num, PANEL *panel)
 
 void ui_show_commando_groups()
 {
-	ui_command_group_status = !ui_command_group_status;
+	switch(ui_command_group_status)
+	{
+		case 0:
+		ui_command_group_status = 1;
+		ui_command_group_process = 0;
+		break;
+		case 1:
+		ui_command_group_status = -1;
+		break;
+		case 2:
+		ui_command_group_status = -1;
+		ui_command_group_process = 0;
+		break;
+		case -1:
+		ui_command_group_status = 1;
+		break;
+		default:
+		ui_command_group_status = 0;
+		ui_command_group_process = 0;
+	}
 }
 
 void ui_rescale_radial(PANEL *rad)
@@ -158,24 +177,24 @@ void update_or_create_lifebar(ENTITY *ent)
 
 void ui_add_dot_to_minimap(ENTITY *ent, int size, BMAP *dot, int counter)
 {
-//	var px = (16000 - abs(ent->y + 8000)) / 16000;
-//	var py = (16000 - abs(ent->x + 8000)) / 16000;
-//	var t1 = pan_setwindow(ui_minimap, counter, px * bmap_width(ui_mm), py * bmap_height(ui_mm), size, size, dot, 0, 0);
-//	if(!t1)
-//	{
-//		pan_setwindow(ui_minimap, 0, px * bmap_width(ui_mm) * scale_factor_x * mini_map_extra_scale_x, py * bmap_height(ui_mm) * scale_factor_x * mini_map_extra_scale_y, size, size, dot, 0, 0);
-//	}
+	//	var px = (16000 - abs(ent->y + 8000)) / 16000;
+	//	var py = (16000 - abs(ent->x + 8000)) / 16000;
+	//	var t1 = pan_setwindow(ui_minimap, counter, px * bmap_width(ui_mm), py * bmap_height(ui_mm), size, size, dot, 0, 0);
+	//	if(!t1)
+	//	{
+		//		pan_setwindow(ui_minimap, 0, px * bmap_width(ui_mm) * scale_factor_x * mini_map_extra_scale_x, py * bmap_height(ui_mm) * scale_factor_x * mini_map_extra_scale_y, size, size, dot, 0, 0);
+	//	}
 }
 
 void ui_add_camera_to_minimap()
 {
-//	var px = (16000 - abs(camera->y + 8000)) / 16000;
-//	var py = (16000 - abs(camera->x + 8000)) / 16000;
-//	var t1 = pan_setneedle(ui_minimap, 1, px * bmap_width(ui_mm), py * bmap_height(ui_mm), ui_bmap_camera, 8, 16, 0, 0, 360, camera.pan );
-//	if(!t1)
-//	{
-//		pan_setneedle(ui_minimap, 0, px * bmap_width(ui_mm) * scale_factor_x * mini_map_extra_scale_x, py * bmap_height(ui_mm) * scale_factor_x * mini_map_extra_scale_y, ui_bmap_camera, 8, 16, 0, 0, 360, camera.pan );
-//	}
+	//	var px = (16000 - abs(camera->y + 8000)) / 16000;
+	//	var py = (16000 - abs(camera->x + 8000)) / 16000;
+	//	var t1 = pan_setneedle(ui_minimap, 1, px * bmap_width(ui_mm), py * bmap_height(ui_mm), ui_bmap_camera, 8, 16, 0, 0, 360, camera.pan );
+	//	if(!t1)
+	//	{
+		//		pan_setneedle(ui_minimap, 0, px * bmap_width(ui_mm) * scale_factor_x * mini_map_extra_scale_x, py * bmap_height(ui_mm) * scale_factor_x * mini_map_extra_scale_y, ui_bmap_camera, 8, 16, 0, 0, 360, camera.pan );
+	//	}
 }
 
 void ui_minimap_click(PANEL *panel)
@@ -209,11 +228,13 @@ void ui_game_init()
 	ui_portrait = pan_create("", 99);
 	ui_minimap = pan_create("", 100);
 	ui_monitor = pan_create("", 99);
+	ui_open_game_menu = pan_create("", 101);
 
 	ui_radial_counter->bmap = ui_radial_n;
 	ui_radial_counter->flags = CENTER_X | CENTER_Y | UNTOUCHABLE;
 	pan_setwindow(ui_radial_counter, 0, -5, -4, 128, 128, ui_radial_progress, 0, 0);
 	pan_setdigits(ui_radial_counter, 0, bmap_width(ui_radial_n) / 2, bmap_height(ui_radial_n) / 2 , "%.0f", ui_hud_font, 1, &a_dummy_var);
+
 
 	pan_setbutton(ui_game_menu, 0, 0, 1, 151, ui_hide_button_p, ui_hide_button_n, ui_hide_button_o, ui_hide_button_n, ui_show_commando_groups, NULL, NULL);
 
@@ -222,6 +243,9 @@ void ui_game_init()
 	pan_setbutton(ui_game_menu, 0, 4, 15, 350, ui_icon_tree_o, ui_icon_tree, ui_icon_tree_o, ui_icon_tree, ui_place_building, NULL, NULL);
 	pan_setbutton(ui_game_menu, 0, 4, 15, 458, ui_icon_tower_o, ui_icon_tower, ui_icon_tower_o, ui_icon_tower, ui_place_building, NULL, NULL);
 	pan_setbutton(ui_game_menu, 0, 4, 15, 564, ui_icon_bank_o, ui_icon_bank, ui_icon_bank_o, ui_icon_bank, ui_place_building, NULL, NULL);
+	
+	ui_open_game_menu->bmap = ui_icon_hammer;
+	pan_setbutton(ui_open_game_menu, 0, 0, 0, 0, ui_icon_hammer_o, ui_icon_hammer, ui_icon_hammer_o, NULL, ui_show_commando_groups, NULL, NULL);
 
 	ui_bmap_cbabe[0] = ui_face_cbabe1;
 	ui_bmap_cbabe[1] = ui_face_cbabe2;
@@ -243,14 +267,14 @@ void ui_game_init()
 	ui_bmap_eye[1] = ui_face_eye2;
 	ui_bmap_eye[2] = ui_face_eye3;
 
-    ui_bmap_skull[0] = ui_face_skull1;
-    ui_bmap_skull[1] = ui_face_skull2;
-    ui_bmap_skull[2] = ui_face_skull3;
-    ui_bmap_skull[3] = ui_face_skull4;
-    ui_bmap_skull[4] = ui_face_skull5;
-    ui_bmap_skull[5] = ui_face_skull6;
-    ui_bmap_skull[6] = ui_face_skull7;
-    ui_bmap_skull[7] = ui_face_skull8;
+	ui_bmap_skull[0] = ui_face_skull1;
+	ui_bmap_skull[1] = ui_face_skull2;
+	ui_bmap_skull[2] = ui_face_skull3;
+	ui_bmap_skull[3] = ui_face_skull4;
+	ui_bmap_skull[4] = ui_face_skull5;
+	ui_bmap_skull[5] = ui_face_skull6;
+	ui_bmap_skull[6] = ui_face_skull7;
+	ui_bmap_skull[7] = ui_face_skull8;
 
 	pan_setwindow(ui_unit_meta, 0, 0, 0, 0, 0, ui_bmap_cbabe[0], 0, 0);
 
@@ -285,16 +309,16 @@ void ui_game_init()
 
 void ui_game_open()
 {
-    MAP * map = mapGetCurrent();
-    if(map == NULL)
-        error("ui_game_open must be called after jps init!");
+	MAP * map = mapGetCurrent();
+	if(map == NULL)
+	error("ui_game_open must be called after jps init!");
 
-    if(ui_mm != NULL)
-        error("doppelter aufruf von ui_game_open");
-    ui_mm = bmap_createblack(UI_MMAP_SCALE * map->size[0], UI_MMAP_SCALE * map->size[1], 8888);
-    if(ui_mm == NULL)
-        error("konnte ui_mm nicht erstellen!");
-    ui_minimap->bmap = ui_mm;
+	if(ui_mm != NULL)
+	error("doppelter aufruf von ui_game_open");
+	ui_mm = bmap_createblack(UI_MMAP_SCALE * map->size[0], UI_MMAP_SCALE * map->size[1], 8888);
+	if(ui_mm == NULL)
+	error("konnte ui_mm nicht erstellen!");
+	ui_minimap->bmap = ui_mm;
 
 	ui_monitor->flags |= SHOW;
 	ui_minimap->flags |= SHOW;
@@ -306,8 +330,10 @@ void ui_game_open()
 
 	ui_unit_meta->pos_y = screen_size.y - bmap_height(ui_bmap_units);
 	ui_main_resources->flags |= SHOW;
-
-	ui_game_menu->flags |= SHOW;
+	
+	ui_game_menu->flags &= ~SHOW;
+	
+	ui_open_game_menu->flags |= SHOW;
 }
 
 void ui_game_close()
@@ -333,13 +359,12 @@ void ui_game_close()
 		}
 	}
 
-    ptr_remove(ui_mm);
-    ui_mm = NULL;
+	ptr_remove(ui_mm);
+	ui_mm = NULL;
 }
 
 void ui_game_update()
 {
-
 	int i; for(i = 0; i < ui_lifebar_counter; i++)
 	{
 		ENTITY *ent = ptr_for_handle(ui_life_indicator[i]->skill_x);
@@ -400,9 +425,6 @@ void ui_game_update()
 	ui_unit_meta->scale_x = scale_factor_x;
 	ui_unit_meta->scale_y = scale_factor_x;
 
-	ui_game_menu->scale_x = scale_factor_x;
-	ui_game_menu->scale_y = scale_factor_x;
-
 	ui_portrait->scale_x = scale_factor_x;
 	ui_portrait->scale_y = scale_factor_x;
 
@@ -413,8 +435,16 @@ void ui_game_update()
 	ui_monitor->scale_y = scale_factor_x;
 	ui_monitor->pos_y = screen_size.y - bmap_height(ui_bmap_monitor) * scale_factor_x;
 
-    ui_minimap->pos_x = floor(46 * scale_factor_x + 0.5);
+	ui_minimap->pos_x = floor(46 * scale_factor_x + 0.5);
 	ui_minimap->pos_y = screen_size.y - bmap_height(ui_mm) * scale_factor_x - 12 * scale_factor_x;// + 18;// * scale_factor_x;
+	
+	ui_game_menu->scale_x = scale_factor_x;
+	ui_game_menu->scale_y = scale_factor_x;
+	
+	ui_open_game_menu->scale_x = scale_factor_x;
+	ui_open_game_menu->scale_y = scale_factor_x;
+	ui_open_game_menu->pos_x = screen_size.x - bmap_width(ui_icon_hammer) * scale_factor_x;
+	ui_open_game_menu->pos_y = screen_size.y * 0.15 * scale_factor_x + 10 * scale_factor_x;
 
 	ui_lifebar_counter = 0;
 
@@ -425,18 +455,47 @@ void ui_game_update()
 	int ui_count_esel = 0;
 	int ui_count_cbabes = 0;
 	int ui_count_eye = 0;
-    int ui_count_skull = 0;
-
-	if( !ui_command_group_status )
+	int ui_count_skull = 0;
+	
+	if(ui_command_group_status == 1 || ui_command_group_status == -1)
 	{
-		ui_game_menu->pos_x = screen_size.x - bmap_width(ui_bmap_gamemenu) * scale_factor_x + 100 * scale_factor_x;
-		ui_game_menu->pos_y = screen_size.y * 0.15 * scale_factor_x;
+		ui_game_menu->flags |= SHOW;
+		ui_open_game_menu->flags |= SHOW;
+		
+		ui_command_group_process += 25 * time_step;
+		
+		if( ui_command_group_status == 1 )
+		{
+			ui_open_game_menu->alpha = clamp(100 - ui_command_group_process, 0, 100);
+			ui_game_menu->alpha = clamp(ui_command_group_process, 0, 100);
+		}
+		else if ( ui_command_group_status == -1 )
+		{
+			ui_open_game_menu->alpha = clamp(ui_command_group_process, 0, 100);
+			ui_game_menu->alpha = clamp(100 - ui_command_group_process, 0, 100);
+		}
+		
+		if ( ui_command_group_process >= 100 ) 
+		{
+			if( ui_command_group_status == 1)
+			{
+				ui_command_group_process = 0;
+				ui_command_group_status = 2;
+				ui_game_menu->flags |= SHOW;
+				ui_open_game_menu->flags &= ~SHOW;
+			}
+			if( ui_command_group_status == -1)
+			{
+				ui_command_group_process = 0;
+				ui_command_group_status = 0;
+				ui_game_menu->flags &= ~SHOW;
+				ui_open_game_menu->flags |= SHOW;
+			}
+		}
 	}
-	else
-	{
-		ui_game_menu->pos_x = screen_size.x - bmap_width(ui_bmap_gamemenu) * scale_factor_x;
-		ui_game_menu->pos_y = screen_size.y * 0.15 * scale_factor_x;
-	}
+	
+	ui_game_menu->pos_x = screen_size.x - bmap_width(ui_bmap_gamemenu) * scale_factor_x;
+	ui_game_menu->pos_y = screen_size.y * 0.15 * scale_factor_x;
 
 	ui_unit_meta->pos_y = screen_size.y - bmap_height(ui_bmap_units) * scale_factor_x - 3;
 
@@ -482,21 +541,21 @@ void ui_game_update()
 			}
 		}
 
-        TILE* tile = mapGetTileFromVector(mapGetCurrent(), &ent->x);
-        if(tile)
-        {
-            if (fow_isVisible(tile))
-            {
-                if( ent->group == GROUP_ENEMY_SPAWNER )
-                {
-                    ui_add_dot_to_minimap(ent, 3, ui_bmap_green, counter);
-                    counter++;
-                } else {
-                    ui_add_dot_to_minimap(ent, 3, ui_bmap_red, counter);
-                    counter++;
-                }
-            }
-        }
+		TILE* tile = mapGetTileFromVector(mapGetCurrent(), &ent->x);
+		if(tile)
+		{
+			if (fow_isVisible(tile))
+			{
+				if( ent->group == GROUP_ENEMY_SPAWNER )
+				{
+					ui_add_dot_to_minimap(ent, 3, ui_bmap_green, counter);
+					counter++;
+					} else {
+					ui_add_dot_to_minimap(ent, 3, ui_bmap_red, counter);
+					counter++;
+				}
+			}
+		}
 	}
 	for(ent = ent_next(NULL); ent != NULL; ent = ent_next(ent))
 	{
@@ -520,9 +579,9 @@ void ui_game_update()
 					case UNIT_BABE:
 					ui_count_cbabes++;
 					break;
-                case UNIT_SKULL:
-                ui_count_skull++;
-                break;
+					case UNIT_SKULL:
+					ui_count_skull++;
+					break;
 				}
 
 				if( str_cmp(ent->type, "SPUTNIK.MDL") )
@@ -533,36 +592,36 @@ void ui_game_update()
 			}
 		}
 
-        TILE* tile = mapGetTileFromVector(mapGetCurrent(), &ent->x);
-        if(tile)
-        {
-            if (fow_isVisible(tile))
-            {
-                if(ent->group == GROUP_PLAYER_UNIT)
-                {
-                    ui_add_dot_to_minimap(ent, 1, ui_bmap_cyan, counter);
-                    counter++;
-                }
-                else if( ent->group == GROUP_ENEMY_UNIT && ent->ENTITY_UNITTYPE != UNIT_Z)
-                {
-                    ui_add_dot_to_minimap(ent, 1, ui_bmap_red, counter);
-                    counter++;
-                }
-            }
-        }
+		TILE* tile = mapGetTileFromVector(mapGetCurrent(), &ent->x);
+		if(tile)
+		{
+			if (fow_isVisible(tile))
+			{
+				if(ent->group == GROUP_PLAYER_UNIT)
+				{
+					ui_add_dot_to_minimap(ent, 1, ui_bmap_cyan, counter);
+					counter++;
+				}
+				else if( ent->group == GROUP_ENEMY_UNIT && ent->ENTITY_UNITTYPE != UNIT_Z)
+				{
+					ui_add_dot_to_minimap(ent, 1, ui_bmap_red, counter);
+					counter++;
+				}
+			}
+		}
 	}
 
 	SUBSYSTEM_LOOP(ent, SUBSYSTEM_Z)
 	{
-        TILE* tile = mapGetTileFromVector(mapGetCurrent(), &ent->x);
-        if(tile)
-        {
-            if (fow_isVisible(tile))
-            {
-                ui_add_dot_to_minimap(ent, 1, ui_bmap_yellow, counter);
-                counter++;
-            }
-        }
+		TILE* tile = mapGetTileFromVector(mapGetCurrent(), &ent->x);
+		if(tile)
+		{
+			if (fow_isVisible(tile))
+			{
+				ui_add_dot_to_minimap(ent, 1, ui_bmap_yellow, counter);
+				counter++;
+			}
+		}
 	}
 
 	if(ui_has_ents)
@@ -572,32 +631,32 @@ void ui_game_update()
 		ui_minimap->flags &= ~SHOW;
 
 
-        int mask = 0;
-        if(ui_count_sputniks > 0) mask |= 1;
-        if(ui_count_cbabes > 0)   mask |= 2;
-        if(ui_count_eye > 0)      mask |= 4;
-        if(ui_count_esel > 0)     mask |= 8;
-        if(ui_count_skull > 0)    mask |= 16;
+		int mask = 0;
+		if(ui_count_sputniks > 0) mask |= 1;
+		if(ui_count_cbabes > 0)   mask |= 2;
+		if(ui_count_eye > 0)      mask |= 4;
+		if(ui_count_esel > 0)     mask |= 8;
+		if(ui_count_skull > 0)    mask |= 16;
 
-        int i; for(i = 0; i < 5; i++)
-        {
-            if((mask & (1 << i)) == 0)
-                continue;
-            ui_max_type = i + 1;
-            break;
-        }
+		int i; for(i = 0; i < 5; i++)
+		{
+			if((mask & (1 << i)) == 0)
+			continue;
+			ui_max_type = i + 1;
+			break;
+		}
 
-        if(mask != 0)
-        {
-            switch(ui_max_type)
-            {
-            case UI_SPUTNIK: ui_active_portrait = ui_bmap_sputnik; break;
-            case UI_CBABE:   ui_active_portrait = ui_bmap_cbabe; break;
-            case UI_EYE:     ui_active_portrait = ui_bmap_eye; break;
-            case UI_ESEL:    ui_active_portrait = ui_bmap_esel; break;
-            case UI_SKULL:   ui_active_portrait = ui_bmap_skull; break;
-            }
-        }
+		if(mask != 0)
+		{
+			switch(ui_max_type)
+			{
+				case UI_SPUTNIK: ui_active_portrait = ui_bmap_sputnik; break;
+				case UI_CBABE:   ui_active_portrait = ui_bmap_cbabe; break;
+				case UI_EYE:     ui_active_portrait = ui_bmap_eye; break;
+				case UI_ESEL:    ui_active_portrait = ui_bmap_esel; break;
+				case UI_SKULL:   ui_active_portrait = ui_bmap_skull; break;
+			}
+		}
 	}
 	else
 	{
@@ -785,69 +844,69 @@ void ui_game_update()
 
 	}
 
-    // render minimap
-    {
-        var fmt = bmap_lock(ui_mm, 0);
+	// render minimap
+	{
+		var fmt = bmap_lock(ui_mm, 0);
 
-        MAP * map = mapGetCurrent();
-        if(map == NULL) error("ui_game_update requires a map!");
+		MAP * map = mapGetCurrent();
+		if(map == NULL) error("ui_game_update requires a map!");
 
-        var col_fogged = pixel_for_vec(vector(  0,   0,   0), 100, fmt);
-        var col_wall   = pixel_for_vec(vector( 64,  64,  96), 100, fmt);
-        var col_ground = pixel_for_vec(vector(128, 128, 128), 100, fmt);
+		var col_fogged = pixel_for_vec(vector(  0,   0,   0), 100, fmt);
+		var col_wall   = pixel_for_vec(vector( 64,  64,  96), 100, fmt);
+		var col_ground = pixel_for_vec(vector(128, 128, 128), 100, fmt);
 
-        var col_player[2];
-        col_player[PLAYER_ID_PLAYER]  = pixel_for_vec(PLAYER_COLOR_PLAYER, 100, fmt);
-        col_player[PLAYER_ID_AI]      = pixel_for_vec(PLAYER_COLOR_AI, 100, fmt);
+		var col_player[2];
+		col_player[PLAYER_ID_PLAYER]  = pixel_for_vec(PLAYER_COLOR_PLAYER, 100, fmt);
+		col_player[PLAYER_ID_AI]      = pixel_for_vec(PLAYER_COLOR_AI, 100, fmt);
 
-        int y; for(y = 0; y < map->size[1]; y++)
-        {
-            int x; for(x = 0; x < map->size[0]; x++)
-            {
-                TILE * tile = mapTileGet(map, x, y);
-                var col = col_fogged;
-                if(fow_isVisible(tile))
-                {
-                    if(tile->value)
-                        col = col_wall;
-                    else
-                        col = col_ground;
-                }
+		int y; for(y = 0; y < map->size[1]; y++)
+		{
+			int x; for(x = 0; x < map->size[0]; x++)
+			{
+				TILE * tile = mapTileGet(map, x, y);
+				var col = col_fogged;
+				if(fow_isVisible(tile))
+				{
+					if(tile->value)
+					col = col_wall;
+					else
+					col = col_ground;
+				}
 
-                int dy; for(dy = 0; dy < UI_MMAP_SCALE; dy++)
-                {
-                    int dx; for(dx = 0; dx < UI_MMAP_SCALE; dx++)
-                    {
-                        pixel_to_bmap(ui_mm, UI_MMAP_SCALE * x + dx, UI_MMAP_SCALE * y + dy, col);
-                    }
-                }
-            }
-        }
+				int dy; for(dy = 0; dy < UI_MMAP_SCALE; dy++)
+				{
+					int dx; for(dx = 0; dx < UI_MMAP_SCALE; dx++)
+					{
+						pixel_to_bmap(ui_mm, UI_MMAP_SCALE * x + dx, UI_MMAP_SCALE * y + dy, col);
+					}
+				}
+			}
+		}
 
-        int currentPlayer;
-        for(currentPlayer = 0; currentPlayer < MAX_PLAYERS; currentPlayer++)
-        {
-            UNIT * unit = map.unitFirst[currentPlayer];
-            while(unit)
-            {
-                if(unit->isActive && unit->tile)
-                {
-                    if(fow_isVisible(unit->tile))
-                    {
-                        pixel_to_bmap(ui_mm, UI_MMAP_SCALE * unit->pos2d.x+0, UI_MMAP_SCALE * unit->pos2d.y+0, col_player[currentPlayer]);
-                        pixel_to_bmap(ui_mm, UI_MMAP_SCALE * unit->pos2d.x+1, UI_MMAP_SCALE * unit->pos2d.y+0, col_player[currentPlayer]);
-                        pixel_to_bmap(ui_mm, UI_MMAP_SCALE * unit->pos2d.x+0, UI_MMAP_SCALE * unit->pos2d.y+1, col_player[currentPlayer]);
-                        pixel_to_bmap(ui_mm, UI_MMAP_SCALE * unit->pos2d.x+1, UI_MMAP_SCALE * unit->pos2d.y+1, col_player[currentPlayer]);
-                    }
-                }
-                unit = unit->next;
-            }
-        }
+		int currentPlayer;
+		for(currentPlayer = 0; currentPlayer < MAX_PLAYERS; currentPlayer++)
+		{
+			UNIT * unit = map.unitFirst[currentPlayer];
+			while(unit)
+			{
+				if(unit->isActive && unit->tile)
+				{
+					if(fow_isVisible(unit->tile))
+					{
+						pixel_to_bmap(ui_mm, UI_MMAP_SCALE * unit->pos2d.x+0, UI_MMAP_SCALE * unit->pos2d.y+0, col_player[currentPlayer]);
+						pixel_to_bmap(ui_mm, UI_MMAP_SCALE * unit->pos2d.x+1, UI_MMAP_SCALE * unit->pos2d.y+0, col_player[currentPlayer]);
+						pixel_to_bmap(ui_mm, UI_MMAP_SCALE * unit->pos2d.x+0, UI_MMAP_SCALE * unit->pos2d.y+1, col_player[currentPlayer]);
+						pixel_to_bmap(ui_mm, UI_MMAP_SCALE * unit->pos2d.x+1, UI_MMAP_SCALE * unit->pos2d.y+1, col_player[currentPlayer]);
+					}
+				}
+				unit = unit->next;
+			}
+		}
 
-        // TODO: Add camera here
+		// TODO: Add camera here
 
-        bmap_unlock(ui_mm);
-    }
+		bmap_unlock(ui_mm);
+	}
 }
 
 var ui_game_isdone()
