@@ -87,7 +87,7 @@ void SKULL__wait_or_walk(ENTITY * ptr)
 			case 0: ent_playsound(ptr,skull_snd_hit1, 7000); break;
 			case 1: ent_playsound(ptr,skull_snd_hit2, 7000); break;
 		}
-	}	
+	}
 	else
 	{
 		//selected victim is near - attack
@@ -101,10 +101,11 @@ void SKULL__wait_or_walk(ENTITY * ptr)
 		{
 			unit_findNextVictim(ptr, UNIT_Z);
 		}
-		
+
 	}
 }
 
+var SKULL__owner;
 
 void SKULL_Update()
 {
@@ -149,7 +150,7 @@ void SKULL_Update()
 		}
 
 		if (ptr->ENTITY_STATE != ENTITY_STATE_DIE && ptr->ENTITY_STATE != ENTITY_STATE_DEAD)
-		{			
+		{
 			UNIT* unit = jpsUnitGetFromEntity(ptr);
 			if(unit)
 			{
@@ -169,7 +170,7 @@ void SKULL_Update()
 				vec_scale(contact.x, ptr->scale_x);
 				vec_rotate(contact.x, ptr->pan);
 				vec_add(contact.x, ptr->x);
-				
+
 				VECTOR velocity;
 				vec_set(velocity, nullvector);
 				velocity.x = -20 - random(20);
@@ -181,6 +182,7 @@ void SKULL_Update()
 				}
 				else
 				{
+                    SKULL__owner = ptr->OWNER;
 					effect(SKULL__fireEffect, 3*time_step, contact.x, velocity);
 				}
 			}
@@ -218,7 +220,7 @@ void SKULL__attack(ENTITY* ptr)
 			ent_playsound(ptr,skull_snd_attack, 7000);
 		}
 	}
-	
+
 	ANG_turnToPos(ptr, unit_getTarget(ptr), ptr->SKULL_TURNSPEED, 0);
 
 	ent_animate(ptr, SKULL_WALKANIM, 0, 0);
@@ -230,7 +232,7 @@ void SKULL__attack(ENTITY* ptr)
 		{
 			int i;
 			for(i = 0; i < 5; i++)
-			{	
+			{
 				VECTOR velocity;
 				vec_set(velocity, &victim->x);
 				vec_sub(velocity, &ptr->x);
@@ -268,14 +270,14 @@ void SKULL__attack(ENTITY* ptr)
 			ptr->SKULL_ANIMSTATEATK = 0;
 			ptr->ENTITY_STATE = ENTITY_STATE_WAIT_OR_WALK;
 		}
-	}	
+	}
 
 }
 
 void SKULL__die(ENTITY* ptr)
 {
 	ptr->ENTITY_ANIM = minv(ptr->ENTITY_ANIM + 4*time_step, 100);
-	var animState = (100 - ptr->ENTITY_ANIM ) / 100;	
+	var animState = (100 - ptr->ENTITY_ANIM ) / 100;
 	vec_set(&ptr->scale_x, vector(animState, animState, animState));
 	VECTOR* pos = vector(ptr->x+random(10)-5, ptr->y+random(10)-5, ptr->z+random(10)-5);
 	VECTOR* vel = vector(-5-random(10), -2-random(4), 2+random(4));
@@ -300,9 +302,18 @@ void SKULL__fireParticle(PARTICLE *p)
 void SKULL__fireEffect(PARTICLE *p)
 {
 	set(p, MOVE | BRIGHT | TRANSLUCENT);
-	p.red = 255;
-	p.green = 0;
-	p.blue = 0;
+    if(SKULL__owner == PLAYER_ID_PLAYER)
+    {
+        p.red = 128;
+        p.green = 255;
+        p.blue = 0;
+    }
+    else
+    {
+        p.red = 255;
+        p.green = 0;
+        p.blue = 0;
+    }
 	p.alpha = 100;
 	p.lifespan = 50;
 	p.size = 30;
@@ -351,7 +362,7 @@ void smoke_fade_p(PARTICLE* p)
 {
 	p.alpha -= p.skill_a*time_step;
 	if (p.alpha <= 0) p.lifespan = 0;
-	
+
 	p.size = minv(p.skill_b, p.size+time_step*3);
 }
 

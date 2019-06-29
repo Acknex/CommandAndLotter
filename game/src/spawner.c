@@ -17,6 +17,7 @@
 #define SPAWNER_SMOKEPARTICLES skill30
 #define SPAWNER_WIREFRAME skill31
 #define SPAWNER_SPAWNANGLE skill32
+#define SPAWNER_VERTEXOFFSET skill33
 
 
 #define SPAWNER_BASEX skill70			// Position nach dem erstellen
@@ -61,10 +62,32 @@ MATERIAL * building_material =
   effect = "building.fx";
 }
 
+int spawner_vertices[] =
+{
+    0,    // 0 (invalid)
+    2221, // 1 (Bank of Zorro)
+    2081,
+    2205,
+    2254,
+    0,
+    143,  // 6 (Palm)
+    0,
+    2115, // 8 (Lark Farm)
+    0,
+    262,  // 10 (Tower)
+    81,
+    0
+};
+
+#define SPAWNER_VERTEXOFFSET_BANK_OF_ZORRO  1
+#define SPAWNER_VERTEXOFFSET_PALM           6
+#define SPAWNER_VERTEXOFFSET_FARM           8
+#define SPAWNER_VERTEXOFFSET_TOWER         10
+
 ENTITY* spawner_spawn(int unittype, VECTOR* pos, var angle, var owner)
 {
-	ENTITY* ent;
-   ENTITY *wireframe;
+	ENTITY * ent;
+    ENTITY * wireframe;
 	switch (unittype)
 	{
         case UNIT_SPUTNIK:
@@ -74,21 +97,25 @@ ENTITY* spawner_spawn(int unittype, VECTOR* pos, var angle, var owner)
 
         case UNIT_LERCHE:
             ent = ent_create("lark_farm.mdl", pos, Spawner);
+            ent->SPAWNER_VERTEXOFFSET = SPAWNER_VERTEXOFFSET_FARM;
             wireframe = ent_create("lark_farm_wireframe.mdl", pos, NULL);
             break;
 
         case UNIT_EYE:
             ent = ent_create("eye_tree_you.mdl", pos, Spawner);
+            ent->SPAWNER_VERTEXOFFSET = SPAWNER_VERTEXOFFSET_PALM;
             wireframe = ent_create("eye_tree_you_wireframe.mdl", pos, NULL);
             break;
 
         case UNIT_BABE:
             ent = ent_create("the_tower.mdl", pos, Spawner);
+            ent->SPAWNER_VERTEXOFFSET = SPAWNER_VERTEXOFFSET_TOWER;
             wireframe = ent_create("the_tower_wireframe.mdl", pos, NULL);
             break;
 
         case UNIT_SKULL:
             ent = ent_create("bank_of_zorro.mdl", pos, Spawner);
+            ent->SPAWNER_VERTEXOFFSET = SPAWNER_VERTEXOFFSET_BANK_OF_ZORRO;
             wireframe = ent_create("bank_of_zorro_wireframe.mdl", pos, NULL);
             break;
 	}
@@ -197,15 +224,52 @@ void SPAWNER_Init()
 {
 }
 
+BMAP * SPAWNER_ParticlePlayer_Sprite = "LG.png";
+BMAP * SPAWNER_ParticleAI_Sprite = "LR.png";
+
+void SPAWNER_ParticleSprite(PARTICLE * p)
+{
+    p->lifespan = 0.01;
+    p->size = 60;
+    p->alpha = 100;
+    p->flags = TRANSLUCENT | BRIGHT;
+}
+
+void SPAWNER_ParticlePlayer(PARTICLE * p)
+{
+    p->bmap = SPAWNER_ParticlePlayer_Sprite;
+    SPAWNER_ParticleSprite(p);
+}
+
+void SPAWNER_ParticleAI(PARTICLE * p)
+{
+    p->bmap = SPAWNER_ParticleAI_Sprite;
+    SPAWNER_ParticleSprite(p);
+}
+
 void SPAWNER_Update()
 {
 	ENTITY * ptr;
 	SUBSYSTEM_LOOP(ptr, SUBSYSTEM_SPAWNER)
 	{
-
 		if (ptr->HEALTH > 0)
 		{
 			SPAWNER__hitcheck(ptr);
+
+            if(ptr->SPAWNER_VERTEXOFFSET > 0)
+            {
+                int p = ptr->SPAWNER_VERTEXOFFSET;
+                while(spawner_vertices[p] != 0)
+                {
+                    VECTOR v;
+                    vec_for_vertex(&v, ptr, p);
+                    if(ptr->OWNER == PLAYER_ID_PLAYER)
+                        effect(SPAWNER_ParticlePlayer, 1, &v, nullvector);
+                    else
+                        effect(SPAWNER_ParticleAI, 1, &v, nullvector);
+                    p += 1;
+                }
+            }
 		}
 
 		if (ptr->DAMAGE_HIT > 0)

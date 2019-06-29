@@ -85,6 +85,9 @@ typedef int bool;
 #define PLAYER_ID_PLAYER 0
 #define PLAYER_ID_AI 1
 
+COLOR * PLAYER_COLOR_AI     = { red=255; green=128; blue=0; }
+COLOR * PLAYER_COLOR_PLAYER = { red=0;   green=128; blue=255; }
+
 
 //#define GAME_OPEN_DEBUG
 //#define CONSOLE_SHOW

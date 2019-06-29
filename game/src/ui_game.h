@@ -16,8 +16,9 @@
 
 #define UI_SPUTNIK 1
 #define UI_CBABE 2
-#define UI_SKULL 3
+#define UI_EYE 3
 #define UI_ESEL 4
+#define UI_SKULL 5
 
 
 PANEL *ui_main_resources;
@@ -60,6 +61,7 @@ BMAP *ui_bmap_sputnik[3];
 BMAP *ui_bmap_noise[3];
 BMAP *ui_bmap_eye[3];
 BMAP *ui_bmap_esel[3];
+BMAP *ui_bmap_skull[8];
 
 BMAP **ui_active_portrait;
 
@@ -101,11 +103,20 @@ BMAP *ui_face_eye1 = "ui_H4.png";
 BMAP *ui_face_eye2 = "ui_H4.png";
 BMAP *ui_face_eye3 = "ui_H4.png";
 
+BMAP *ui_face_skull1 = "WkFace1.png";
+BMAP *ui_face_skull2 = "WkFace2.png";
+BMAP *ui_face_skull3 = "WkFace3.png";
+BMAP *ui_face_skull4 = "WkFace4.png";
+BMAP *ui_face_skull5 = "WkFace5.png";
+BMAP *ui_face_skull6 = "WkFace6.png";
+BMAP *ui_face_skull7 = "WkFace7.png";
+BMAP *ui_face_skull8 = "WkFace8.png";
+
 BMAP *ui_face_noise1 = "Rauschen1.png";
 BMAP *ui_face_noise2 = "Rauschen2.png";
 BMAP *ui_face_noise3 = "Rauschen3.png";
 
-BMAP *ui_mm = "#288x324x24";
+BMAP *ui_mm = NULL;
 BMAP *ui_bmap_monitor = "monitor.png";
 
 ENTITY* last_building;
