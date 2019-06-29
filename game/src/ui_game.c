@@ -217,10 +217,11 @@ void ui_game_init()
 
 	pan_setbutton(ui_game_menu, 0, 0, 1, 151, ui_hide_button_p, ui_hide_button_n, ui_hide_button_o, ui_hide_button_n, ui_show_commando_groups, NULL, NULL);
 
-	pan_setbutton(ui_game_menu, 0, 4, 15, 134, ui_icon_tower_o, ui_icon_tower, ui_icon_tower_o, ui_icon_tower, ui_place_building, NULL, NULL);
+	pan_setbutton(ui_game_menu, 0, 4, 15, 134, ui_icon_press_o, ui_icon_press, ui_icon_press_o, ui_icon_press, ui_place_building, NULL, NULL);
 	pan_setbutton(ui_game_menu, 0, 4, 15, 242, ui_icon_farm_o, ui_icon_farm, ui_icon_farm_o, ui_icon_farm, ui_place_building, NULL, NULL);
-	pan_setbutton(ui_game_menu, 0, 4, 15, 350, ui_icon_blank_o, ui_icon_blank, ui_icon_blank_o, ui_icon_blank, ui_place_building, NULL, NULL);
-	pan_setbutton(ui_game_menu, 0, 4, 15, 458, ui_icon_bank_o, ui_icon_bank, ui_icon_bank_o, ui_icon_bank, ui_place_building, NULL, NULL);
+	pan_setbutton(ui_game_menu, 0, 4, 15, 350, ui_icon_tree_o, ui_icon_tree, ui_icon_tree_o, ui_icon_tree, ui_place_building, NULL, NULL);
+	pan_setbutton(ui_game_menu, 0, 4, 15, 458, ui_icon_tower_o, ui_icon_tower, ui_icon_tower_o, ui_icon_tower, ui_place_building, NULL, NULL);
+	pan_setbutton(ui_game_menu, 0, 4, 15, 564, ui_icon_bank_o, ui_icon_bank, ui_icon_bank_o, ui_icon_bank, ui_place_building, NULL, NULL);
 
 	ui_bmap_cbabe[0] = ui_face_cbabe1;
 	ui_bmap_cbabe[1] = ui_face_cbabe2;

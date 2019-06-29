@@ -78,14 +78,16 @@ BMAP *ui_icon_sputnik = "ui_H1.png";
 BMAP *ui_icon_skull = "ui_H4.png";
 BMAP *ui_icon_esel = "ui_H3.png";
 
-BMAP *ui_icon_blank = "build_menu_tree_n.png";
-BMAP *ui_icon_blank_o = "build_menu_tree_o.png";
-BMAP *ui_icon_tower = "build_menu_press_n.png";
-BMAP *ui_icon_tower_o = "build_menu_press_o.png";
+BMAP *ui_icon_tree = "build_menu_tree_n.png";
+BMAP *ui_icon_tree_o = "build_menu_tree_o.png";
+BMAP *ui_icon_press = "build_menu_press_n.png";
+BMAP *ui_icon_press_o = "build_menu_press_o.png";
 BMAP *ui_icon_farm = "build_menu_esel_n.png";
 BMAP *ui_icon_farm_o = "build_menu_esel_o.png";
 BMAP *ui_icon_bank = "build_menu_bank_n.png";
 BMAP *ui_icon_bank_o = "build_menu_bank_o.png";
+BMAP *ui_icon_tower = "build_menu_tower_n.png";
+BMAP *ui_icon_tower_o = "build_menu_tower_o.png";
 
 BMAP *ui_face_cbabe1 = "CbFace1.png";
 BMAP *ui_face_cbabe2 = "CbFace2.png";
