@@ -142,7 +142,10 @@ var ui_switch_frame = 0;
 var a_stupid_var = 1234;
 var a_dummy_var = 0;
 
-int ui_frame_order[19] = {0, 1, 0, 1, 2, 1, 0, 1, 1, 2, 0, 2, 0, 0, 1, 2, 0, 1, 2};
+int ui_frame_order_norm[16] =    {15, 0, 1, 0, 1, 2, 1, 0, 1, 1, 2, 0, 2, 0, 0, 1};
+int ui_frame_order_spceial[15] = {14, 0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3};
+int ui_frame_noise_order[3] = {0, 1, 2};
+int *ui_frame_order;
 int ui_selected_max_type = 0;
 int ui_command_group_status = 0;
 var ui_command_group_process = 0;

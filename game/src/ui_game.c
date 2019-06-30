@@ -7,7 +7,7 @@
 #include "fow.h"
 #include "global.h"
 
-#define UI_MMAP_SCALE 2
+#define UI_MMAP_SCALE 5
 
 void ui_spawn_event_sputnik(var num, PANEL *panel)
 {
@@ -650,11 +650,11 @@ void ui_game_update()
 		{
 			switch(ui_max_type)
 			{
-				case UI_SPUTNIK: ui_active_portrait = ui_bmap_sputnik; break;
-				case UI_CBABE:   ui_active_portrait = ui_bmap_cbabe; break;
-				case UI_EYE:     ui_active_portrait = ui_bmap_eye; break;
-				case UI_ESEL:    ui_active_portrait = ui_bmap_esel; break;
-				case UI_SKULL:   ui_active_portrait = ui_bmap_skull; break;
+				case UI_SPUTNIK: ui_active_portrait = ui_bmap_sputnik; ui_frame_order = ui_frame_order_norm; break;
+				case UI_CBABE:   ui_active_portrait = ui_bmap_cbabe; ui_frame_order = ui_frame_order_norm; break;
+				case UI_EYE:     ui_active_portrait = ui_bmap_eye; ui_frame_order = ui_frame_order_norm; break;
+				case UI_ESEL:    ui_active_portrait = ui_bmap_esel; ui_frame_order = ui_frame_order_norm; break;
+				case UI_SKULL:   ui_active_portrait = ui_bmap_skull; ui_frame_order = ui_frame_order_spceial; break;
 			}
 		}
 	}
@@ -702,18 +702,24 @@ void ui_game_update()
 	}
 	else if( ui_anim_unit_state == UI_ANIM_UNIT_PROGRESS )
 	{
+		// Frame-Count + immer gleiche Reihenfolge noise mit 3 frames
+		var anim_frame_count = (ui_frame_order)[0] + 3;
 		ui_switch_frame += time_step * UI_ANIM_UNIT_SPEED;
-		ui_switch_frame %= 19;
-		if ( ui_switch_frame >= 13 && ui_switch_frame < 18)
-		{
-			ui_active_portrait = ui_bmap_noise;
-		}
-		else if( ui_switch_frame >= 18 )
+		var ui_active_frame = integer(ui_switch_frame);
+		
+		if( ui_active_frame >= anim_frame_count ) // Terminieren 
 		{
 			ui_anim_unit_state = UI_ANIM_UNIT_OFF;
 		}
-
-		pan_setwindow(ui_unit_meta, 1, 408, 98, 196, 186, (ui_active_portrait)[ui_frame_order[ui_switch_frame]], 0, 0);
+		else if ( ui_active_frame >= anim_frame_count - 3 ) // noise
+		{
+			ui_active_portrait = ui_bmap_noise;
+			pan_setwindow(ui_unit_meta, 1, 408, 98, 196, 186, (ui_active_portrait)[ui_frame_noise_order[ ui_switch_frame - (ui_frame_order)[0] ]], 0, 0);
+		}
+		else // Normale Animation
+		{
+			pan_setwindow(ui_unit_meta, 1, 408, 98, 196, 186, (ui_active_portrait)[(ui_frame_order)[ui_active_frame + 1]], 0, 0);
+		}
 	}
 	else if( ui_anim_unit_state == UI_ANIM_UNIT_ON )
 	{
