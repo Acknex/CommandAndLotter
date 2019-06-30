@@ -124,6 +124,12 @@ BMAP *ui_face_noise1 = "Rauschen1.png";
 BMAP *ui_face_noise2 = "Rauschen2.png";
 BMAP *ui_face_noise3 = "Rauschen3.png";
 
+BMAP *ui_name_sputnik = "Name4.png";
+BMAP *ui_name_esel = "Name1.png";
+BMAP *ui_name_eye = "Name5.png";
+BMAP *ui_name_skull = "Name2.png";
+BMAP *ui_name_cbabe = "Name3.png";
+
 BMAP *ui_mm = NULL;
 BMAP *ui_bmap_monitor = "monitor.png";
 

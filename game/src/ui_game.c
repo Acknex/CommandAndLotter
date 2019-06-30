@@ -293,7 +293,13 @@ void ui_game_init()
 	bmap_fill(ui_bmap_magenta, vector(255, 0, 255), 100);
 
 	ui_unit_meta->bmap = ui_bmap_units;
-	ui_unit_meta->pos_x = 3;
+	ui_unit_meta->pos_x = 0;
+	
+	pan_setwindow(ui_unit_meta, 0, 649, 187, 0, 0, ui_name_sputnik, 0, 0);
+	pan_setwindow(ui_unit_meta, 0, 649, 187, 0, 0, ui_name_esel, 0, 0);
+	pan_setwindow(ui_unit_meta, 0, 649, 187, 0, 0, ui_name_eye, 0, 0);
+	pan_setwindow(ui_unit_meta, 0, 649, 187, 0, 0, ui_name_cbabe, 0, 0);
+	pan_setwindow(ui_unit_meta, 0, 649, 187, 0, 0, ui_name_skull, 0, 0);
 
 	ui_game_menu->bmap = ui_bmap_gamemenu;
 
@@ -332,6 +338,8 @@ void ui_game_open()
 	ui_unit_meta->pos_y = screen_size.y - bmap_height(ui_bmap_units);
 	ui_main_resources->flags |= SHOW;
 	
+	pan_setwindow(ui_unit_meta, 2, 649, 187, 0, 0, ui_name_sputnik, 0, 0);
+	
 	ui_game_menu->flags &= ~SHOW;
 	
 	ui_open_game_menu->flags |= SHOW;
@@ -352,7 +360,7 @@ void ui_game_close()
 	ui_minimap->flags &= ~SHOW;
 	ui_radial_delete->flags &= ~SHOW;
 	ui_monitor->flags &= ~SHOW;
-
+	
 	int i; for(i = 0; i < 2000; i++)
 	{
 		if( ui_life_indicator[i] )
@@ -589,10 +597,6 @@ void ui_game_update()
 					break;
 				}
 
-				if( str_cmp(ent->type, "SPUTNIK.MDL") )
-				{
-					ui_count_sputniks++;
-				}
 				update_or_create_lifebar(ent);
 			}
 		}
@@ -655,11 +659,31 @@ void ui_game_update()
 		{
 			switch(ui_max_type)
 			{
-				case UI_SPUTNIK: ui_active_portrait = ui_bmap_sputnik; ui_frame_order = ui_frame_order_norm; break;
-				case UI_CBABE:   ui_active_portrait = ui_bmap_cbabe; ui_frame_order = ui_frame_order_norm; break;
-				case UI_EYE:     ui_active_portrait = ui_bmap_eye; ui_frame_order = ui_frame_order_norm; break;
-				case UI_ESEL:    ui_active_portrait = ui_bmap_esel; ui_frame_order = ui_frame_order_norm; break;
-				case UI_SKULL:   ui_active_portrait = ui_bmap_skull; ui_frame_order = ui_frame_order_spceial; break;
+				case UI_SPUTNIK: 
+				ui_active_portrait = ui_bmap_sputnik; 
+				ui_frame_order = ui_frame_order_norm; 
+				pan_setwindow(ui_unit_meta, 2, 649 + (324 - bmap_width(ui_name_sputnik)) / 2, 195 + (65 - bmap_height(ui_name_sputnik)) / 2, bmap_width(ui_name_sputnik), bmap_height(ui_name_sputnik), ui_name_sputnik, 0, 0); 
+				break;
+				case UI_CBABE:   
+				ui_active_portrait = ui_bmap_cbabe; 
+				ui_frame_order = ui_frame_order_norm; 
+				pan_setwindow(ui_unit_meta, 2, 649 + (324 - bmap_width(ui_name_cbabe)) / 2, 195 + (65 - bmap_height(ui_name_cbabe)) / 2, bmap_width(ui_name_cbabe), bmap_height(ui_name_cbabe), ui_name_cbabe, 0, 0); 
+				break;
+				case UI_EYE:     
+				ui_active_portrait = ui_bmap_eye; 
+				ui_frame_order = ui_frame_order_norm; 
+				pan_setwindow(ui_unit_meta, 2, 649 + (324 - bmap_width(ui_name_eye)) / 2, 195 + (65 - bmap_height(ui_name_eye)) / 2, bmap_width(ui_name_eye), bmap_height(ui_name_eye), ui_name_eye, 0, 0); 
+				break;
+				case UI_ESEL:    
+				ui_active_portrait = ui_bmap_esel; 
+				ui_frame_order = ui_frame_order_norm; 
+				pan_setwindow(ui_unit_meta, 2, 649 + (324 - bmap_width(ui_name_esel)) / 2, 195 + (65 - bmap_height(ui_name_esel)) / 2, bmap_width(ui_name_esel), bmap_height(ui_name_esel), ui_name_esel, 0, 0); 
+				break;
+				case UI_SKULL:   
+				ui_active_portrait = ui_bmap_skull; 
+				ui_frame_order = ui_frame_order_spceial; 
+				pan_setwindow(ui_unit_meta, 2, 649 + (324 - bmap_width(ui_name_skull)) / 2, 195 + (65 - bmap_height(ui_name_skull)) / 2, bmap_width(ui_name_skull), bmap_height(ui_name_skull), ui_name_skull, 0, 0); 
+				break;
 			}
 		}
 	}
