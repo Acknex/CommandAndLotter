@@ -31,6 +31,7 @@ PANEL *ui_radial_delete;
 PANEL *ui_radial_counter;
 PANEL *ui_radial_cbabe;
 PANEL *ui_radial_skull;
+PANEL *ui_radial_eye;
 PANEL *ui_radial_esel;
 PANEL *ui_radial_sputnik;
 PANEL *ui_radial_active;
@@ -76,7 +77,8 @@ BMAP *ui_radial_progress = "#128x128x8888";
 
 BMAP *ui_icon_cbabe = "ui_H2.png";
 BMAP *ui_icon_sputnik = "ui_H1.png";
-BMAP *ui_icon_skull = "ui_H4.png";
+BMAP *ui_icon_eye = "ui_H4.png";
+BMAP *ui_icon_skull = "ui_H5.png";
 BMAP *ui_icon_esel = "ui_H3.png";
 
 BMAP *ui_icon_hammer = "ico_hammer_n.png";
@@ -143,7 +145,7 @@ var a_stupid_var = 1234;
 var a_dummy_var = 0;
 
 int ui_frame_order_norm[16] =    {15, 0, 1, 0, 1, 2, 1, 0, 1, 1, 2, 0, 2, 0, 0, 1};
-int ui_frame_order_spceial[15] = {14, 0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3};
+int ui_frame_order_spceial[15] = {14, 0, 1, 2, 3, 4, 5, 6, 7, 7, 6, 5, 4, 3, 2};
 int ui_frame_noise_order[3] = {0, 1, 2};
 int *ui_frame_order;
 int ui_selected_max_type = 0;

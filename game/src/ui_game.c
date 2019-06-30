@@ -219,6 +219,7 @@ void ui_game_init()
 	ui_radial_counter = pan_create("", 2);
 	ui_radial_cbabe = ui_create_radial_button(ui_icon_cbabe, ui_spawn_event_sputnik);
 	ui_radial_sputnik = ui_create_radial_button(ui_icon_sputnik, ui_spawn_event_sputnik);
+	ui_radial_eye = ui_create_radial_button(ui_icon_eye, ui_spawn_event_sputnik);
 	ui_radial_skull = ui_create_radial_button(ui_icon_skull, ui_spawn_event_sputnik);
 	ui_radial_esel = ui_create_radial_button(ui_icon_esel, ui_spawn_event_sputnik);
 
@@ -343,6 +344,7 @@ void ui_game_close()
 	ui_hide_radial(ui_radial_sputnik);
 	ui_hide_radial(ui_radial_cbabe);
 	ui_hide_radial(ui_radial_skull);
+	ui_hide_radial(ui_radial_eye);
 	ui_hide_radial(ui_radial_esel);
 	ui_game_menu->flags &= ~SHOW;
 	ui_radial_counter->flags &= ~SHOW;
@@ -523,6 +525,9 @@ void ui_game_update()
 					ui_radial_esel->skill_y = 0;
 					break;
 					case UNIT_EYE:
+					ui_radial_active = ui_radial_eye;
+					ui_radial_eye->skill_y = 0;
+					break;
 					case UNIT_SKULL: //TODO: add me properly
 					ui_radial_active = ui_radial_skull;
 					ui_radial_skull->skill_y = 0;
