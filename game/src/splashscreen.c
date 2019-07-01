@@ -42,7 +42,7 @@ void splashscreen_update()
             0
         ),
         NULL,
-        30,
+        310,
         0
     );
 

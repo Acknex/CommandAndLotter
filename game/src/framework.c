@@ -10,6 +10,7 @@
 #include "materials.h"
 #include "settings.h"
 #include "splashscreen.h"
+#include "briefing.h"
 
 #include <acknex.h>
 #include <windows.h>
@@ -20,6 +21,7 @@
 #define FRAMEWORK_STATE_GAME         2
 #define FRAMEWORK_STATE_CREDITS      3
 #define FRAMEWORK_STATE_SPLASH       4
+#define FRAMEWORK_STATE_BRIEFING     5
 
 typedef struct
 {
@@ -179,6 +181,7 @@ void framework_update()
             game_init();
             credits_init();
             splashscreen_init();
+            briefing_init();
 #ifdef DEBUG_FRAMEWORK_FASTSTART
             if(settings.skipIntro)
                 framework_transfer(FRAMEWORK_STATE_LOAD);
@@ -207,7 +210,7 @@ void framework_update()
             switch(response)
             {
             case MAINMENU_RESPONSE_STARTGAME:
-                framework_transfer(FRAMEWORK_STATE_GAME);
+                framework_transfer(FRAMEWORK_STATE_BRIEFING);
                 break;
             case MAINMENU_RESPONSE_CREDIT:
                 framework_transfer(FRAMEWORK_STATE_CREDITS);
@@ -232,6 +235,12 @@ void framework_update()
         game_update();
         if(game_is_done())
             framework_transfer(FRAMEWORK_STATE_MAINMENU);
+        break;
+
+    case FRAMEWORK_STATE_BRIEFING:
+        briefing_update();
+        if(briefing_isDone())
+            framework_transfer(FRAMEWORK_STATE_GAME);
         break;
 
     default:
@@ -268,6 +277,10 @@ void framework_update()
             splashscreen_close();
             break;
 
+        case FRAMEWORK_STATE_BRIEFING:
+            briefing_close();
+            break;
+
         default:
             error(str_printf(NULL, "framework: unsupported state %d!", framework.state));
         }
@@ -299,6 +312,10 @@ void framework_update()
 
         case FRAMEWORK_STATE_SPLASH:
             splashscreen_open();
+            break;
+
+        case FRAMEWORK_STATE_BRIEFING:
+            briefing_open();
             break;
 
         default:

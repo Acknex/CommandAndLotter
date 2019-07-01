@@ -60,3 +60,4 @@ function main()
 #include "ini.c"
 #include "settings.c"
 #include "splashscreen.c"
+#include "briefing.c"

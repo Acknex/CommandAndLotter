@@ -31,6 +31,7 @@ SOURCES += \
   main.c \
   src/ai.c \
   src/ang.c \
+  src/briefing.c \
   src/building.c \
   src/camera.c \
   src/credits.c \
@@ -80,6 +81,7 @@ HEADERS += \
   shaders/terrain.fx \
   src/ai.h \
   src/ang.h \
+  src/briefing.h \
   src/building.h \
   src/camera.h \
   src/console.h \
