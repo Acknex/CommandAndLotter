@@ -706,6 +706,7 @@ void ui_game_update()
 		ui_hide_radial(ui_radial_cbabe);
 		ui_hide_radial(ui_radial_skull);
 		ui_hide_radial(ui_radial_esel);
+		ui_hide_radial(ui_radial_eye);
 		ui_anim_state = UI_ANIM_RESTARTED;
 		last_building = ui_active_building;
 	}
