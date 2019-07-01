@@ -48,6 +48,7 @@ SOURCES += \
   src/scan.c \
   src/settings.c \
   src/skull.c \
+  src/splashscreen.c \
   src/sputnik.c \
   src/stub.c \
   src/ui_game.c \
@@ -100,6 +101,7 @@ HEADERS += \
   src/scan.h \
   src/settings.h \
   src/skull.h \
+  src/splashscreen.h \
   src/sputnik.h \
   src/stub.h \
   src/ui_game.h \

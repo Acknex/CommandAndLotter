@@ -9,6 +9,7 @@
 #include "ui_game.h"
 #include "materials.h"
 #include "settings.h"
+#include "splashscreen.h"
 
 #include <acknex.h>
 #include <windows.h>
@@ -18,6 +19,7 @@
 #define FRAMEWORK_STATE_MAINMENU     1
 #define FRAMEWORK_STATE_GAME         2
 #define FRAMEWORK_STATE_CREDITS      3
+#define FRAMEWORK_STATE_SPLASH       4
 
 typedef struct
 {
@@ -176,16 +178,25 @@ void framework_update()
             mainmenu_init();
             game_init();
             credits_init();
+            splashscreen_init();
 #ifdef DEBUG_FRAMEWORK_FASTSTART
             if(settings.skipIntro)
                 framework_transfer(FRAMEWORK_STATE_LOAD);
             else
                 framework_transfer(FRAMEWORK_STATE_INTRO);
 #else
-            framework_transfer(FRAMEWORK_STATE_MAINMENU);
+            framework_transfer(FRAMEWORK_STATE_SPLASH);
 #endif
         }
         break;
+
+    case FRAMEWORK_STATE_SPLASH:
+    {
+        splashscreen_update();
+        if(splashscreen_isDone())
+            framework_transfer(FRAMEWORK_STATE_MAINMENU);
+        break;
+    }
 
     case FRAMEWORK_STATE_MAINMENU:
     {
@@ -253,6 +264,10 @@ void framework_update()
             game_close();
             break;
 
+        case FRAMEWORK_STATE_SPLASH:
+            splashscreen_close();
+            break;
+
         default:
             error(str_printf(NULL, "framework: unsupported state %d!", framework.state));
         }
@@ -280,6 +295,10 @@ void framework_update()
             // game was already openend
             // by LOAD stateg
             game_open();
+            break;
+
+        case FRAMEWORK_STATE_SPLASH:
+            splashscreen_open();
             break;
 
         default:

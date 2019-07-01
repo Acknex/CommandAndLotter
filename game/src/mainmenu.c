@@ -1,6 +1,6 @@
 #include "mainmenu.h"
 #include "music_player.h"
-
+#include "ui_menu.h"
 
 void mainmenu_init(void)
 {
@@ -166,13 +166,13 @@ void mainmenu_resolution_update(void)
 	if(mainmenu_wndMenuMain != NULL)
 	{
 		mainmenu_wndMenuMain->_content_panel->scale_x =
-		mainmenu_wndMenuBackground->_content_panel->scale_x = 
-		mainmenu_wndMenuBackgroundBright->_content_panel->scale_x = 
+		mainmenu_wndMenuBackground->_content_panel->scale_x =
+		mainmenu_wndMenuBackgroundBright->_content_panel->scale_x =
 		screen_size.x  / 1920;
 
-		mainmenu_wndMenuMain->_content_panel->scale_y = 
-		mainmenu_wndMenuBackground->_content_panel->scale_y = 
-		mainmenu_wndMenuBackgroundBright->_content_panel->scale_y = 
+		mainmenu_wndMenuMain->_content_panel->scale_y =
+		mainmenu_wndMenuBackground->_content_panel->scale_y =
+		mainmenu_wndMenuBackgroundBright->_content_panel->scale_y =
 		screen_size.y  / 1080;
 	}
 }
