@@ -239,8 +239,15 @@ void framework_update()
 
     case FRAMEWORK_STATE_BRIEFING:
         briefing_update();
-        if(briefing_isDone())
+        switch(briefing_getResult())
+        {
+        case BRIEFING_ABORT:
+            framework_transfer(FRAMEWORK_STATE_MAINMENU);
+            break;
+        case BRIEFING_ACCEPT:
             framework_transfer(FRAMEWORK_STATE_GAME);
+            break;
+        }
         break;
 
     default:
