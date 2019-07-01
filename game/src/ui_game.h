@@ -80,6 +80,7 @@ BMAP *ui_icon_sputnik = "ui_H1.png";
 BMAP *ui_icon_eye = "ui_H4.png";
 BMAP *ui_icon_skull = "ui_H5.png";
 BMAP *ui_icon_esel = "ui_H3.png";
+BMAP *ui_icon_explo = "ui_explo.png";
 
 BMAP *ui_icon_hammer = "ico_hammer_n.png";
 BMAP *ui_icon_hammer_o = "ico_hammer_o.png";
