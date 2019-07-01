@@ -79,6 +79,10 @@ int spawner_vertices[] =
     0
 };
 
+var spawner_unit_cost[UNIT_CLASSES] = {10,20,50,35,5,0};
+var spawner_building_cost[BUILDING_CLASSES] = {10,20,30,40,50};
+
+
 #define SPAWNER_VERTEXOFFSET_BANK_OF_ZORRO  1
 #define SPAWNER_VERTEXOFFSET_PALM           6
 #define SPAWNER_VERTEXOFFSET_FARM           8
@@ -170,13 +174,25 @@ var spawner_produce(ENTITY* ent)
 	return 0;
 }
 
-var spawner_getCost(ENTITY* ent)
+var spawner_getUnitCost(ENTITY* ent)
 {
 	if (ent != NULL)
 	{
 		if (ent->group == GROUP_ENEMY_SPAWNER || ent->group == GROUP_PLAYER_SPAWNER)
 		{
-			return spawner_unit_cost[ent->ENTITY_UNITTYPE];
+			return spawner_unit_cost[clamp(ent->ENTITY_UNITTYPE,0,UNIT_CLASSES-1)];
+		}
+	}
+	return 0;
+}
+
+var spawner_getBuildingCost(ENTITY* ent)
+{
+	if (ent != NULL)
+	{
+		if (ent->group == GROUP_ENEMY_SPAWNER || ent->group == GROUP_PLAYER_SPAWNER)
+		{
+			return spawner_building_cost[clamp(ent->ENTITY_UNITTYPE,0,BUILDING_CLASSES-1)];
 		}
 	}
 	return 0;

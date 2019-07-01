@@ -26,7 +26,7 @@ typedef int bool;
 #define UNIT_Z        5
 #define UNIT_CLASSES  6
 
-
+#define BUILDING_CLASSES 5
 
 #define DAMAGE_ENT skill50
 #define DAMAGE_HIT skill51
