@@ -108,7 +108,7 @@ ENTITY* unit_spawn(int unittype, VECTOR* pos, VECTOR* targetPos, var owner)
         if(owner== PLAYER_ID_PLAYER)
             ent = ent_create("cEselslerche.mdl", pos, Sputnik);
         else
-            ent = ent_create("cEselslerche.mdl", pos, Sputnik);
+            ent = ent_create("EvilEselslerche.mdl", pos, Sputnik);
         break;
 
     case UNIT_EYE:
