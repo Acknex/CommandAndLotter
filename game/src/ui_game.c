@@ -553,7 +553,7 @@ void ui_game_update()
 				a_dummy_var = spawner_getQueue(ent);
 			}
 		}
-
+		
 		TILE* tile = mapGetTileFromVector(mapGetCurrent(), &ent->x);
 		if(tile)
 		{
@@ -699,6 +699,7 @@ void ui_game_update()
 	VECTOR screen;
 
 	a_stupid_var = z_get(PLAYER_ID_PLAYER);
+	
 
 	if( last_building != ui_active_building)
 	{
@@ -714,7 +715,7 @@ void ui_game_update()
 	if( ui_max_type != ui_selected_max_type )
 	{
 		ui_anim_unit_state = UI_ANIM_UNIT_RESTARTED;
-		ui_anim_state = UI_ANIM_OFF;
+		//ui_anim_state = UI_ANIM_OFF;
 		ui_selected_max_type = ui_max_type;
 	}
 
@@ -725,7 +726,7 @@ void ui_game_update()
 
 	if( ui_anim_unit_state == UI_ANIM_UNIT_RESTARTED )
 	{
-
+		ui_anim_state = UI_ANIM_OFF;
 		ui_switch_frame = 0;
 		pan_setwindow(ui_unit_meta, 1, 408, 98, 196, 186, (ui_active_portrait)[0], 0, 0);
 		ui_anim_unit_state = UI_ANIM_UNIT_PROGRESS;
@@ -753,7 +754,7 @@ void ui_game_update()
 	}
 	else if( ui_anim_unit_state == UI_ANIM_UNIT_ON )
 	{
-
+		
 	}
 	else if ( ui_anim_unit_state == UI_ANIM_UNIT_OFF )
 	{
@@ -789,7 +790,6 @@ void ui_game_update()
 
 	if( ui_radial_active )
 	{
-
 		if( ui_anim_state == UI_ANIM_RESTARTED )
 		{
 			ui_orbit_radial(ui_radial_active,screen.x, screen.y, 270, 200);
