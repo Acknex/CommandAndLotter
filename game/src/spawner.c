@@ -170,6 +170,18 @@ var spawner_produce(ENTITY* ent)
 	return 0;
 }
 
+var spawner_getCost(ENTITY* ent)
+{
+	if (ent != NULL)
+	{
+		if (ent->group == GROUP_ENEMY_SPAWNER || ent->group == GROUP_PLAYER_SPAWNER)
+		{
+			return spawner_unit_cost[ent->ENTITY_UNITTYPE];
+		}
+	}
+	return 0;
+}
+
 var spawner_getQueue(ENTITY* ent)
 {
 	if (ent != NULL)
@@ -402,7 +414,7 @@ void SPAWNER__produce(ENTITY* ptr)
 		ptr->SPAWNER_QUEUE--;
 		ptr->SPAWNER_SPAWNANGLE += 137.5;
 		ptr->SPAWNER_SPAWNANGLE %= 360;
-		VECTOR* targetPos = vector(400,0,0);
+		VECTOR* targetPos = vector(500,0,0);
 		VECTOR* angle = vector(ang(ptr->SPAWNER_SPAWNANGLE), 0, 0);
 		vec_rotate(targetPos, angle);
 		vec_add(targetPos, ptr->x);
