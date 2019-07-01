@@ -215,7 +215,7 @@ void ui_game_init()
 	scale_factor_x = screen_size.x / 1920;
 	scale_factor_y = screen_size.y / 1080;
 
-	ui_radial_delete = ui_create_radial_button(NULL, ui_destroy_event_sputnik);
+	ui_radial_delete = ui_create_radial_button(ui_icon_explo, ui_destroy_event_sputnik);
 	ui_radial_counter = pan_create("", 2);
 	ui_radial_cbabe = ui_create_radial_button(ui_icon_cbabe, ui_spawn_event_sputnik);
 	ui_radial_sputnik = ui_create_radial_button(ui_icon_sputnik, ui_spawn_event_sputnik);
