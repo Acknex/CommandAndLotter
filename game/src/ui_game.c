@@ -205,9 +205,11 @@ void ui_minimap_click(PANEL *panel)
 	mpx /= (bmap_width(ui_mm) * scale_factor_x * mini_map_extra_scale_x);
 	mpy /= (bmap_height(ui_mm) * scale_factor_x * mini_map_extra_scale_y);
 
-	mpx = mpx * 16000 * -1;
-	mpy = mpy * 16000 * -1;
-	topdown_camera_set_pos(vector(mpy, mpx, camera.z));
+    var aspect = bmap_width(ui_mm) / bmap_height(ui_mm);
+
+	mpx = mpx * 16000;
+	mpy = mpy * 16000 / aspect;
+	topdown_camera_set_pos(vector(mpx, mpy, camera.z));
 }
 
 void ui_game_init()
