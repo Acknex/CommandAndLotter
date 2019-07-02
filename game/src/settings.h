@@ -10,7 +10,12 @@ struct settings_t
     int max_framerate;
     int res_x, res_y;
     int master_volume;
+    int intro_skipmode;
 };
+
+#define SETTINGS_INTRO_NOSKIP   0
+#define SETTINGS_INTRO_FASTSKIP 1
+#define SETTINGS_INTRO_AUTOSKIP 2
 
 struct settings_t settings;
 

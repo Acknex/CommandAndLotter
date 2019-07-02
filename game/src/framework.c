@@ -210,7 +210,10 @@ void framework_update()
             switch(response)
             {
             case MAINMENU_RESPONSE_STARTGAME:
-                framework_transfer(FRAMEWORK_STATE_BRIEFING);
+                if(settings.intro_skipmode == SETTINGS_INTRO_AUTOSKIP)
+                    framework_transfer(FRAMEWORK_STATE_GAME);
+                else
+                    framework_transfer(FRAMEWORK_STATE_BRIEFING);
                 break;
             case MAINMENU_RESPONSE_CREDIT:
                 framework_transfer(FRAMEWORK_STATE_CREDITS);

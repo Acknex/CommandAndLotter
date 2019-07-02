@@ -1,4 +1,5 @@
 #include "briefing.h"
+#include "settings.h"
 
 typedef struct BRIEFING_NODE_tag
 {
@@ -152,7 +153,7 @@ void briefing_open()
     on_esc = briefing_abort;
     briefing_result = BRIEFING_PENDING;
     briefing_startup = total_ticks;
-    briefing_ready = false;
+    briefing_ready = (settings.intro_skipmode == SETTINGS_INTRO_FASTSKIP);
 
     briefing_current_node = briefing_txt_01;
     briefing_text_cursor = 0;

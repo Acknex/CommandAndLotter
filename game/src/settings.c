@@ -54,6 +54,7 @@ void settings_load()
     settings.res_x = ini_read_int(settings_file, "resolution", "width", 1280);
     settings.res_y = ini_read_int(settings_file, "resolution", "height", 720);
     settings.master_volume = ini_read_int(settings_file, "volume", "master", 100);
+    settings.intro_skipmode = ini_read_int(settings_file, "intro", "skip", SETTINGS_INTRO_NOSKIP);
 }
 
 void settings_save()
@@ -64,4 +65,5 @@ void settings_save()
     ini_write_int(settings_file, "resolution", "width",     settings.res_x);
     ini_write_int(settings_file, "resolution", "height",    settings.res_y);
     ini_write_int(settings_file, "volume",     "master",    settings.master_volume);
+    ini_write_int(settings_file, "intro",      "skip",      settings.intro_skipmode);
 }
