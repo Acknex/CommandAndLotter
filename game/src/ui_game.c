@@ -909,7 +909,7 @@ void ui_game_update()
 		MAP * map = mapGetCurrent();
 		if(map == NULL) error("ui_game_update requires a map!");
 
-		var col_fogged = pixel_for_vec(vector(  0,   0,   0), 100, fmt);
+		var col_fogged = pixel_for_vec(vector(  0,   0,   0),   0, fmt);
 		var col_wall   = pixel_for_vec(vector( 64,  64,  96), 100, fmt);
 		var col_ground = pixel_for_vec(vector(128, 128, 128), 100, fmt);
 
