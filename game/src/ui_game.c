@@ -244,7 +244,7 @@ void ui_game_init()
 	pan_setbutton(ui_game_menu, 0, 4, 15, 350, ui_icon_tree_o, ui_icon_tree, ui_icon_tree_o, ui_icon_tree, ui_place_building, NULL, NULL);
 	pan_setbutton(ui_game_menu, 0, 4, 15, 458, ui_icon_tower_o, ui_icon_tower, ui_icon_tower_o, ui_icon_tower, ui_place_building, NULL, NULL);
 	pan_setbutton(ui_game_menu, 0, 4, 15, 564, ui_icon_bank_o, ui_icon_bank, ui_icon_bank_o, ui_icon_bank, ui_place_building, NULL, NULL);
-	
+
 	ui_open_game_menu->bmap = ui_icon_hammer;
 	pan_setbutton(ui_open_game_menu, 0, 0, 0, 0, ui_icon_hammer_o, ui_icon_hammer, ui_icon_hammer_o, NULL, ui_show_commando_groups, NULL, NULL);
 
@@ -294,7 +294,7 @@ void ui_game_init()
 
 	ui_unit_meta->bmap = ui_bmap_units;
 	ui_unit_meta->pos_x = 0;
-	
+
 	pan_setwindow(ui_unit_meta, 0, 649, 187, 0, 0, ui_name_sputnik, 0, 0);
 	pan_setwindow(ui_unit_meta, 0, 649, 187, 0, 0, ui_name_esel, 0, 0);
 	pan_setwindow(ui_unit_meta, 0, 649, 187, 0, 0, ui_name_eye, 0, 0);
@@ -337,11 +337,11 @@ void ui_game_open()
 
 	ui_unit_meta->pos_y = screen_size.y - bmap_height(ui_bmap_units);
 	ui_main_resources->flags |= SHOW;
-	
+
 	pan_setwindow(ui_unit_meta, 2, 649, 187, 0, 0, ui_name_sputnik, 0, 0);
-	
+
 	ui_game_menu->flags &= ~SHOW;
-	
+
 	ui_open_game_menu->flags |= SHOW;
 }
 
@@ -360,7 +360,7 @@ void ui_game_close()
 	ui_minimap->flags &= ~SHOW;
 	ui_radial_delete->flags &= ~SHOW;
 	ui_monitor->flags &= ~SHOW;
-	
+
 	int i; for(i = 0; i < 2000; i++)
 	{
 		if( ui_life_indicator[i] )
@@ -371,6 +371,23 @@ void ui_game_close()
 
 	ptr_remove(ui_mm);
 	ui_mm = NULL;
+}
+
+// skaliert *dst* so, dass es in *rect* relativ zu *dst* zentriert ist.
+// übernimmt hierbei die skalierung von *ref*
+void ui_game_scale_panel_to_rect(PANEL * dst, PANEL * ref, VECTOR * pos, VECTOR * size)
+{
+    var dst_w = bmap_width(dst->bmap);
+    var dst_h = bmap_height(dst->bmap);
+    dst->scale_x = ref->scale_x * size->x / dst_w;
+    dst->scale_y = ref->scale_y * size->y / dst_h;
+
+    var scale = minv(dst->scale_x, dst->scale_y);
+    dst->scale_x = scale;
+    dst->scale_y = scale;
+
+    dst->pos_x = ref->pos_x + ref->scale_x * pos->x + (ref->scale_x * size->x - scale * dst_w) / 2;
+    dst->pos_y = ref->pos_y + ref->scale_y * pos->y + (ref->scale_x * size->y - scale * dst_h) / 2;
 }
 
 void ui_game_update()
@@ -438,19 +455,22 @@ void ui_game_update()
 	ui_portrait->scale_x = scale_factor_x;
 	ui_portrait->scale_y = scale_factor_x;
 
-	ui_minimap->scale_x = scale_factor_x * mini_map_extra_scale_x;
-	ui_minimap->scale_y = scale_factor_x * mini_map_extra_scale_y;
-
 	ui_monitor->scale_x = scale_factor_x;
 	ui_monitor->scale_y = scale_factor_x;
 	ui_monitor->pos_y = screen_size.y - bmap_height(ui_bmap_monitor) * scale_factor_x;
 
-	ui_minimap->pos_x = floor(46 * scale_factor_x + 0.5);
-	ui_minimap->pos_y = screen_size.y - bmap_height(ui_mm) * scale_factor_x - 12 * scale_factor_x;// + 18;// * scale_factor_x;
-	
+
+	// ui_minimap->scale_x = scale_factor_x * mini_map_extra_scale_x;
+	// ui_minimap->scale_y = scale_factor_x * mini_map_extra_scale_y;
+	// ui_minimap->pos_x = floor(46 * scale_factor_x + 0.5);
+	// ui_minimap->pos_y = screen_size.y - bmap_height(ui_mm) * scale_factor_x - 12 * scale_factor_x;// + 18;// * scale_factor_x;
+
+    // improved minimap placement
+    ui_game_scale_panel_to_rect(ui_minimap, ui_monitor, vector(64, 33, 0), vector(253, 284, 0));
+
 	ui_game_menu->scale_x = scale_factor_x;
 	ui_game_menu->scale_y = scale_factor_x;
-	
+
 	ui_open_game_menu->scale_x = scale_factor_x;
 	ui_open_game_menu->scale_y = scale_factor_x;
 	ui_open_game_menu->pos_x = screen_size.x - bmap_width(ui_icon_hammer) * scale_factor_x;
@@ -466,14 +486,14 @@ void ui_game_update()
 	int ui_count_cbabes = 0;
 	int ui_count_eye = 0;
 	int ui_count_skull = 0;
-	
+
 	if(ui_command_group_status == 1 || ui_command_group_status == -1)
 	{
 		ui_game_menu->flags |= SHOW;
 		ui_open_game_menu->flags |= SHOW;
-		
+
 		ui_command_group_process += 25 * time_step;
-		
+
 		if( ui_command_group_status == 1 )
 		{
 			ui_open_game_menu->alpha = clamp(100 - ui_command_group_process, 0, 100);
@@ -484,8 +504,8 @@ void ui_game_update()
 			ui_open_game_menu->alpha = clamp(ui_command_group_process, 0, 100);
 			ui_game_menu->alpha = clamp(100 - ui_command_group_process, 0, 100);
 		}
-		
-		if ( ui_command_group_process >= 100 ) 
+
+		if ( ui_command_group_process >= 100 )
 		{
 			if( ui_command_group_status == 1)
 			{
@@ -503,7 +523,7 @@ void ui_game_update()
 			}
 		}
 	}
-	
+
 	ui_game_menu->pos_x = screen_size.x - bmap_width(ui_bmap_gamemenu) * scale_factor_x;
 	ui_game_menu->pos_y = screen_size.y * 0.15 * scale_factor_x;
 
@@ -553,7 +573,7 @@ void ui_game_update()
 				a_dummy_var = spawner_getQueue(ent);
 			}
 		}
-		
+
 		TILE* tile = mapGetTileFromVector(mapGetCurrent(), &ent->x);
 		if(tile)
 		{
@@ -659,30 +679,30 @@ void ui_game_update()
 		{
 			switch(ui_max_type)
 			{
-				case UI_SPUTNIK: 
-				ui_active_portrait = ui_bmap_sputnik; 
-				ui_frame_order = ui_frame_order_norm; 
-				pan_setwindow(ui_unit_meta, 2, 649 + (324 - bmap_width(ui_name_sputnik)) / 2, 195 + (65 - bmap_height(ui_name_sputnik)) / 2, bmap_width(ui_name_sputnik), bmap_height(ui_name_sputnik), ui_name_sputnik, 0, 0); 
+				case UI_SPUTNIK:
+				ui_active_portrait = ui_bmap_sputnik;
+				ui_frame_order = ui_frame_order_norm;
+				pan_setwindow(ui_unit_meta, 2, 649 + (324 - bmap_width(ui_name_sputnik)) / 2, 195 + (65 - bmap_height(ui_name_sputnik)) / 2, bmap_width(ui_name_sputnik), bmap_height(ui_name_sputnik), ui_name_sputnik, 0, 0);
 				break;
-				case UI_CBABE:   
-				ui_active_portrait = ui_bmap_cbabe; 
-				ui_frame_order = ui_frame_order_norm; 
-				pan_setwindow(ui_unit_meta, 2, 649 + (324 - bmap_width(ui_name_cbabe)) / 2, 195 + (65 - bmap_height(ui_name_cbabe)) / 2, bmap_width(ui_name_cbabe), bmap_height(ui_name_cbabe), ui_name_cbabe, 0, 0); 
+				case UI_CBABE:
+				ui_active_portrait = ui_bmap_cbabe;
+				ui_frame_order = ui_frame_order_norm;
+				pan_setwindow(ui_unit_meta, 2, 649 + (324 - bmap_width(ui_name_cbabe)) / 2, 195 + (65 - bmap_height(ui_name_cbabe)) / 2, bmap_width(ui_name_cbabe), bmap_height(ui_name_cbabe), ui_name_cbabe, 0, 0);
 				break;
-				case UI_EYE:     
-				ui_active_portrait = ui_bmap_eye; 
-				ui_frame_order = ui_frame_order_norm; 
-				pan_setwindow(ui_unit_meta, 2, 649 + (324 - bmap_width(ui_name_eye)) / 2, 195 + (65 - bmap_height(ui_name_eye)) / 2, bmap_width(ui_name_eye), bmap_height(ui_name_eye), ui_name_eye, 0, 0); 
+				case UI_EYE:
+				ui_active_portrait = ui_bmap_eye;
+				ui_frame_order = ui_frame_order_norm;
+				pan_setwindow(ui_unit_meta, 2, 649 + (324 - bmap_width(ui_name_eye)) / 2, 195 + (65 - bmap_height(ui_name_eye)) / 2, bmap_width(ui_name_eye), bmap_height(ui_name_eye), ui_name_eye, 0, 0);
 				break;
-				case UI_ESEL:    
-				ui_active_portrait = ui_bmap_esel; 
-				ui_frame_order = ui_frame_order_norm; 
-				pan_setwindow(ui_unit_meta, 2, 649 + (324 - bmap_width(ui_name_esel)) / 2, 195 + (65 - bmap_height(ui_name_esel)) / 2, bmap_width(ui_name_esel), bmap_height(ui_name_esel), ui_name_esel, 0, 0); 
+				case UI_ESEL:
+				ui_active_portrait = ui_bmap_esel;
+				ui_frame_order = ui_frame_order_norm;
+				pan_setwindow(ui_unit_meta, 2, 649 + (324 - bmap_width(ui_name_esel)) / 2, 195 + (65 - bmap_height(ui_name_esel)) / 2, bmap_width(ui_name_esel), bmap_height(ui_name_esel), ui_name_esel, 0, 0);
 				break;
-				case UI_SKULL:   
-				ui_active_portrait = ui_bmap_skull; 
-				ui_frame_order = ui_frame_order_spceial; 
-				pan_setwindow(ui_unit_meta, 2, 649 + (324 - bmap_width(ui_name_skull)) / 2, 195 + (65 - bmap_height(ui_name_skull)) / 2, bmap_width(ui_name_skull), bmap_height(ui_name_skull), ui_name_skull, 0, 0); 
+				case UI_SKULL:
+				ui_active_portrait = ui_bmap_skull;
+				ui_frame_order = ui_frame_order_spceial;
+				pan_setwindow(ui_unit_meta, 2, 649 + (324 - bmap_width(ui_name_skull)) / 2, 195 + (65 - bmap_height(ui_name_skull)) / 2, bmap_width(ui_name_skull), bmap_height(ui_name_skull), ui_name_skull, 0, 0);
 				break;
 			}
 		}
@@ -699,7 +719,7 @@ void ui_game_update()
 	VECTOR screen;
 
 	a_stupid_var = z_get(PLAYER_ID_PLAYER);
-	
+
 
 	if( last_building != ui_active_building)
 	{
@@ -737,8 +757,8 @@ void ui_game_update()
 		var anim_frame_count = (ui_frame_order)[0] + 3;
 		ui_switch_frame += time_step * UI_ANIM_UNIT_SPEED;
 		var ui_active_frame = integer(ui_switch_frame);
-		
-		if( ui_active_frame >= anim_frame_count ) // Terminieren 
+
+		if( ui_active_frame >= anim_frame_count ) // Terminieren
 		{
 			ui_anim_unit_state = UI_ANIM_UNIT_OFF;
 		}
@@ -754,20 +774,22 @@ void ui_game_update()
 	}
 	else if( ui_anim_unit_state == UI_ANIM_UNIT_ON )
 	{
-		
+
 	}
 	else if ( ui_anim_unit_state == UI_ANIM_UNIT_OFF )
 	{
 		pan_setwindow(ui_unit_meta, 1, 0, 0, 0, 0, (ui_bmap_cbabe)[0], 0, 0);
 		if( ui_unit_meta->flags & SHOW )
 		{
-			ui_minimap->pos_x = 412 * scale_factor_x;
-			ui_minimap->pos_y = screen_size.y - (202 * scale_factor_x);
+			// ui_minimap->pos_x = 412 * scale_factor_x;
+			// ui_minimap->pos_y = screen_size.y - (202 * scale_factor_x);
 			mini_map_extra_scale_x = 0.69;
 			mini_map_extra_scale_y = 0.58;
-			ui_minimap->scale_x = scale_factor_x * mini_map_extra_scale_x;
-			ui_minimap->scale_y = scale_factor_x * mini_map_extra_scale_y;
+			// ui_minimap->scale_x = scale_factor_x * mini_map_extra_scale_x;
+			// ui_minimap->scale_y = scale_factor_x * mini_map_extra_scale_y;
 			ui_minimap->flags |= SHOW;
+
+            ui_game_scale_panel_to_rect(ui_minimap, ui_unit_meta, vector(421, 110, 0), vector(172, 162, 0));
 		}
 		else
 		{
