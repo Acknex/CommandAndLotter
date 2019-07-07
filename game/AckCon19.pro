@@ -132,6 +132,7 @@ HEADERS += \
   src/z.h
 
 DISTFILES += \
+  credits.dat \
   main.wdl \
   shaders/progress-radial.fx \
   shaders/water.fx

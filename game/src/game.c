@@ -20,7 +20,7 @@
 
 void game_init(void)
 {
-	ui_game_init();
+    ui_game_init();
     UnitMangement_init();
     grid_init();
 	buildingPlacement_init();
@@ -53,8 +53,10 @@ void game_open(void)
 	#ifdef GAME_OPEN_DEBUG
 		cprintf0("\n - calling ui_game_open() now...");
 	#endif
-	ui_game_open();
-	topdown_camera_open();
+
+    ui_game_open();
+
+    topdown_camera_open();
 
     UnitMangement_open();
     fow_open();

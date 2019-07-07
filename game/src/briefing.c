@@ -16,7 +16,11 @@ BMAP * briefing_startbtn     = "intro_start.png";
 BMAP * briefing_rotor        = "intro_rotor.png";
 BMAP * briefing_startbtn_dis = "intro_start_inactive.png";
 
+BMAP * briefing_slide_top    = "intro-slide-top.png";
+BMAP * briefing_slide_bot    = "intro-slide-bot.png";
+
 SOUND * briefing_write_snd   = "intro_write.wav";
+SOUND * briefing_gate_snd    = "intro-gate.wav";
 
 FONT * briefing_font = "Dot Matrix#32";
 
@@ -95,6 +99,10 @@ VECTOR briefing_startbutton_min, briefing_startbutton_max;
 int briefing_result;
 var briefing_startup;
 bool briefing_ready;
+bool briefing_complete;
+bool briefing_quitnext;
+
+var briefing_shutdown;
 
 void briefing_init()
 {
@@ -139,7 +147,9 @@ void briefing_mouseclick()
         return;
     if(mouse_pos.y >= briefing_startbutton_max.y)
         return;
-    briefing_result = BRIEFING_ACCEPT;
+    briefing_complete = true;
+    briefing_shutdown = 750;
+    snd_play(briefing_gate_snd, 100, 0);
 }
 
 void briefing_abort()
@@ -160,6 +170,13 @@ void briefing_open()
     briefing_current_mode = 0;
 
     str_cpy((briefing_render_txt->pstring)[0], "");
+
+    briefing_complete = false;
+    briefing_shutdown = 0;
+    briefing_quitnext = false;
+
+    level_load(NULL);
+    vec_set(sky_color, vector(1,1,1));
 }
 
 void briefing_update()
@@ -275,7 +292,7 @@ void briefing_update()
         BMAP * bmp = (faceset[(total_ticks / 4) % 3]);
         draw_quad(
             bmp,
-            vector(scale * 1266, scale * 179, 0),
+            vector(pos_x + scale * 1266, pos_y + scale * 179, 0),
             NULL,
             NULL,
             vector(scale * 192 / bmap_width(bmp), scale * 186 / bmap_height(bmp), 0),
@@ -336,6 +353,56 @@ void briefing_update()
                 100,
                 -total_ticks
             );
+    }
+
+    // allows one-frame-delay
+    if(briefing_quitnext)
+    {
+        briefing_result = BRIEFING_ACCEPT;
+    }
+
+    if(briefing_complete)
+    {
+        briefing_shutdown -= 45 * time_step;
+
+        var offset_top = 120;
+        var offset_bot = 20;
+
+        var center_y = screen_size.y / 2;
+
+        if(briefing_shutdown < 0)
+        {
+            briefing_shutdown = 0;
+            briefing_quitnext = true;
+        }
+
+        var scale = maxv(
+            (screen_size.y / 2) / 563,
+            screen_size.x / bmap_width(briefing_slide_top)
+        );
+
+        var delta_x = (screen_size.x - scale * bmap_width(briefing_slide_top)) / 2;
+
+        draw_quad(
+            briefing_slide_top,
+            vector(delta_x, center_y + scale * offset_top - scale * briefing_shutdown - scale * bmap_height(briefing_slide_top), 0),
+            NULL,
+            NULL,
+            vector(scale, scale, 0),
+            NULL,
+            100,
+            0
+        );
+        draw_quad(
+            briefing_slide_bot,
+            vector(delta_x, center_y - scale * offset_bot + scale * briefing_shutdown, 0),
+            NULL,
+            NULL,
+            vector(scale, scale, 0),
+            NULL,
+            100,
+            0
+        );
     }
 }
 
