@@ -53,6 +53,7 @@ void buildingPlacement_movePreview()
 				mapGetVectorFromTile(mapCurrent, &targetPos, tile);
 				targetPos.z = _hit.z;
 				vec_set(&buildingPlacement_previewModel->x, targetPos);
+				buildingPlacement_previewModel->pan = 45;
 			}
 		}
 	}
@@ -71,7 +72,7 @@ void buildingPlacement_beginConstruction(int selection)
 	buildingPlacement_previewModel = ent_create(buildingPlacement_constructionAssets[selection], nullvector, NULL);
 	buildingPlacement_previewModel->flags |= TRANSLUCENT;
 	buildingPlacement_previewModel->alpha = 70;
-	buildingPlacement_previewModel->pan = random(360);
+	buildingPlacement_previewModel->pan = 45;
 }
 
 void buildingPlacement_endConstruction()

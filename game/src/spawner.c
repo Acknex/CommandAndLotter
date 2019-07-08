@@ -90,6 +90,7 @@ var spawner_building_cost[BUILDING_CLASSES] = {10,20,30,40,50};
 
 ENTITY* spawner_spawn(int unittype, VECTOR* pos, var angle, var owner)
 {
+	angle = 45;
 	ENTITY * ent;
     ENTITY * wireframe;
 	switch (unittype)
@@ -163,9 +164,9 @@ var spawner_produce(ENTITY* ent)
 	{
 		if (ent->group == GROUP_ENEMY_SPAWNER || ent->group == GROUP_PLAYER_SPAWNER)
 		{
-			if(z_isSufficient(spawner_unit_cost[ent->ENTITY_UNITTYPE], ent->OWNER))
+			if(1) //z_isSufficient(spawner_unit_cost[ent->ENTITY_UNITTYPE], ent->OWNER))
 			{
-				z_pay(spawner_unit_cost[ent->ENTITY_UNITTYPE], ent->OWNER);
+				//z_pay(spawner_unit_cost[ent->ENTITY_UNITTYPE], ent->OWNER);
 				ent->SPAWNER_QUEUE++;
 			}
 			return ent->SPAWNER_QUEUE;
@@ -291,10 +292,10 @@ void SPAWNER_Update()
                 {
                     VECTOR v;
                     vec_for_vertex(&v, ptr, p);
-                    if(ptr->OWNER == PLAYER_ID_PLAYER)
+                    /*if(ptr->OWNER == PLAYER_ID_PLAYER)
                         effect(SPAWNER_ParticlePlayer, 1, &v, nullvector);
                     else
-                        effect(SPAWNER_ParticleAI, 1, &v, nullvector);
+                        effect(SPAWNER_ParticleAI, 1, &v, nullvector);*/
                     p += 1;
                 }
             }

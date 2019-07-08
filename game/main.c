@@ -2,6 +2,7 @@
 #define PRAGMA_PATH "src"
 #define PRAGMA_PATH "code"
 
+//#define DEBUG_FRAMEWORK_FASTSTART
 #define PRAGMA_PATH "%EXE_DIR%\\code"; // fx files
 
 #define DEBUG

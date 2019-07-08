@@ -115,7 +115,8 @@ int fow_isTileInLOS(MAP* map, TILE* sourceTile, int range, int playerNumber)
 			if(vec_dist(pos, &otherPos) > range)
 				continue;
 
-			if(!tile->numUnits[playerNumber])
+			//if(!tile->numUnits[playerNumber])
+			if(!tile->numUnits[0] && !tile->numUnits[1])
 				continue;
 			if(fow_hasDirectLOS(map, &pos, &otherPos))
 				return 1;
@@ -160,7 +161,7 @@ void fow_setBorder(TILE *tile)
 	if(tile->visibility & FOW_BORDER)
 		return;
 
-	tile->visibility |= FOW_BORDER;´
+	tile->visibility |= FOW_BORDER;
 	fow_borderCells[fow_borderCells_IDX] = tile;
 	fow_borderCells_IDX++;
 }

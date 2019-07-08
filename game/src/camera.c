@@ -15,6 +15,7 @@ void topdown_camera_open()
 	camera.z = 3000;
 	camera.tilt = -70;
 	topdown_camera_height = 4;
+	topdown_camera_centerTarget.y = camera.y = 6100;
 	
 	vec_set(&topdown_camera_center, nullvector);
 }

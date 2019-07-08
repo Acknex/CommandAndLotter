@@ -139,9 +139,34 @@ PANEL* ui_create_radial_button(BMAP *initial_icon, void *ev)
 	return rad;
 }
 
+
+void update_or_create_lifebar_enemy(ENTITY *ent)
+{
+	float health = unit_getHealth(ent);
+	
+	VECTOR sc;
+	vec_set(sc, ent.x);
+	if(vec_to_screen(sc, camera))
+	{
+		vec_sub(sc, vector(15, 35, 0));
+		draw_quad(NULL,vector(sc.x,sc.y,0),NULL,vector(30,3,0),NULL,COLOR_BLACK,100,0);
+		draw_quad(NULL,vector(sc.x,sc.y,0),NULL,vector(30*health,3,0),NULL,vector(255,64,0),100,0);
+	}
+}
+
 void update_or_create_lifebar(ENTITY *ent)
 {
-	if( ui_lifebar_counter >= 2000 ) { return; }
+	float health = unit_getHealth(ent);
+	
+	VECTOR sc;
+	vec_set(sc, ent.x);
+	if(vec_to_screen(sc, camera))
+	{
+		vec_sub(sc, vector(15, 35, 0));
+		draw_quad(NULL,vector(sc.x,sc.y,0),NULL,vector(30,3,0),NULL,COLOR_RED,100,0);
+		draw_quad(NULL,vector(sc.x,sc.y,0),NULL,vector(30*health,3,0),NULL,COLOR_GREEN,100,0);
+	}
+	/*	if( ui_lifebar_counter >= 2000 ) { return; }
 
 	var health = unit_getHealth(ent);
 	var fac = health;
@@ -172,7 +197,7 @@ void update_or_create_lifebar(ENTITY *ent)
 	ui_life_indicator[ui_lifebar_counter]->alpha = 60;
 	ui_life_indicator[ui_lifebar_counter]->flags |= (SHOW | UNTOUCHABLE | TRANSLUCENT);
 
-	ui_lifebar_counter++;
+	ui_lifebar_counter++;*/
 }
 
 void ui_add_dot_to_minimap(ENTITY *ent, int size, BMAP *dot, int counter)
@@ -205,7 +230,7 @@ void ui_minimap_click(PANEL *panel)
 	mpx /= (bmap_width(ui_mm) * scale_factor_x * mini_map_extra_scale_x);
 	mpy /= (bmap_height(ui_mm) * scale_factor_x * mini_map_extra_scale_y);
 
-    var aspect = bmap_width(ui_mm) / bmap_height(ui_mm);
+	var aspect = bmap_width(ui_mm) / bmap_height(ui_mm);
 
 	mpx = mpx * 16000;
 	mpy = mpy * 16000 / aspect;
@@ -363,13 +388,13 @@ void ui_game_close()
 	ui_radial_delete->flags &= ~SHOW;
 	ui_monitor->flags &= ~SHOW;
 
-	int i; for(i = 0; i < 2000; i++)
+	/*int i; for(i = 0; i < 2000; i++)
 	{
 		if( ui_life_indicator[i] )
 		{
 			ui_life_indicator[i]->flags &= ~SHOW;
 		}
-	}
+	}*/
 
 	ptr_remove(ui_mm);
 	ui_mm = NULL;
@@ -379,22 +404,22 @@ void ui_game_close()
 // übernimmt hierbei die skalierung von *ref*
 void ui_game_scale_panel_to_rect(PANEL * dst, PANEL * ref, VECTOR * pos, VECTOR * size)
 {
-    var dst_w = bmap_width(dst->bmap);
-    var dst_h = bmap_height(dst->bmap);
-    dst->scale_x = ref->scale_x * size->x / dst_w;
-    dst->scale_y = ref->scale_y * size->y / dst_h;
+	var dst_w = bmap_width(dst->bmap);
+	var dst_h = bmap_height(dst->bmap);
+	dst->scale_x = ref->scale_x * size->x / dst_w;
+	dst->scale_y = ref->scale_y * size->y / dst_h;
 
-    var scale = minv(dst->scale_x, dst->scale_y);
-    dst->scale_x = scale;
-    dst->scale_y = scale;
+	var scale = minv(dst->scale_x, dst->scale_y);
+	dst->scale_x = scale;
+	dst->scale_y = scale;
 
-    dst->pos_x = ref->pos_x + ref->scale_x * pos->x + (ref->scale_x * size->x - scale * dst_w) / 2;
-    dst->pos_y = ref->pos_y + ref->scale_y * pos->y + (ref->scale_x * size->y - scale * dst_h) / 2;
+	dst->pos_x = ref->pos_x + ref->scale_x * pos->x + (ref->scale_x * size->x - scale * dst_w) / 2;
+	dst->pos_y = ref->pos_y + ref->scale_y * pos->y + (ref->scale_x * size->y - scale * dst_h) / 2;
 }
 
 void ui_game_update()
 {
-	int i; for(i = 0; i < ui_lifebar_counter; i++)
+	/*int i; for(i = 0; i < ui_lifebar_counter; i++)
 	{
 		ENTITY *ent = ptr_for_handle(ui_life_indicator[i]->skill_x);
 		if(ent)
@@ -404,7 +429,7 @@ void ui_game_update()
 				ui_life_indicator[i]->flags &= ~SHOW;
 			}
 		}
-	}
+	}*/
 
 	scale_factor_x = screen_size.x / 1920;
 	scale_factor_y = screen_size.y / 1080;
@@ -416,7 +441,7 @@ void ui_game_update()
 		{
 			int size = 4;
 			draw_quad(bmp,vector(000,0,0),NULL,NULL,vector(size,size,0),NULL,100,0);
-			int unitDrawSize = 4;
+			int unitDrawSize = 1;
 			int currentPlayer;
 			for(currentPlayer = 0; currentPlayer < MAX_PLAYERS; currentPlayer++)
 			{
@@ -425,7 +450,7 @@ void ui_game_update()
 				{
 					if(unit->isActive)
 					{
-						draw_quad(NULL,vector(unit->pos2d.x*size-unitDrawSize/2,unit->pos2d.y*size-unitDrawSize/2,0),NULL,vector(4,4,0),NULL,COLOR_RED,50,0);
+						draw_quad(NULL,vector(unit->pos2d.x*size-unitDrawSize,unit->pos2d.y*size-unitDrawSize,0),NULL,vector(2,2,0),NULL,COLOR_RED,50,0);
 					}
 					unit = unit->next;
 				}
@@ -467,8 +492,8 @@ void ui_game_update()
 	// ui_minimap->pos_x = floor(46 * scale_factor_x + 0.5);
 	// ui_minimap->pos_y = screen_size.y - bmap_height(ui_mm) * scale_factor_x - 12 * scale_factor_x;// + 18;// * scale_factor_x;
 
-    // improved minimap placement
-    ui_game_scale_panel_to_rect(ui_minimap, ui_monitor, vector(64, 33, 0), vector(253, 284, 0));
+	// improved minimap placement
+	ui_game_scale_panel_to_rect(ui_minimap, ui_monitor, vector(64, 33, 0), vector(253, 284, 0));
 
 	ui_game_menu->scale_x = scale_factor_x;
 	ui_game_menu->scale_y = scale_factor_x;
@@ -535,6 +560,8 @@ void ui_game_update()
 	int counter = 1;
 	SUBSYSTEM_LOOP(ent, SUBSYSTEM_SPAWNER)
 	{
+		if( ent->HEALTH > 0 && ent->group == GROUP_ENEMY_SPAWNER ) update_or_create_lifebar_enemy(ent);
+		
 		if( ent->SELCTED_SKILL && ent->HEALTH > 0 )
 		{
 			if( ent->group == GROUP_PLAYER_SPAWNER )
@@ -594,6 +621,7 @@ void ui_game_update()
 	}
 	for(ent = ent_next(NULL); ent != NULL; ent = ent_next(ent))
 	{
+		if(ent->group == GROUP_ENEMY_UNIT ) update_or_create_lifebar_enemy(ent);
 		if( ent->group == GROUP_PLAYER_UNIT)
 		{
 			if( ent->SELCTED_SKILL )
@@ -720,7 +748,7 @@ void ui_game_update()
 
 	VECTOR screen;
 
-	a_stupid_var = z_get(PLAYER_ID_PLAYER);
+	a_stupid_var = z_get(PLAYER_ID_PLAYER)*10;
 
 
 	if( last_building != ui_active_building)
@@ -791,7 +819,7 @@ void ui_game_update()
 			// ui_minimap->scale_y = scale_factor_x * mini_map_extra_scale_y;
 			ui_minimap->flags |= SHOW;
 
-            ui_game_scale_panel_to_rect(ui_minimap, ui_unit_meta, vector(421, 110, 0), vector(172, 162, 0));
+			ui_game_scale_panel_to_rect(ui_minimap, ui_unit_meta, vector(421, 110, 0), vector(172, 162, 0));
 		}
 		else
 		{

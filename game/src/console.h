@@ -3,7 +3,7 @@
 // made by Rackscha, adapted by Superku
 
 	#include <windows.h>
-
+//#define CONSOLE_SHOW
 	long WINAPI WriteConsole(int Handle, char* Buffer, int CharsToWrite, int* CharsWritten, int reserved);
 	long WINAPI CreateConsoleScreenBuffer(long dwDesiredAccess, long dwShareMode, long *lpSecurityAttributes, long dwFlags, long lpScreenBufferData);
 	long WINAPI SetConsoleActiveScreenBuffer(long hConsoleOutput);

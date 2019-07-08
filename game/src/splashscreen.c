@@ -9,6 +9,7 @@ var splashscreen_startup;
 
 void splashscreen_quit()
 {
+	if(splashscreen_begin_exit) return;
     splashscreen_begin_exit = true;
     splashscreen_startup = total_ticks;
 }

@@ -67,7 +67,7 @@ ENTITY* z_spawn(VECTOR* pos)
 void Z()
 {
 	framework_setup(my, SUBSYSTEM_Z);
-	set(my, SHADOW);
+	//set(my, SHADOW);
 	my->Z_SIZE = 2.0 + random(2);
 	my->pan = random(360);
 	vec_set(my->scale_x, vector(my->Z_SIZE , my->Z_SIZE , my->Z_SIZE ));
@@ -80,8 +80,8 @@ void Z()
 
 void Z_Init()
 {
-	z_amount[0] = 50;
-	z_amount[1] = 50;
+	z_amount[0] = 500;
+	z_amount[1] = 500;
 }
 
 void Z_Update()

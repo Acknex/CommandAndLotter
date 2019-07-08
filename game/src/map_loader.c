@@ -160,9 +160,9 @@ void maploader_load(char const * fileName)
     you = ent_createterrain(
         maploader_lava,
         vector(0, 0, 200),
-        180,
-        180,
-        256
+        90,
+        90,
+        256*2
     );
     you.material = maploader_water_material;
 

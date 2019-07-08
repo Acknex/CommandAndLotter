@@ -47,35 +47,33 @@ void SKULL_Init()
 
 void SKULL__wait_or_walk(ENTITY * ptr)
 {
-	UNIT* unit = jpsAllowMovementForEntity(ptr, true);
+	UNIT* unit = jpsUnitGetFromEntity(ptr);
 	if(!unit) return;
-
 	vec_set(ptr->x, unit->pos3d);
 	VECTOR diff, temp;
-	vec_diff(diff, unit->pos3d, unit->prevPos3d);
+	vec_diff(diff, unit->currentTarget3d, unit->prevPos3d);
 
+	int decreaseSpeedTrue = 1;
 	var len = vec_to_angle(temp, diff)/time_step;
-
-	if(len > 8) ptr->SKULL_RUNCOUNTER = 4;
-
-	if(ptr->SKULL_RUNCOUNTER > 0)
+	var angDiff = ang(temp.x-ptr->pan);
+	if(len > 8)
 	{
-		ptr->SKULL_RUNCOUNTER = maxv(ptr->SKULL_RUNCOUNTER-time_step,0);
-		if(len > 8) ptr->pan += ang(temp.x-ptr->pan)*0.5*time_step;
-
-		ptr->SKULL_DIDATTACK = 0;
-		ptr->SKULL_ANIMSTATEATK = 0;
-		ptr->ENTITY_ANIM += len*0.425*time_step;
-		ent_animate(ptr, SKULL_WALKANIM, ptr->ENTITY_ANIM, ANM_CYCLE);
-
-		ptr->SKULL_IDLECOUNTER = 0;
+		var turnSpeed = 5+unit->speedFac*10;
+		ptr->pan += clamp(angDiff*0.25,-12,12)*time_step;
+		if(abs(angDiff) < 15)
+		{
+			unit->speedFac = minv(unit->speedFac+0.1*time_step,1);
+			decreaseSpeedTrue = 0;
+		}
 	}
-	else
+	if(decreaseSpeedTrue)
 	{
-		ptr->SKULL_IDLECOUNTER += time_step;
-		ptr->ENTITY_ANIM += 7 * time_step;
-		ent_animate(ptr, SKULL_WAITANIM, ptr->ENTITY_ANIM, ANM_CYCLE);
+		unit->speedFac = maxv(unit->speedFac-0.15*time_step,0);
+		vec_set(unit->speedOverwrite, vector(1,0,0));
+		vec_rotate(unit->speedOverwrite, vector(ptr->pan,0,0));
+		unit->speedOverwrite.z = clamp((abs(angDiff)-15)/15.0,0,1)*clamp((len-8)/8.0,0,1);
 	}
+	jpsAllowMovementForEntity(ptr, true);
 
 	//skull was hit?
 	if (unit_checkHit(ptr))
@@ -95,11 +93,6 @@ void SKULL__wait_or_walk(ENTITY * ptr)
 		{
 			ptr->ENTITY_STATE = ENTITY_STATE_ATTACK;
 			ptr->ENTITY_ANIM = 0;
-		}
-		//nothing to do? go mining
-		if(ptr->SKULL_IDLECOUNTER > SKULL_MAXIDLE && !unit_getVictim(ptr))
-		{
-			unit_findNextVictim(ptr, UNIT_Z);
 		}
 
 	}
@@ -164,6 +157,7 @@ void SKULL_Update()
 			int vertices[] = {73, 200, 67, 201, 68};
 			CONTACT contact;
 			int i;
+			/*
 			for(i = 0; i < 5; i++)
 			{
 				ent_getvertex(ptr, &contact, vertices[i]);
@@ -186,6 +180,7 @@ void SKULL_Update()
 					effect(SKULL__fireEffect, 3*time_step, contact.x, velocity);
 				}
 			}
+			*/
 		}
 	}
 }
@@ -231,7 +226,7 @@ void SKULL__attack(ENTITY* ptr)
 		if (victim != NULL)
 		{
 			int i;
-			for(i = 0; i < 5; i++)
+			for(i = 0; i < -5; i++)
 			{
 				VECTOR velocity;
 				vec_set(velocity, &victim->x);
@@ -281,7 +276,7 @@ void SKULL__die(ENTITY* ptr)
 	vec_set(&ptr->scale_x, vector(animState, animState, animState));
 	VECTOR* pos = vector(ptr->x+random(10)-5, ptr->y+random(10)-5, ptr->z+random(10)-5);
 	VECTOR* vel = vector(-5-random(10), -2-random(4), 2+random(4));
-	effect(PARTICLE_smoke, 6*time_step, pos, vel);
+	//effect(PARTICLE_smoke, 6*time_step, pos, vel);
 
 	/* transitions */
 	if(animState <= 0)

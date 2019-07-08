@@ -150,6 +150,7 @@ function SetUnitSelcted(ENTITY* ent, var isSelected)
     }
 }
 
+int controlEnemyUnitsAsWell = 0;
 function MarkUnits()
 {
     VECTOR Posis[4];
@@ -166,7 +167,7 @@ function MarkUnits()
 
     ENTITY * ent;
     for(ent = ent_next(NULL); ent != NULL; ent = ent_next(ent)){
-        if(ent->group==GROUP_PLAYER_UNIT){
+        if(ent->group==GROUP_PLAYER_UNIT || controlEnemyUnitsAsWell){
             var isInside = 1;
             for(i = 0; i < 4 && isInside; i++){
                 isInside = CheckIsLeftFrom(Posis[i],Posis[(i+1)%4],ent.x);
@@ -185,7 +186,7 @@ function SelectMarkedUnits()
 {
     ENTITY * ent;
     for(ent = ent_next(NULL); ent != NULL; ent = ent_next(ent)){
-        if(ent->group==GROUP_PLAYER_UNIT){
+        if(ent->group==GROUP_PLAYER_UNIT || controlEnemyUnitsAsWell){
             SetUnitSelcted(ent, ent.ambient > 0);
         }
      }
@@ -207,15 +208,19 @@ var MouseRightLast = 0;
 
 function SetDestForSelectd(VECTOR * Dest)
 {
+	cprintf3("\n SetDestForSelectd(%d,%d,0) at frame %d: START", (int)Dest.x, (int)Dest.y, (int)total_frames);
     int Count = 0;
     ENTITY * ent;
-    for(ent = ent_next(NULL); ent != NULL; ent = ent_next(ent)){
-        if(ent->group==GROUP_PLAYER_UNIT && ent.SELCTED_SKILL){
+    for(ent = ent_next(NULL); ent != NULL; ent = ent_next(ent))
+    {
+        if((ent->group==GROUP_PLAYER_UNIT || controlEnemyUnitsAsWell) && ent.SELCTED_SKILL)
+        {
             unit_setTarget(ent, Dest);
             Count++;
         }
     }
-    return Count;
+	cprintf0("\n - SetDestForSelectd END");
+   return Count;
 }
 
 
@@ -224,7 +229,7 @@ function SetVictimForSelectd(ENTITY * Victim)
     int Count = 0;
     ENTITY * ent;
     for(ent = ent_next(NULL); ent != NULL; ent = ent_next(ent)){
-        if(ent->group==GROUP_PLAYER_UNIT && ent.SELCTED_SKILL){
+        if((ent->group==GROUP_PLAYER_UNIT || controlEnemyUnitsAsWell) && ent.SELCTED_SKILL){
             unit_setVictim(ent, Victim);
             Count++;
         }
@@ -269,7 +274,7 @@ function NumberKeyPressed(int nr)
 
     ENTITY * ent;
     for(ent = ent_next(NULL); ent != NULL; ent = ent_next(ent)){
-        if(ent->group==GROUP_PLAYER_UNIT){
+        if(ent->group==GROUP_PLAYER_UNIT || controlEnemyUnitsAsWell){
             if(key_ctrl){
                 if(ent.SELCTED_SKILL){
                     ent.UNIT_GROUP_SKILL = nr;
@@ -393,6 +398,7 @@ function UnitControl()
             if(unit_management_current_taunt_sound == 0)
                 unit_management_current_taunt_sound = snd_play(group[sndid], 100, 0);
 
+if(key_ctrl || key_f) CmdType = EFFECTS2D_TYPE_ATTACK;
             effects2d_spawn(Dest, CmdType);
         }
     }

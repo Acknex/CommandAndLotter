@@ -1,7 +1,7 @@
 #ifndef FOW_H
 #define FOW_H
 
-#define USE_FOW
+//#define USE_FOW
 
 #define FOW_SCOUTED 0
 #define FOW_HIDDEN 1

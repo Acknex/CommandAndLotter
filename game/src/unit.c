@@ -4,13 +4,13 @@
 
 #define UNIT_TABLESIZE 36 // UNIT_CLASSES*UNIT_CLASSES Lite-C is stupid. Really.
 var unit__dmgtable[UNIT_TABLESIZE] = {
-   /*S L E C K Z*/
-/*S*/7,9,2,2,5,1,
-/*L*/2,5,7,7,5,1,
-/*E*/9,5,3,3,5,1,
-/*C*/2,5,7,7,5,1,
-/*K*/0,0,0,0,0,2,
-/*Z*/0,0,0,0,0,0
+	/*S L E C K Z*/
+	/*S*/7,9,2,2,5,1,
+	/*L*/2,5,7,7,5,1,
+	/*E*/9,5,3,3,5,1,
+	/*C*/2,5,7,7,5,1,
+	/*K*/0,0,0,0,0,2,
+	/*Z*/0,0,0,0,0,0
 };
 /*
 (CBABE)Maschinengewehrinfanterie: ++Infanterie  00Fahrzeug  --Panzer
@@ -29,15 +29,22 @@ var unit_setTarget(ENTITY* ent, VECTOR* pos)
 	MAP* map = mapGetCurrent();
 	mapGetVector2DFromVector3D(map, target2D, pos);
 
-	//cprintf2("\n unit_setTarget(%p): group(%d)", ent, ent->group);
+	//cprintf3("\n unit_setTarget(%p) at frame %d: group(%d)", ent, (int)total_frames, (int)ent->group);
 
 	if (ent != NULL)
 	{
 		if (ent->group == GROUP_PLAYER_UNIT || ent->group == GROUP_ENEMY_UNIT)
 		{
 			vec_set(ent->UNIT_TARGET, pos);
-			unitSetTargetFromVector2D(map, jpsUnitGetFromEntity(ent), target2D);
-			unit_setVictim(ent, NULL);
+			UNIT* unit = jpsUnitGetFromEntity(ent);
+			if(unit)
+			{
+				//cprintf1(" uniqueID(%d)", unit->uniqueID);
+				unitSetTargetFromVector2D(map, unit, target2D);
+				unit->victimUnit = NULL;
+				if(ent->group == GROUP_ENEMY_UNIT) unit->attackMove = 1;
+				else unit->attackMove = (key_f || key_ctrl);
+			}
 			return 1;
 		}
 	}
@@ -52,24 +59,12 @@ VECTOR* unit_getTarget(ENTITY* ent)
 
 var unit_setVictim(ENTITY* ent, ENTITY* victim)
 {
-	if (ent != NULL)
-	{
-		if (ent->group == GROUP_PLAYER_UNIT || ent->group == GROUP_ENEMY_UNIT)
-		{
-			if (victim != NULL)
-			{
-				//if (victim->group == GROUP_UNIT)
-				{
-					ent->ENTITY_VICTIM = handle(victim);
-					ent->ENTITY_VICTIMTYPE = victim->ENTITY_UNITTYPE;
-					return 1;
-				}
-			}
-			ent->ENTITY_VICTIMTYPE = UNIT_INVALID;
-			ent->ENTITY_VICTIM = NULL;
-		}
-	}
-	return 0;
+	if(!ent || !victim) return 0;
+	UNIT* entUnit = jpsUnitGetFromEntity(ent);
+	UNIT* victimUnit = jpsUnitGetFromEntity(victim);
+	if(!entUnit || !victimUnit) return 0;
+	jpsUnitSetEnemyTargetUnit(mapGetCurrent(), entUnit, victimUnit);
+	return 1;
 }
 
 ENTITY* unit_getVictim(ENTITY* ent)
@@ -80,7 +75,7 @@ ENTITY* unit_getVictim(ENTITY* ent)
 		if (victim != NULL)
 		{
 			if (victim->ENTITY_STATE == ENTITY_STATE_DIE || victim->ENTITY_STATE == ENTITY_STATE_DEAD)
-				return NULL;
+			return NULL;
 		}
 		return victim;
 	}
@@ -95,47 +90,47 @@ ENTITY* unit_spawn(int unittype, VECTOR* pos, var owner)
 ENTITY* unit_spawn(int unittype, VECTOR* pos, VECTOR* targetPos, var owner)
 {
 	ENTITY* ent = NULL;
-    switch (unittype)
-    {
-    case UNIT_SPUTNIK:
-        if(owner== PLAYER_ID_PLAYER)
-            ent = ent_create("sputnik.mdl", pos, Sputnik);
-        else
-            ent = ent_create("evilSputnik.mdl", pos, Sputnik);
-        break;
+	switch (unittype)
+	{
+		case UNIT_SPUTNIK:
+		if(owner== PLAYER_ID_PLAYER)
+		ent = ent_create("sputnik.mdl", pos, Sputnik);
+		else
+		ent = ent_create("evilSputnik.mdl", pos, Sputnik);
+		break;
 
-    case UNIT_LERCHE:
-        if(owner== PLAYER_ID_PLAYER)
-            ent = ent_create("cEselslerche.mdl", pos, Sputnik);
-        else
-            ent = ent_create("EvilEselslerche.mdl", pos, Sputnik);
-        break;
+		case UNIT_LERCHE:
+		if(owner== PLAYER_ID_PLAYER)
+		ent = ent_create("cEselslerche2.mdl", pos, Sputnik);
+		else
+		ent = ent_create("EvilEselslerche.mdl", pos, Sputnik);
+		break;
 
-    case UNIT_EYE:
+		case UNIT_EYE:
 
-        if(owner== PLAYER_ID_PLAYER)
-            ent = ent_create("eye.mdl", pos, Sputnik);
-        else
-            ent = ent_create("eye.mdl", pos, Sputnik);
-        break;
+		if(owner== PLAYER_ID_PLAYER)
+		ent = ent_create("eye.mdl", pos, Sputnik);
+		else
+		ent = ent_create("eye.mdl", pos, Sputnik);
+		break;
 
-    case UNIT_BABE:
-        if(owner== PLAYER_ID_PLAYER)
-            ent = ent_create("cbabe.mdl", pos, Sputnik);
-        else
-            ent = ent_create("cbabe.mdl", pos, Sputnik);
-        break;
+		case UNIT_BABE:
+		if(owner== PLAYER_ID_PLAYER)
+		ent = ent_create("jeep.mdl", pos, Sputnik);
+		else
+		ent = ent_create("jeep.mdl", pos, Sputnik);
+		break;
 
-    case UNIT_SKULL:
-        if(owner== PLAYER_ID_PLAYER)
-            ent = ent_create("whiskas_G.mdl", pos, Skull);
-        else
-            ent = ent_create("whiskas.mdl", pos, Skull);
-        break;
+		case UNIT_SKULL:
+		if(owner== PLAYER_ID_PLAYER)
+		ent = ent_create("whiskas_G.mdl", pos, Skull); //whiskas_G
+		else
+		ent = ent_create("whiskas.mdl", pos, Skull);
+		break;
 
-    default:
-        break;
-    }
+		default:
+		break;
+	}
 
 	if (ent != NULL)
 	{
@@ -154,7 +149,7 @@ ENTITY* unit_spawn(int unittype, VECTOR* pos, VECTOR* targetPos, var owner)
 
 		ent->ENTITY_UNITTYPE = unittype;
 		unit_setTarget(ent, targetPos);
-		unit_setVictim(ent,NULL);
+		//unit_setVictim(ent,NULL);
 	}
 
 	return ent;
@@ -162,7 +157,13 @@ ENTITY* unit_spawn(int unittype, VECTOR* pos, VECTOR* targetPos, var owner)
 
 var unit_getHealth(ENTITY* ent)
 {
-	return ent->HEALTH / ent->MAXHEALTH;
+	UNIT* unit = jpsUnitGetFromEntity(ent);
+	if(!unit) return 0;
+	UNIT_PRESET* unitPreset = &unitPresets[unit->presetID];
+	ent->HEALTH = unit->HP;
+	ent->MAXHEALTH = unitPreset->maxHP;
+	return unit->HP/(float)unitPreset->maxHP;
+	//return ent->HEALTH / ent->MAXHEALTH;
 }
 
 var unit_initHealth(ENTITY* ent)
@@ -189,7 +190,7 @@ var unit_checkHit(ENTITY* ent)
 				ent->HEALTH = maxv(0, ent->HEALTH - ent->DAMAGE_HIT);
 				//deactivate directly in order to avoid single frame gap
 				if (ent->HEALTH <= 0)
-					unit_deactivate(ent);
+				unit_deactivate(ent);
 				ret = 1;
 			}
 			ent->DAMAGE_HIT = 0;
@@ -227,12 +228,13 @@ ENTITY* unit_findNextVictim(ENTITY* ptr, var unittype)
 
 ENTITY* unit_findNextVictim(ENTITY* ptr)
 {
+	error("unit_findNextVictim");
 	/* following requirements have to be met for auto-picking of next victim
-	   1) no victim active
-	   2) unit type of last victim is still valid
+	1) no victim active
+	2) unit type of last victim is still valid
 
-	   if unit type of last victim is cleared, no new victim is searched
-	 */
+	if unit type of last victim is cleared, no new victim is searched
+	*/
 
 	if (unit_getVictim(ptr) == NULL && ptr->ENTITY_VICTIMTYPE != UNIT_INVALID)
 	{
@@ -249,7 +251,7 @@ ENTITY* unit_findNextVictim(ENTITY* ptr)
 		}
 		else
 		{
-		//error("searching");
+			//error("searching");
 			if (mapGetNearbyUnitsOfTypeForPos(ptr->x, ptr->ENTITY_VICTIMTYPE, ptr->OWNER, 2000, 1) > 0)
 			{
 				ent = jpsGetEntityFromUnitArray(0);

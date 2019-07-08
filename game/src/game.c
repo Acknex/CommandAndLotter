@@ -67,7 +67,9 @@ void game_open(void)
 	SKULL_Init();
 	SPAWNER_Init();
 	Z_Init();
-	stub_init(); //hook debug shit here
+	//stub_init(); //hook debug shit here
+	spawner_spawn(UNIT_EYE, vector(256,6100,500), 0, PLAYER_ID_PLAYER);
+	camera.y = 6100;
 
 	grid_open(50,50);
 	buildingPlacement_open();

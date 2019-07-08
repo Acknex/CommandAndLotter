@@ -47,7 +47,7 @@
 		int totalCost;
 		LIST *unitList;
 		int numUnits[MAX_PLAYERS];
-		void *unitArray[MAX_UNITS_PER_TILE];
+		void *unitArray[MAX_PLAYERS][MAX_UNITS_PER_TILE];
 		struct _TILE *prev;
 	};
 	typedef struct _TILE TILE;
@@ -61,7 +61,10 @@
 	};
 	typedef struct _JPSPATH JPSPATH; // PATH might be an acknex keyword
 
-
+#define ARMOR_TYPE_HUMANS 0
+#define ARMOR_TYPE_VEHICLE_LIGHT 1
+#define ARMOR_TYPE_VEHICLE_HEAVY 2
+#define ARMOR_TYPE_MAX 3
 	#define MAX_PRESETS UNIT_CLASSES
 	struct _UNIT_PRESET
 	{
@@ -69,10 +72,12 @@
 		char file[32];
 		float maxSpeed;
 		int maxHP;
+		int armorType;
 		var radius;
 	};
 	typedef struct _UNIT_PRESET UNIT_PRESET;
 	UNIT_PRESET unitPresets[MAX_PRESETS];
+
 
 	#define MAX_TURNS 2
 	struct _UNIT
@@ -82,39 +87,53 @@
 		int isActive;
 		int isMoving;
 		int allowMovement;
+		int allowLogic;
+		int uniqueID;
+		int targetReached;
 		int HP;
 		int speed;
-		VECTOR pos2d, pos3d, prevPos3d;
-		VECTOR target2d, prevTarget2d, currentTarget2d;
+		int flaggedForDeletion; // values: 0,1,2
+		var attackCooldown;
+		int attackMove;
+		float speedFac;
+		VECTOR pos2d, pos3d, prevPos3d, currentTarget3d, target3d;
+		VECTOR target2d, prevTarget2d, currentTarget2d, speedOverwrite;
 		ENTITY* ent;
 		TILE* tile;
 		TILE* prevTile;
 		TILE* targetTile;
 		JPSPATH *jpsPath;
 		struct _UNIT *next;
+		struct _UNIT *victimUnit;
 	};
 	typedef struct _UNIT UNIT;
+
 
 	struct _PROJECTILE_PRESET
 	{
 		int ID;
-		int damage;
-		int range;
-		// particles?
+		int damage[ARMOR_TYPE_MAX];
+		float range;
+		var cooldown;
+		float speed;
 	};
 	typedef struct _PROJECTILE_PRESET PROJECTILE_PRESET;
+	PROJECTILE_PRESET projectilePresets[MAX_PRESETS];
 
 	struct _PROJECTILE
 	{
 		int presetID;
 		int playerID;
-		int isActive;
-		int lifetime;
-		VECTOR pos2d, pos3d; //[MAX_TURNS];
-		struct _PROJECTILE *next;
+		//int isActive;
+		var lifetime;
+		VECTOR pos2d, prevPos2d, target2d;
+		VECTOR pos3d, prevPos3d;
+		UNIT* victim;
+		//struct _PROJECTILE *next;
 	};
 	typedef struct _PROJECTILE PROJECTILE;
 	
+	#define MAX_PROJECTILES 1024
 	struct _MAP
 	{
 		int size[2];
@@ -125,8 +144,11 @@
 		// quant and 3d stuff
 		VECTOR vMin, vMax, vSize;
 		var tileSize;
+		int numUnits[MAX_PLAYERS];
 		UNIT *unitFirst[MAX_PLAYERS];
-		PROJECTILE *projectileFirst[MAX_PLAYERS];
+		//PROJECTILE *projectileFirst[MAX_PLAYERS];
+		int numProjectiles[MAX_PLAYERS];
+		PROJECTILE projectiles[MAX_PLAYERS][MAX_PROJECTILES];
 	};
 	typedef struct _MAP MAP;
 	MAP* mapCurrent = NULL;
@@ -160,6 +182,8 @@
 
 	void unitSetTargetFromVector2D(MAP* map, UNIT* unit, VECTOR *vTarget);
 
+	void jpsUnitSetEnemyTargetUnit(MAP* map, UNIT* unit, UNIT* victimUnit);
+
 	TILE* mapGetTileFromVector(MAP* map, VECTOR* v);
 
 	BMAP* mapGetBitmap(MAP* map);
@@ -167,11 +191,12 @@
 	void jpsGameUpdate(MAP* map);
 	
 	UNIT* jpsAllowMovementForEntity(ENTITY* ptr, int allow);
+	UNIT* jpsAllowForEntity(ENTITY* ptr, int allow);
 	
 	void mapSetTileValueAtPos3D(MAP* map, VECTOR* pos3d, int value);
 	int mapGetTileValueAtPos3D(MAP* map, VECTOR* pos3d);
 	
-	TILE* mapGetEmptyTileForAI(MAP* map, int freeBorder);
+	TILE* mapGetEmptyTileForAI(MAP* map, int freeBorder, int jShift);
 
 	// firo, use this:
 	int mapGetNearbyUnitsOfTypeForPos(VECTOR *vpos, int typeID, int owner, var maxDistance, int maxNumEntities);
