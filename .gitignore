@@ -10,3 +10,5 @@ game/src/ackerr.txt
 game/ackerr.txt
 game/assets/fow_fog2.png
 *~
+/game/build.log
+/game/main.cd

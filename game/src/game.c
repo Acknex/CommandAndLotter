@@ -43,7 +43,7 @@ void game_open(void)
 	#ifdef GAME_OPEN_DEBUG
 		cprintf0("\n - calling jpsMapLoadFromFile() now...");
 	#endif
-	int loadResult = (jpsMapLoadFromFile("map0.txt") != NULL);
+	int loadResult = (jpsMapLoadFromFile("media\\map0.txt") != NULL);
 	#ifdef GAME_OPEN_DEBUG
 		cprintf1(" result: %d", loadResult);
 		cprintf0("\n - calling maploader_load() now...");
