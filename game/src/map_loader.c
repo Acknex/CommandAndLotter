@@ -143,7 +143,7 @@ void maploader_load(char const * fileName)
 
 			((maploader.cells)[maploader.w * y + x]).celltype = type;
 			((maploader.cells)[maploader.w * y + x]).vegetation = col.green / 255.0;
-            ((maploader.cells)[maploader.w * y + x]).elevation = col.blue * 3;
+            ((maploader.cells)[maploader.w * y + x]).elevation = col.blue * 2+80;
             ((maploader.cells)[maploader.w * y + x]).zettiness = 1.0 - alpha / 100.0;
             ((maploader.cells)[maploader.w * y + x]).streetyness = col.red / 255.0;
 		}

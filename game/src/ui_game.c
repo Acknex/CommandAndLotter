@@ -25,11 +25,6 @@ void ui_destroy_event_sputnik(var num, PANEL *panel)
 	ent->ENTITY_STATE = 4;
 }
 
-void ui_place_building(var num, PANEL *panel)
-{
-	buildingPlacement_beginConstruction(num - 2);
-}
-
 void ui_show_commando_groups()
 {
 	switch(ui_command_group_status)
@@ -237,6 +232,38 @@ void ui_minimap_click(PANEL *panel)
 	topdown_camera_set_pos(vector(mpx, mpy, camera.z));
 }
 
+int buildingsAllowed[6] = { 1,1,0,0,1,0 };
+
+
+void ui_place_building(var num, PANEL *panel)
+{
+	num -= 2;
+	if(buildingsAllowed[num]) buildingPlacement_beginConstruction(num);
+}
+
+PANEL* ui_build_no =
+{
+	bmap = ui_icon_no;
+	layer = 99999;
+}
+
+void ui_place_building_is_allowed(var num, PANEL *panel)
+{
+	num -= 2;
+	if(!buildingsAllowed[num])
+	{
+		cprintf2("\n ui_place_building_is_allowed at frame %d: num(%d)", (int)total_frames, (int)num);
+		//draw_quad(ui_icon_no,vector(ui_game_menu.pos_x+15,ui_game_menu.pos_y+134+108*num,0),NULL,NULL,NULL,NULL,100,0);
+		set(ui_build_no,SHOW);
+		ui_build_no.scale_x = scale_factor_x;
+		ui_build_no.scale_y = scale_factor_y;
+		ui_build_no.pos_x = ui_game_menu.pos_x+15*scale_factor_x;
+		ui_build_no.pos_y = ui_game_menu.pos_y+(134+108*num)*scale_factor_y;
+	}
+	else reset(ui_build_no,SHOW);
+}
+
+
 void ui_game_init()
 {
 	scale_factor_x = screen_size.x / 1920;
@@ -266,11 +293,11 @@ void ui_game_init()
 
 	pan_setbutton(ui_game_menu, 0, 0, 1, 151, ui_hide_button_p, ui_hide_button_n, ui_hide_button_o, ui_hide_button_n, ui_show_commando_groups, NULL, NULL);
 
-	pan_setbutton(ui_game_menu, 0, 4, 15, 134, ui_icon_press_o, ui_icon_press, ui_icon_press_o, ui_icon_press, ui_place_building, NULL, NULL);
-	pan_setbutton(ui_game_menu, 0, 4, 15, 242, ui_icon_farm_o, ui_icon_farm, ui_icon_farm_o, ui_icon_farm, ui_place_building, NULL, NULL);
-	pan_setbutton(ui_game_menu, 0, 4, 15, 350, ui_icon_tree_o, ui_icon_tree, ui_icon_tree_o, ui_icon_tree, ui_place_building, NULL, NULL);
-	pan_setbutton(ui_game_menu, 0, 4, 15, 458, ui_icon_tower_o, ui_icon_tower, ui_icon_tower_o, ui_icon_tower, ui_place_building, NULL, NULL);
-	pan_setbutton(ui_game_menu, 0, 4, 15, 564, ui_icon_bank_o, ui_icon_bank, ui_icon_bank_o, ui_icon_bank, ui_place_building, NULL, NULL);
+	pan_setbutton(ui_game_menu, 0, 4, 15, 134, ui_icon_press_o, ui_icon_press, ui_icon_press_o, ui_icon_press, ui_place_building, NULL, ui_place_building_is_allowed);
+	pan_setbutton(ui_game_menu, 0, 4, 15, 242, ui_icon_farm_o, ui_icon_farm, ui_icon_farm_o, ui_icon_farm, ui_place_building, NULL, ui_place_building_is_allowed);
+	pan_setbutton(ui_game_menu, 0, 4, 15, 350, ui_icon_tree_o, ui_icon_tree, ui_icon_tree_o, ui_icon_tree, ui_place_building, NULL, ui_place_building_is_allowed);
+	pan_setbutton(ui_game_menu, 0, 4, 15, 458, ui_icon_tower_o, ui_icon_tower, ui_icon_tower_o, ui_icon_tower, ui_place_building, NULL, ui_place_building_is_allowed);
+	pan_setbutton(ui_game_menu, 0, 4, 15, 566, ui_icon_bank_o, ui_icon_bank, ui_icon_bank_o, ui_icon_bank, ui_place_building, NULL, ui_place_building_is_allowed);
 
 	ui_open_game_menu->bmap = ui_icon_hammer;
 	pan_setbutton(ui_open_game_menu, 0, 0, 0, 0, ui_icon_hammer_o, ui_icon_hammer, ui_icon_hammer_o, NULL, ui_show_commando_groups, NULL, NULL);
@@ -431,6 +458,7 @@ void ui_game_update()
 		}
 	}*/
 
+	if(mouse_pos.x < ui_game_menu.pos_x || mouse_pos.y < ui_game_menu.pos_y || mouse_pos.y > ui_game_menu.pos_y+696) reset(ui_build_no,SHOW);
 	scale_factor_x = screen_size.x / 1920;
 	scale_factor_y = screen_size.y / 1080;
 

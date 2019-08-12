@@ -95,6 +95,7 @@ BMAP *ui_icon_bank = "build_menu_bank_n.png";
 BMAP *ui_icon_bank_o = "build_menu_bank_o.png";
 BMAP *ui_icon_tower = "build_menu_tower_n.png";
 BMAP *ui_icon_tower_o = "build_menu_tower_o.png";
+BMAP *ui_icon_no = "build_menu_no.png";
 
 BMAP *ui_face_cbabe1 = "CbFace1.png";
 BMAP *ui_face_cbabe2 = "CbFace2.png";
